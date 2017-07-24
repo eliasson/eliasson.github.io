@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>A BitTorrent client in Python 3.5 &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">A BitTorrent client in Python 3.5</h1>
+                        <div class="tidy-article-ingress">
+                            <p>Python 3.5 comes with support for asynchronous IO, which seems like a perfect fit when implementing a BitTorrent client. This article will guide you through the BitTorrent protocol details while showcasing how a small client was implemented using it.</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/python">Python</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/bittorrent">BitTorrent</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Wednesday, August 24, 2016
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>When Python 3.5 was released together with the new module asyncio I was curios to give it a try. Recently I decided to implement a simple BitTorrent client using asyncio - I have always been interested in peer-to-peer protocols and it seemed like a perfect fit.</p>
+
+<p>The project is named <strong>Pieces</strong>, all of the source code is available at <a href="https://github.com/eliasson/pieces">GitHub</a> and released under the Apache 2 license. Feel free to learn from it, steal from it, improve it, laugh at it or just ignore it.</p>
+
+<p>I previously posted a short <a href="/article/introduction-to-asyncio">introduction to Python&rsquo;s async module</a>. If this is your first time looking at <code>asyncio</code> it might be a good idea to read through that one first.</p>
+
+<h2 id="an-introduction-to-bittorrent">An introduction to BitTorrent</h2>
+
+<p>BitTorrent has been around since 2001 when <a href="https://en.wikipedia.org/wiki/Bram_Cohen">Bram Cohen</a> authored the first version of the protocol. The big breakthrough was when sites as <em>The Pirate Bay</em> made it popular to use for downloading pirated material. Streaming sites, such as Netflix, might have resulted in a decrease of people using BitTorrent for downloading movies. But BitTorrent is still used in a number of different, legal, solutions where distribution of larger files are important.</p>
+
+<ul>
+<li><a href="https://torrentfreak.com/facebook-uses-bittorrent-and-they-love-it-100625/">Facebook</a> use it to distribute updates within their huge data centers</li>
+<li><a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/S3Torrent.html">Amazon S3</a> implement it for downloading of static files</li>
+<li>Traditional downloads still used for larger files such as <a href="http://www.ubuntu.com/download/alternative-downloads">Linux distributions</a></li>
+</ul>
+
+<p>BitTorrent is a peer-to-peer protocol, where <em>peers</em> join a <em>swarm</em> of other peers to exchange pieces of data between each other. Each peer is connected to multiple peers at the same time, and thus downloading or uploading to multiple peers at the same time. This is great in terms of limiting bandwidth compared to when a file is downloaded from a central server. It is also great for keeping a file available as it does not rely on a single source being online.</p>
+
+<p>There is a <code>.torrent</code> file that regulates how many pieces there is for a given file(s), how these should be exchanged between peers, as well as how the data integrity of these pieces can be confirmed by clients.</p>
+
+<p>While going through the implementation it might be good to have read, or to have another tab open with the <a href="https://wiki.theory.org/BitTorrentSpecification">Unofficial BitTorrent Specification</a>. This is without a doubt the best source of information on the BitTorrent protocol. The official specification is vague and lacks certain details so the unofficial is the one you want to study.</p>
+
+<h3 id="parsing-a-torrent-file">Parsing a .torrent file</h3>
+
+<p>The first thing a client needs to do is to find out what it is supposed to download and from where. This information is what is stored in the <code>.torrent</code> file, a.k.a. the <em>meta-info</em>. There is a number of properties stored in the <em>meta-info</em> that we need in order to successfully implement a client.</p>
+
+<p>Things like:</p>
+
+<ul>
+<li>The name of the file to download</li>
+<li>The size of the file to download</li>
+<li>The URL to the tracker to connect to</li>
+</ul>
+
+<p>All these properties are stored in a binary format called <em>Bencoding</em>.</p>
+
+<p>Bencoding supports four different data types, <em>dictionaries</em>, <em>lists</em>, <em>integers</em> and <em>strings</em> - it is fairly easy translate to Python&rsquo;s <em>object literals</em> or <em>JSON</em>.</p>
+
+<p>Below is bencoding described in <a href="https://en.wikipedia.org/wiki/Augmented_Backus–Naur_Form">Augmented Backus-Naur Form</a> courtesy of the <a href="https://hackage.haskell.org/package/bencoding-0.4.3.0/docs/Data-BEncode.html">Haskell library</a>.</p>
+
+<pre><code>&lt;BE&gt;    ::= &lt;DICT&gt; | &lt;LIST&gt; | &lt;INT&gt; | &lt;STR&gt;
+
+&lt;DICT&gt;  ::= &quot;d&quot; 1 * (&lt;STR&gt; &lt;BE&gt;) &quot;e&quot;
+&lt;LIST&gt;  ::= &quot;l&quot; 1 * &lt;BE&gt;         &quot;e&quot;
+&lt;INT&gt;   ::= &quot;i&quot;     &lt;SNUM&gt;       &quot;e&quot;
+&lt;STR&gt;   ::= &lt;NUM&gt; &quot;:&quot; n * &lt;CHAR&gt;; where n equals the &lt;NUM&gt;
+
+&lt;SNUM&gt;  ::= &quot;-&quot; &lt;NUM&gt; / &lt;NUM&gt;
+&lt;NUM&gt;   ::= 1 * &lt;DIGIT&gt;
+&lt;CHAR&gt;  ::= %
+&lt;DIGIT&gt; ::= &quot;0&quot; | &quot;1&quot; | &quot;2&quot; | &quot;3&quot; | &quot;4&quot; | &quot;5&quot; | &quot;6&quot; | &quot;7&quot; | &quot;8&quot; | &quot;9&quot;
+</code></pre>
+
+<p>In <em>pieces</em> the encoding and decoding of <em>bencoded</em> data is implemented in the <code>pieces.bencoding</code> module (<a href="https://github.com/eliasson/pieces/blob/master/pieces/bencoding.py">source code</a>).</p>
+
+<p>Here are a few examples decoding bencoded data into a Python representation using that module.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; from pieces.bencoding import Decoder
+
+# An integer value starts with an 'i' followed by a series of
+# digits until terminated with a 'e'.
+&gt;&gt;&gt; Decoder(b'i123e').decode()
+123
+
+# A string value, starts by defining the number of characters
+# contained in the string, followed by the actual string.
+# Notice that the string returned is a binary string, not unicode.
+&gt;&gt;&gt; Decoder(b'12:Middle Earth').decode()
+b'Middle Earth'
+
+# A list starts with a 'l' followed by any number of objects, until
+# terminated with an 'e'.
+# As in Python, a list may contain any type of object.
+&gt;&gt;&gt; Decoder(b'l4:spam4:eggsi123ee').decode()
+[b'spam', b'eggs', 123]
+
+# A dict starts with a 'd' and is terminated with a 'e'. objects
+# in between those characters must be pairs of string + object.
+# The order is significant in a dict, thus OrderedDict (from
+# Python 3.1) is used.
+&gt;&gt;&gt; Decoder(b'd3:cow3:moo4:spam4:eggse').decode()
+OrderedDict([(b'cow', b'moo'), (b'spam', b'eggs')])
+</code></pre>
+
+<p>Likewise, a Python object structure can be encoded into a bencoded byte string using the same module.</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; from collections import OrderedDict
+&gt;&gt;&gt; from pieces.bencoding import Encoder
+
+&gt;&gt;&gt; Encoder(123).encode()
+b'i123e'
+
+&gt;&gt;&gt; Encoder('Middle Earth').encode()
+b'12:Middle Earth'
+
+&gt;&gt;&gt; Encoder(['spam', 'eggs', 123]).encode()
+bytearray(b'l4:spam4:eggsi123ee')
+
+&gt;&gt;&gt; d = OrderedDict()
+&gt;&gt;&gt; d['cow'] = 'moo'
+&gt;&gt;&gt; d['spam'] = 'eggs'
+&gt;&gt;&gt; Encoder(d).encode()
+bytearray(b'd3:cow3:moo4:spam4:eggse')
+</code></pre>
+
+<p>These examples can also be found in the <a href="https://github.com/eliasson/pieces/blob/master/tests/test_bendoding.py">unit tests</a>.</p>
+
+<p>The parser implementation is pretty straight forward, no asyncio is used here though, not even reading the <code>.torrent</code> from disk.</p>
+
+<p>Using the parser from <code>pieces.bencoding</code>, let&rsquo;s open the <code>.torrent</code> for the popular Linux distribution Ubuntu:</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; with open('tests/data/ubuntu-16.04-desktop-amd64.iso.torrent', 'rb') as f:
+...     meta_info = f.read()
+...     torrent = Decoder(meta_info).decode()
+...
+&gt;&gt;&gt; torrent
+OrderedDict([(b'announce', b'http://torrent.ubuntu.com:6969/announce'), (b'announce-list', [[b'http://torrent.ubuntu.com:6969/announce'], [b'http://ipv6.torrent.ubuntu.com:6969/announce']
+]), (b'comment', b'Ubuntu CD releases.ubuntu.com'), (b'creation date', 1461232732), (b'info', OrderedDict([(b'length', 1485881344), (b'name', b'ubuntu-16.04-desktop-amd64.iso'), (b'piece
+length', 524288), (b'pieces', b'\x1at\xfc\x84\xc8\xfaV\xeb\x12\x1c\xc5\xa4\x1c?\xf0\x96\x07P\x87\xb8\xb2\xa5G1\xc8L\x18\x81\x9bc\x81\xfc8*\x9d\xf4k\xe6\xdb6\xa3\x0b\x8d\xbe\xe3L\xfd\xfd4\...')]))])
+</code></pre>
+
+<p>Here you can read see some of the <em>meta-data</em> such as the name of the destination file (ubuntu-16.04-desktop-amd64.iso) and the total size in bytes (1485881344).</p>
+
+<p>Notice how the keys used in the <code>OrderedDict</code> are <em>binary</em> strings. Bencoding is a binary protocol, and using UTF-8 strings as keys <em>will not work</em>!</p>
+
+<p>A wrapper class <code>pieces.torrent.Torrent</code> exposing these properties is implemented abstracting the binary strings, and other details away from the rest of the client. This class only implements the attributes used in pieces client.</p>
+
+<p>I will not go through which attributes that is available, instead the rest of this article will refer back to attributes found in the <code>.torrent</code> / <em>meta-info</em> were used.</p>
+
+<h3 id="connecting-to-the-tracker">Connecting to the tracker</h3>
+
+<p>Now that we can decode a <code>.torrent</code> file and we have a Python representation of the data, we need to get a list of peers to connect with. This is where the tracker comes in. A tracker is a central server keeping track of available peers for a given torrent. A tracker does <strong>NOT</strong> contain any of the torrent data, only which peers that can be connected to and their statistics.</p>
+
+<h4 id="building-the-request">Building the request</h4>
+
+<p>The <code>announce</code> property in the <em>meta-info</em> is the HTTP URL to the tracker to connect to using the following URL parameters:</p>
+
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th> Description</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>info_hash</td>
+<td>The SHA1 hash of the info dict found in the <code>.torrent</code></td>
+</tr>
+
+<tr>
+<td>peer_id</td>
+<td>A unique ID generated for this client</td>
+</tr>
+
+<tr>
+<td>uploaded</td>
+<td>The total number of bytes uploaded</td>
+</tr>
+
+<tr>
+<td>downloaded</td>
+<td>The total number of bytes downloaded</td>
+</tr>
+
+<tr>
+<td>left</td>
+<td>The number of bytes left to download for this client</td>
+</tr>
+
+<tr>
+<td>port</td>
+<td>The TCP port this client listens on</td>
+</tr>
+
+<tr>
+<td>compact</td>
+<td>Whether or not the client accepts a compacted list of peers or not</td>
+</tr>
+</tbody>
+</table>
+
+<p>The peer_id needs to be exactly 20 bytes, and there are two major conventions used on how to generate this ID. Pieces follows the <a href="https://wiki.theory.org/BitTorrentSpecification#peer_id">Azureus-style</a> convention generating peer id like:</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; import random
+# -&lt;2 character id&gt;&lt;4 digit version number&gt;-&lt;random numbers&gt;
+&gt;&gt;&gt; '-PC0001-' + ''.join([str(random.randint(0, 9)) for _ in range(12)])
+'-PC0001-478269329936'
+</code></pre>
+
+<p>A tracker request can look like this using <a href="https://github.com/jkbrzt/httpie">httpie</a>:</p>
+
+<pre><code class="language-http">http GET &quot;http://torrent.ubuntu.com:6969/announce?info_hash=%90%28%9F%D3M%FC%1C%F8%F3%16%A2h%AD%D85L%853DX&amp;peer_id=-PC0001-706887310628&amp;uploaded=0&amp;downloaded=0&amp;left=699400192&amp;port=6889&amp;compact=1&quot;
+HTTP/1.0 200 OK
+Content-Length: 363
+Content-Type: text/plain
+Pragma: no-cache
+
+d8:completei3651e10:incompletei385e8:intervali1800e5:peers300:£¬%ËÌyOkÝ.ê@_&lt;K+Ô\Ý Ámb^TnÈÕ^AËO*ÈÕ1*ÈÕ&gt;¥³ÈÕBä)ðþ¸ÐÞ¦Ô/ãÈÕÈuÉæÈÕ
+...
+</code></pre>
+
+<p><em>The response data is truncated since it contains binary data that screws up the Markdown formatting.</em></p>
+
+<p>From the tracker response, there is two properties of interest:</p>
+
+<ul>
+<li><strong>interval</strong> - The interval in seconds until the client should make a new announce call to the tracker.</li>
+<li><strong>peers</strong> - The list of peers is a binary string with a length of multiple of 6 bytes. Where each peer consist of a 4 byte IP address and a 2 byte port number (since we are using the compact format).</li>
+</ul>
+
+<p>So, a successful announce call made to the tracker, gives you a list of peers to connect to. This might not be all available peers in this swarm, only the peers the tracker assigned your client to connect. A subsequent call to the tracker might result in another list of peers.</p>
+
+<h4 id="async-http">Async HTTP</h4>
+
+<p>Python does not come with a built-in support for async HTTP and my beloved <a href="https://github.com/kennethreitz/requests">requests library</a> does not implement asyncio either. Scouting around the Internet it looks like most use <a href="https://github.com/KeepSafe/aiohttp">aiohttp</a>, which implement both a HTTP client and server.</p>
+
+<p>Pieces use <code>aiohttp</code> in the <code>pieces.tracker.Tracker</code> class for making the HTTP request to the tracker announce url. A shortened version of that code is this:</p>
+
+<pre><code class="language-python">async def connect(self,
+                    first: bool=None,
+                    uploaded: int=0,
+                    downloaded: int=0):
+    params = { ...}
+    url = self.torrent.announce + '?' + urlencode(params)
+
+    async with self.http_client.get(url) as response:
+        if not response.status == 200:
+            raise ConnectionError('Unable to connect to tracker')
+        data = await response.read()
+        return TrackerResponse(bencoding.Decoder(data).decode())
+</code></pre>
+
+<p>The method is declared using <code>async</code> and uses the new <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-context-managers-and-async-with">asynchronous context manager</a> <code>async with</code> to allow being suspended while the HTTP call is being made. Given a successful response, this method will be suspended again while reading the binary response data <code>await response.read()</code>. Finally the response data is wrapped in a <code>TrackerResponse</code> instance containing the list of peers, alternative an error message.</p>
+
+<p>The result of using <code>aiohttp</code> is that our event loop is free to schedule other work while we have an outstanding request to the tracker.</p>
+
+<p>See the module <code>pieces.tracker</code> <a href="https://github.com/eliasson/pieces/blob/master/pieces/tracker.py">source code</a> for full details.</p>
+
+<h3 id="the-loop">The loop</h3>
+
+<p>Everything up to this point could really have been made synchronously, but now that we are about to connect to multiple peers we need to go asynchronous.</p>
+
+<p>The main function in <code>pieces.cli</code> is responsible for setting up the asyncio event loop. If we get rid of some <code>argparse</code> and error handling details it would look something like this (see <a href="https://github.com/eliasson/pieces/blob/master/pieces/cli.py">cli.py</a> for the full details).</p>
+
+<pre><code class="language-python">import asyncio
+
+from pieces.torrent import Torrent
+from pieces.client import TorrentClient
+
+loop = asyncio.get_event_loop()
+client = TorrentClient(Torrent(args.torrent))
+task = loop.create_task(client.start())
+
+try:
+    loop.run_until_complete(task)
+except CancelledError:
+    logging.warning('Event loop was canceled')
+</code></pre>
+
+<p>We start off by getting the default event loop for this thread. Then we construct the <code>TorrentClient</code> with the given <code>Torrent</code> (meta-info). This will parse the <code>.torrent</code> file and validate everything is ok.</p>
+
+<p>Calling the <code>async</code> method <code>client.start()</code> and wrapping that in a <code>asyncio.Future</code> and later adding that future and instructing the event loop to keep running until that task is complete.</p>
+
+<p>Is that it? No, not really - we have our own loop (<strong>not</strong> event loop) implemented in the <code>pieces.client.TorrentClient</code> that sets up the peer connections, schedules the announce call, etc.</p>
+
+<p><code>TorrentClient</code> is something like a work coordinator, it starts by creating a <a href="https://docs.python.org/3/library/asyncio-queue.html">async.Queue</a> which will hold the list of available peers that can be connected to.</p>
+
+<p>Then it constructs <em>N</em> number of <code>pieces.protocol.PeerConnection</code> which will consume peers from off the queue. These <code>PeerConnection</code> instances will wait (<code>await</code>) until there is a peer available in the <code>Queue</code> for one of them to connect to (<em>not blocking</em>).</p>
+
+<p>Since the queue is empty to begin with, no <code>PeerConnection</code> will do any real work until we populate it with peers it can connect to. This is done in a loop inside of <code>TorrentClient.start</code>.</p>
+
+<p>Let&rsquo;s have a look at this loop:</p>
+
+<pre><code class="language-python">async def start(self):
+    self.peers = [PeerConnection(self.available_peers,
+                                    self.tracker.torrent.info_hash,
+                                    self.tracker.peer_id,
+                                    self.piece_manager,
+                                    self._on_block_retrieved)
+                    for _ in range(MAX_PEER_CONNECTIONS)]
+
+    # The time we last made an announce call (timestamp)
+    previous = None
+    # Default interval between announce calls (in seconds)
+    interval = 30*60
+
+    while True:
+        if self.piece_manager.complete:
+            break
+        if self.abort:
+            break
+
+        current = time.time()
+        if (not previous) or (previous + interval &lt; current):
+            response = await self.tracker.connect(
+                first=previous if previous else False,
+                uploaded=self.piece_manager.bytes_uploaded,
+                downloaded=self.piece_manager.bytes_downloaded)
+
+            if response:
+                previous = current
+                interval = response.interval
+                self._empty_queue()
+                for peer in response.peers:
+                    self.available_peers.put_nowait(peer)
+        else:
+            await asyncio.sleep(5)
+    self.stop()
+</code></pre>
+
+<p>Basically, what that loop does is to:</p>
+
+<ol>
+<li>Check if we have downloaded all pieces</li>
+<li>Check if user aborted download</li>
+<li>Make a annouce call to the tracker if needed</li>
+<li>Add any retrieved peers to a queue of available peers</li>
+<li>Sleep 5 seconds</li>
+</ol>
+
+<p>So, each time an announce call is made to the tracker, the list of peers to connect to is reset, and if no peers are retrieved, no <code>PeerConnection</code> will run. This goes on until the download is complete or aborted.</p>
+
+<h3 id="the-peer-protocol">The peer protocol</h3>
+
+<p>After receiving a peer IP and port-number from the tracker, our client will to open a TCP connection to that peer. Once the connection is open, these peers will start to exchange messages using the peer protocol.</p>
+
+<p>First, lets go through the different parts of the peer protocol, and then go through how it is all implemented.</p>
+
+<h4 id="handshake">Handshake</h4>
+
+<p>The first message sent needs to be a <code>Handshake</code> message, and it is the connecting client that is responsible for initiating this.</p>
+
+<p>Immediately after sending the Handshake, our client should receive a Handshake message sent from the remote peer.</p>
+
+<p>The <code>Handshake</code> message contains two fields of importance:</p>
+
+<ul>
+<li><strong>peer_id</strong> - The unique ID of either peer</li>
+<li><strong>info_hash</strong> - The SHA1 hash value for the info dict</li>
+</ul>
+
+<p>If the <code>info_hash</code> does not match the torrent we are about to download, we
+close the connection.</p>
+
+<p>Immediately after the Handshake, the remote peer <em>may</em> send a <code>BitField</code> message. The <code>BitField</code> message serves to inform the client on which pieces the remote peer have. Pieces support receiving a <code>BitField</code> message, and most BitTorrent clients seems to send it - but since pieces currently does not support seeding, it is never sent, only received.</p>
+
+<p>The <code>BitField</code> message payload contains a sequence of bytes that when read binary each bit will represent one piece. If the bit is <code>1</code> that means that the peer <em>have</em> the piece with that index, while <code>0</code> means that the peer <em>lacks</em> that piece. I.e. Each byte in the payload represent up to 8 pieces with any spare bits set to <code>0</code>.</p>
+
+<p>Each client starts in the state <em>choked</em> and <em>not interested</em>. That means that the client is not allowed to request pieces from the remote peer, nor do we have intent of being interested.</p>
+
+<ul>
+<li><strong>Choked</strong> A choked peer is not allowed to request any pieces from the other peer.</li>
+<li><strong>Unchoked</strong> A unchoked peer is allowed to request pieces from the other peer.</li>
+<li><strong>Interested</strong> Indicates that a peer is interested in requesting pieces.</li>
+<li><strong>Not interested</strong> Indicates that the peer is not interested in requesting pieces.</li>
+</ul>
+
+<p><em>Consider <strong>Choked</strong> and <strong>Unchoked</strong> to be rules and <strong>Interested</strong> and <strong>Not Interested</strong> to be intents between two peers.</em></p>
+
+<p>After the handshake we send an <code>Interested</code> message to the remote peer, telling that we would like to get <em>unchoked</em> in order to start requesting pieces.</p>
+
+<p>Until the client receives an <code>Unchoke</code> message - it may <strong>not</strong> request a piece from its remote peer - the <code>PeerConnection</code> will be choked (passive) until either <em>unchoked</em> or <em>disconnected</em>.</p>
+
+<p>The following sequence of messages is what we are aiming for when setting up a <code>PeerConnection</code>:</p>
+
+<pre><code>              Handshake
+    client --------------&gt; peer    We are initiating the handshake
+
+              Handshake
+    client &lt;-------------- peer    Comparing the info_hash with our hash
+
+              BitField
+    client &lt;-------------- peer    Might be receiving the BitField
+
+             Interested
+    client --------------&gt; peer    Let peer know we want to download
+
+              Unchoke
+    client &lt;-------------- peer    Peer allows us to start requesting pieces
+</code></pre>
+
+<h4 id="requesting-pieces">Requesting pieces</h4>
+
+<p>As soon as the client gets into a <em>unchoked</em> state it will start requesting pieces from the connected peer. The details surrounding which piece to request is detailed later, in <a href="#managing-the-pieces">Managing the pieces</a>.</p>
+
+<p>If we know that the other peer have a given piece, we can send a <code>Request</code> message asking the remote peer to send us data for the specified piece. If the peer complies it will send us a corresponding <code>Piece</code> message where the message payload is the raw data.</p>
+
+<p>This client will only ever have one outstanding <code>Request</code> per peer and politely wait for a <code>Piece</code> message until taking the next action. Since connections to multiple peers are open concurrently, the client will have multiple <code>Requests</code> outstanding but only one per connection.</p>
+
+<p>If, for some reason, the client do not want a piece anymore, it can send a <code>Cancel</code> message to the remote peer to cancel any previously sent <code>Request</code>.</p>
+
+<h4 id="other-messages">Other messages</h4>
+
+<h5 id="have">Have</h5>
+
+<p>The remote peer can at any point in time send us a <code>Have</code> message. This is done when the remote peer have received a piece and makes that piece available for its connected peers to download.</p>
+
+<p>The <code>Have</code> message payload is the piece index.</p>
+
+<p>When pieces receive a <code>Have</code> message it updates the information on which pieces the peer has.</p>
+
+<h5 id="keepalive">KeepAlive</h5>
+
+<p>The <code>KeepAlive</code> message can be sent at anytime in either direction. The message does not hold any payload.</p>
+
+<h4 id="implementation">Implementation</h4>
+
+<p>The <code>PeerConnection</code> opens a TCP connection to a remote peer using <code>asyncio.open_connection</code> to asynchronously open a TCP connection that returns a tuple of <code>StreamReader</code> and a <code>StreamWriter</code>. Given that the connection was created successfully, the <code>PeerConnection</code> will send and receive a <code>Handshake</code> message.</p>
+
+<p>Once a handshake is made, the PeerConnection will use an asynchronous iterator to return a stream of <code>PeerMessages</code> and take the appropriate action.</p>
+
+<p>Using an async iterator separates the <code>PeerConnection</code> from the details on how to read from sockets and how to parse the BitTorrent binary protocol. The <code>PeerConnection</code> can focus on the semantics regarding the protocol - such as managing the peer state, receiving the pieces, closing the connection.</p>
+
+<p>This allows the main code in <code>PeerConnection.start</code> to basically look like:</p>
+
+<pre><code class="language-python">async for message in PeerStreamIterator(self.reader, buffer):
+    if type(message) is BitField:
+        self.piece_manager.add_peer(self.remote_id, message.bitfield)
+    elif type(message) is Interested:
+        self.peer_state.append('interested')
+    elif type(message) is NotInterested:
+        if 'interested' in self.peer_state:
+            self.peer_state.remove('interested')
+    elif type(message) is Choke:
+        ...
+</code></pre>
+
+<p>An <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-iterators-and-async-for">asynchronous iterator</a> is a class that implements the methods <code>__aiter__</code> and <code>__anext__</code> which is just async versions of Python&rsquo;s standard iterators that have implements the methods, <code>__iter__</code> and <code>next</code>.</p>
+
+<p>Upon iterating (calling next) the <code>PeerStreamIterator</code> will read data from the <code>StreamReader</code> and if enough data is available try to parse and return a valid <code>PeerMessage</code>.</p>
+
+<p>The BitTorrent protocol uses messages with variable length, where all messages takes the form:</p>
+
+<pre><code>&lt;length&gt;&lt;id&gt;&lt;payload&gt;
+</code></pre>
+
+<ul>
+<li><strong>length</strong> is a 4 byte integer value</li>
+<li><strong>id</strong> is a single decimal byte</li>
+<li><strong>payload</strong> is variable and message dependent</li>
+</ul>
+
+<p>So as soon as the buffer have enough data for the next message it will be parsed and returned from the iterator.</p>
+
+<p>All messages are decoded using Python&rsquo;s module <code>struct</code> which contains functions to convert to and from Pythons values and C structs. <a href="https://docs.python.org/3.5/library/struct.html">Struct</a> use compact strings as descriptors on what to convert, e.g. <code>&gt;Ib</code> reads as &ldquo;Big-Endian, 4 byte unsigned integer, 1 byte character.</p>
+
+<p><em>Note that all messages uses Big-Endian in BitTorrent.</em></p>
+
+<p>This makes it easy to create unit tests to encode and decode messages. Let&rsquo;s have a look on the tests for the <code>Have</code> message:</p>
+
+<pre><code class="language-python">class HaveMessageTests(unittest.TestCase):
+    def test_can_construct_have(self):
+        have = Have(33)
+        self.assertEqual(
+            have.encode(),
+            b&quot;\x00\x00\x00\x05\x04\x00\x00\x00!&quot;)
+
+    def test_can_parse_have(self):
+        have = Have.decode(b&quot;\x00\x00\x00\x05\x04\x00\x00\x00!&quot;)
+        self.assertEqual(33, have.index)
+</code></pre>
+
+<p>From the raw binary string we can tell that the Have message have a length of 5 bytes <code>\x00\x00\x00\x05</code> an id of value 4 <code>\x04</code> and the payload is 33 <code>\x00\x00\x00!</code>.</p>
+
+<p>Since the message length is 5 and ID only use a single byte we know that we have four bytes to interpret as the payload value. Using <code>struct.unpack</code> we can easily convert it to a python integer like:</p>
+
+<pre><code class="language-python">&gt;&gt;&gt; import struct
+&gt;&gt;&gt; struct.unpack('&gt;I', b'\x00\x00\x00!')
+(33,)
+</code></pre>
+
+<p>That is basically it regarding the protocol, all messages follow the same procedure and the iterator keeps reading from the socket until it gets disconnected. See the <a href="https://github.com/eliasson/pieces/blob/master/pieces/protocol.py">source code</a> for details on all messages.</p>
+
+<h3 id="managing-the-pieces">Managing the pieces</h3>
+
+<p>So far we have only discussed pieces - pieces of data being exchanged by two peers. It turns out that pieces is not the entire truth, there is one more concept - <em>blocks</em>. If you have looked through any of the source code you might have seen code refering to blocks, so lets go through what a <em>piece</em> really is.</p>
+
+<p>A <em>piece</em> is, unsurprisingly, a partial piece of the torrents data. A torrent&rsquo;s data is split into <em>N</em> number of pieces of equal size (except the last piece in a torrent, which might be of smaller size than the others). The piece length is specified in the <code>.torrent</code> file. Typically pieces are of sizes 512 kB or less, and should be a power of 2.</p>
+
+<p>Pieces are still too big to be shared efficiently between peers, so pieces are further divided into something referred to as <em>blocks</em>. Blocks is the chunks of data that is actually requested between peers, but pieces are still used to indicate which peer that have which pieces. If only blocks should have been used it would increase the overhead in the protocol greatly (resulting in longer BitFields, more Have message and larger <code>.torrent</code> files).</p>
+
+<p>A <em>block</em> is 2^14 (16384) bytes in size, except the final block that most likely will be of a smaller size.</p>
+
+<p>Consider an example where a <code>.torrent</code> describes a single file <code>foo.txt</code> to be downloaded.</p>
+
+<pre><code class="language-python">name: foo.txt
+length: 135168
+piece length: 49152
+</code></pre>
+
+<p>That small torrent would result in 3 pieces:</p>
+
+<pre><code class="language-python">piece 0: 49 152 bytes
+piece 1: 49 152 bytes
+piece 2: 36 864 bytes (135168 - 49152 - 49152)
+        = 135 168
+</code></pre>
+
+<p>Now each piece is divided into blocks in sizes of <code>2^14</code> bytes:</p>
+
+<pre><code class="language-python">piece 0:
+    block 0: 16 384 bytes (2^14)
+    block 1: 16 384 bytes
+    block 2: 16 384 bytes
+          =  49 152 bytes
+
+piece 1:
+    block 0: 16 384 bytes
+    block 1: 16 384 bytes
+    block 2: 16 384 bytes
+          =  49 152 bytes
+
+piece 2:
+    block 0: 16 384 bytes
+    block 1: 16 384 bytes
+    block 2:  4 096 bytes
+          =  36 864 bytes
+
+total:       49 152 bytes
+          +  49 152 bytes
+          +  36 864 bytes
+          = 135 168 bytes
+</code></pre>
+
+<p>Exchanging these blocks between peers is basically what BitTorrent is about. Once all blocks for a piece is done, that piece is complete and can be shared with other peers (the <code>Have</code> message is sent to connected peers). And once all pieces are complete the peer transform from a <em>downloader</em> to only be a <em>seeder</em>.</p>
+
+<p>Two notes on where the official specification is a bit off:</p>
+
+<ol>
+<li><p><em>The official specification refer to both pieces and blocks as just pieces which is quite confusing. The unofficial specification and others seem to have agreed upon using the term block for the smaller piece which is what we will use as well.</em></p></li>
+
+<li><p><em>The official specification is stating another <strong>block size</strong> that what we use. Reading the unofficial specification, it seems that 2^14 bytes is what is agreed among implementers - regardless of the official specification.</em></p></li>
+</ol>
+
+<h3 id="the-implementation">The implementation</h3>
+
+<p>When a <code>TorrentClient</code> is constructed, so is a <code>PieceManager</code> with the resposibility to:</p>
+
+<ul>
+<li>Determine which block to request next</li>
+<li>Persisting received blocks to file</li>
+<li>Determine when a download is complete.</li>
+</ul>
+
+<p>When a <code>PeerConnection</code> successfully <em>handshakes</em> with another peer and receives a <code>BitField</code> message it will inform the <code>PieceManager</code> which peer (<code>peer_id</code>) that have which pieces. This information will be updated on any received <code>Have</code> message as well. Using this information, the <code>PeerManager</code> knows the collective state on which pieces that are available from which peers.</p>
+
+<p>When the first <code>PeerConnection</code> goes into a <em>unchoked</em> state it will request the next block from its peer. The next block is determined by calling the method <code>PieceManager.next_request</code>.</p>
+
+<p>The <code>next_request</code> implements a very simple strategy on which piece to request next.</p>
+
+<ol>
+<li>When the <code>PieceManager</code> is constructed all pieces and blocks are pre-constructed based on the piece length from the <code>.torrent</code> meta-info</li>
+<li>All pieces are put in a missing list</li>
+<li>When <code>next_request</code> is called, the manager will do one of:
+
+<ul>
+<li>Re-request any previously requested block that has timed-out</li>
+<li>Requst the next block in an ongoing piece</li>
+<li>Request the first block in the next missing piece</li>
+</ul></li>
+</ol>
+
+<p>This way the blocks and pieces will be requsted in order. However, multiple pieces might be ongoing based on which piece a client have.</p>
+
+<p>Since pieces aims to be a simple client, no effort have been made on implementing a smart or efficient strategy for which pieces to request. A better solution would be to request the rarest piece first, which would make the entire swarm healthier as well.</p>
+
+<p>Whenever a block is received from a peer, it is stored (in memory) by the PieceManager. When all blocks for a piece is retrieved, a SHA1 hash is made on the piece. This hash is compared to the SHA1 hashes include in the <code>.torrent</code> info dict - if it matches the piece is written to disk.</p>
+
+<p>When all pieces are accounted for (matching hashes) the torrent is considered to be complete, which stops the <code>TorrentClient</code> closing any open TCP connection and as a result the program exits with a message that the torrent is downloaded.</p>
+
+<h3 id="future-work">Future work</h3>
+
+<p>Seeding is not yet implemented, but it should not be that hard to implement. What is needed is something along the lines of this:</p>
+
+<ul>
+<li><p>Whenever a peer is connected to, we should send a <code>BitField</code> message to the remote peer indicating which pieces we have.</p></li>
+
+<li><p>Whenever a new piece is received (and correctness of hash is confirmed), each <code>PeerConnection</code> should send a <code>Have</code> message to its remote peer to indicate the new piece that can be shared.</p></li>
+</ul>
+
+<p>In order to do this the <code>PieceManager</code> needs to be extended to return a list of 0 and 1 for the pieces we have. And the <code>TorrentClient</code> to tell the <code>PeerConnection</code> to send a <code>Have</code> to its remote peer. Both <code>BitField</code> and <code>Have</code> messages should support encoding of these messages.</p>
+
+<p>Having seeding implemented would make Pieces a good citizen, supporting both downloading and uploading of data within the swarm.</p>
+
+<p>Additional features that probably can be added without too much effort is:</p>
+
+<ul>
+<li><p><strong>Multi-file torrent</strong>, will hit <code>PieceManager</code>, since Pieces and Blocks might span over multiple files, it affects how files are persisted (i.e. a single block might contain data for more than one file).</p></li>
+
+<li><p><strong>Resume a download</strong>, by seeing what parts of the file(s) are already downloaded (verified by making SHA1 hashes).</p></li>
+</ul>
+
+<h2 id="summary">Summary</h2>
+
+<p>It was real fun to implement a BitTorrent client, having to handle binary protocols and networking was great to balance all that recent web development I have been doing.</p>
+
+<p>Python continues to be one of my favourite programming language. Handling binary data was a breeze given the <code>struct</code> module and the recent addition <code>asyncio</code> feels very pythonic. Using <em>async iterator</em> to implement the protocol  turned out to be a good fit as well.</p>
+
+<p>Hopefully this article inspired you to write a BitTorrent client of your own, or to extend pieces in some way. If you spot any error in the article or the source code, feel free to open an issue over at <a href="https://github.com/eliasson/pieces/">GitHub</a>.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'markus-eliasson';
+    var disqus_identifier = 'http:\/\/www.markuseliasson.se\/article\/bittorrent-in-python\/';
+    var disqus_title = 'A BitTorrent client in Python 3.5';
+    var disqus_url = 'http:\/\/www.markuseliasson.se\/article\/bittorrent-in-python\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+

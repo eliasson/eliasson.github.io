@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Javascript on Markus Eliasson</title>
+    <link>http://www.markuseliasson.se/tags/javascript/</link>
+    <description>Recent content in Javascript on Markus Eliasson</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 15 May 2017 22:53:30 +0200</lastBuildDate>
+    <atom:link href="http://www.markuseliasson.se/tags/javascript/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Littering in the ecosystem</title>
+      <link>http://www.markuseliasson.se/article/littering-in-the-ecosystem/</link>
+      <pubDate>Mon, 15 May 2017 22:53:30 +0200</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/littering-in-the-ecosystem/</guid>
+      <description>&lt;p&gt;The other day I was in a discussion on the general situation with JavaScript development. I argued that the JavaScript community many time feels like a youth centre, everyone trying to show off themselves and not everyone taking responsibility on what they do. I even expressed that publishing many small NPM packages should be seen as littering the JavaScript ecosystem. Heck, one &lt;a href=&#34;https://www.npmjs.com/~mafintosh&#34;&gt;developer&lt;/a&gt; published over 500 packages and this behaviour seems to be encouraged by the community.&lt;/p&gt;
+
+&lt;p&gt;Today, I revisited these thoughts and asked myself &lt;em&gt;why&lt;/em&gt; I feel this way. What is the problem with having many packages to choose from? Sure, the dependencies your application have each introduce a risk - but the choice of additional dependencies cannot be seen as a risk but a smorgasbord, right? Does my feeling have any reason, or is it just that I am unused to these small modules comparing to Java or Python ecosystems?&lt;/p&gt;
+
+&lt;p&gt;Some argue that people seems to have forgotten how to program, that we need help left padding a string. I don&amp;rsquo;t worry too much about that, using tested and proven code make sense and allows you to focus on adding value to your product or to your client.&lt;/p&gt;
+
+&lt;p&gt;After some thinking I reduced my concern down to two issues:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Discoverability&lt;/strong&gt;, having many modules sharing the same namespace makes it harder to search for a package that fit you needs. Also, using nonsense or silly package names trying to be unique does not help.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maintainability&lt;/strong&gt;, can one developer with 500 packages really maintain all of those? Just managing PR can be a tedious job. Would it not be better with fewer packages that each have several maintainers?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Think about the value your package brings, does it have to be a package? Does it really motivate a new package or can would it be better off as a module in an existing package? Can it just be a gist or a git repository allowing for people to discover and vendor if needed?&lt;/p&gt;
+
+&lt;p&gt;If you publish a package you have the responsibility throughout its life-cycle, allow your potential consumers to distinguish between an abandoned package and a fully functional package that is just feature complete.&lt;/p&gt;
+
+&lt;p&gt;Don&amp;rsquo;t get me wrong, I think that small modules are a good thing, but some of the existing ones are &lt;a href=&#34;https://github.com/gummesson/is-empty-object&#34;&gt;tiny&lt;/a&gt;, these should not be individual packages and there are far too many abandoned packages still around, littering the ecosystem.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Managing your JavaScript dependencies</title>
+      <link>http://www.markuseliasson.se/article/managing-your-javascript-dependencies/</link>
+      <pubDate>Thu, 02 Feb 2017 23:40:47 +0100</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/managing-your-javascript-dependencies/</guid>
+      <description>
+
+&lt;p&gt;Recently a colleague of mine and I had a discussion on npm dependencies, in where he asked &lt;em&gt;“Why is it bad to have many dependencies, really, why do you care?”.&lt;/em&gt; I think it is a fair question, npm gets bashed all the time for resulting in a ridiculous number of dependencies, is that really a problem?&lt;/p&gt;
+
+&lt;p&gt;I don’t think the number of dependencies is the major problem though. Sure too many dependencies can lead to &lt;a href=&#34;https://nolanlawson.com/2016/08/15/the-cost-of-small-modules/&#34;&gt;performance issues&lt;/a&gt; and Windows did have its &lt;a href=&#34;https://github.com/npm/npm/issues/3697&#34;&gt;problem&lt;/a&gt; coping with npm&amp;rsquo;s file structure. The major problem, in my experience, is that developers still - almost a year after the &lt;a href=&#34;https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&#34;&gt;left pad incident&lt;/a&gt; - do a poor job managing their dependencies.&lt;/p&gt;
+
+&lt;p&gt;The way I see it is that each dependency is a risk. It can introduce a bug, a breaking change or just disappear. If you have many dependencies (including transient dependencies) the risk that one of them will break increase the more you have. Do you trust all of these maintainers? Do you trust npm, Inc. to keep the registry online, and free, &lt;sup&gt;24&lt;/sup&gt;&amp;frasl;&lt;sub&gt;7&lt;/sub&gt;?&lt;/p&gt;
+
+&lt;p&gt;Depending on your project it might be OK not being able to reproduce a previous build. But not all organisations move fast and break things, some still work using waterfall process. There it is absolutely crucial to be able to reproduce build both during QA and after release for potential emergency corrections. Not only do you have to be able to reproduce, you might need to step only a single dependency up or down - how can you guarantee that no other dependency was changed?&lt;/p&gt;
+
+&lt;p&gt;Most of these advice is based on first-hand experience, helping a Swedish governmental organization with their frontend development.&lt;/p&gt;
+
+&lt;h2 id=&#34;use-npm&#34;&gt;Use NPM&lt;/h2&gt;
+
+&lt;p&gt;Last few years more and more developers have gone the route of just using npm for dependency management. If you are still using Bower for managing your frontend dependencies you should really let it go, it does not add anything npm cannot do and it still &lt;a href=&#34;https://github.com/bower/bower/issues/505&#34;&gt;lack important features&lt;/a&gt; such as locking versions.&lt;/p&gt;
+
+&lt;p&gt;Also, with the increase support for module exports and ES2015, I would argue that it is easier to use npm + &lt;a href=&#34;http://browserify.org&#34;&gt;Browserify&lt;/a&gt;, &lt;a href=&#34;http://rollupjs.org&#34;&gt;rollup.js&lt;/a&gt; or &lt;a href=&#34;https://webpack.github.io/&#34;&gt;webpack&lt;/a&gt; than to mix package managers.&lt;/p&gt;
+
+&lt;h2 id=&#34;use-semantic-versioning&#34;&gt;Use semantic versioning&lt;/h2&gt;
+
+&lt;p&gt;Npm comes with semantic versioning for packages and you should use that. Besides from version, npm do support &lt;a href=&#34;https://docs.npmjs.com/files/package.json#dependencies&#34;&gt;other values&lt;/a&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;HTTP URL:s&lt;/li&gt;
+&lt;li&gt;Git URL:s&lt;/li&gt;
+&lt;li&gt;File system paths&lt;/li&gt;
+&lt;li&gt;Tags&lt;/li&gt;
+&lt;li&gt;Etc.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Do &lt;strong&gt;not&lt;/strong&gt; rely on anything but semantic versions. Using any other type of dependencies will make it close to impossible to reproduce a build unless you have full control over the remote media. Also, running &lt;code&gt;npm install&lt;/code&gt; will not update git repositories, and &lt;code&gt;npm update&lt;/code&gt; might &lt;a href=&#34;https://github.com/npm/npm/issues/1727&#34;&gt;behave different&lt;/a&gt; depending on host.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Sure, it might be OK using tags during development phase, as long as you know what you are doing.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;lock-your-dependency-tree&#34;&gt;Lock your dependency tree&lt;/h2&gt;
+
+&lt;p&gt;The way npm is built, it will honour &lt;a href=&#34;https://docs.npmjs.com/misc/semver&#34;&gt;SemVer&lt;/a&gt;, but as long as your dependencies resolve accordingly (i.e. respects &lt;code&gt;*&lt;/code&gt;, &lt;code&gt;~&lt;/code&gt;, &lt;code&gt;^&lt;/code&gt; and any range definition) it will not be updated unless you explicitly run &lt;code&gt;npm update&lt;/code&gt;. And running a fresh &lt;code&gt;npm install&lt;/code&gt; might very well give two users different dependency versions based on npm cache and such.&lt;/p&gt;
+
+&lt;p&gt;So, you, your colleagues and your CI server might not be running the same version of your dependencies. Again, this might or might not be ok in your situation, but it will definitely make it harder to reproduce builds.&lt;/p&gt;
+
+&lt;p&gt;In order to solve this, npm has a built in feature called &lt;a href=&#34;https://docs.npmjs.com/cli/shrinkwrap&#34;&gt;shinkwrap&lt;/a&gt;. Using this feature the npm client will generate a parallel file named &lt;code&gt;npm-shrinkwrap.json&lt;/code&gt; that locks down the versions for all installed packages in &lt;code&gt;package.json&lt;/code&gt;, and as long as that file exist any &lt;code&gt;npm install&lt;/code&gt; will use the package versions stated therein instead of resolving according to SemVer.&lt;/p&gt;
+
+&lt;h2 id=&#34;roll-your-own-registry&#34;&gt;Roll your own registry&lt;/h2&gt;
+
+&lt;p&gt;Most rely on &lt;a href=&#34;http://www.npmjs.org&#34;&gt;http://www.npmjs.org&lt;/a&gt; when downloading packages, it&amp;rsquo;s free, it has &lt;strong&gt;tons&lt;/strong&gt; of packages and they do a great job keeping it online. Still, it is a commercial company running that service, &lt;a href=&#34;https://www.npmjs.com/about&#34;&gt;npm, Inc.&lt;/a&gt; Do you trust them to always keep your dependencies around? What if the service suddenly goes away, transfers to a paid service, or it gets bought and shut down?&lt;/p&gt;
+
+&lt;p&gt;During the left-pad incident, npm, Inc. decided to transfer a package name in use to another owner than the current owner due to brand infringement claims. What guarantee is there that something like this does not happen again?&lt;/p&gt;
+
+&lt;p&gt;What you should do is host your own repository, that proxies npmjs.org. That way you can keep a copy of all packages you rely on, including the version history (based on your installations). So even if you do not have the need to publish internal packages, keeping a proxy registry can be extremely valuable in the future, if a package is taken off the Internet.&lt;/p&gt;
+
+&lt;p&gt;There are several free, open source, solutions available - I have successfully used the npm support in &lt;a href=&#34;https://www.sonatype.com/nexus-repository-oss&#34;&gt;Sonatype Nexus&lt;/a&gt; in several projects.&lt;/p&gt;
+
+&lt;h2 id=&#34;yarn&#34;&gt;Yarn&lt;/h2&gt;
+
+&lt;p&gt;In 2016 Facebook introduced &lt;a href=&#34;https://yarnpkg.com/&#34;&gt;Yarn&lt;/a&gt;, a drop-in replacement for the npm client. It still use the same &lt;code&gt;node_modules&lt;/code&gt; directory and the same package registry as npm and can be used side-by-side with npm.&lt;/p&gt;
+
+&lt;p&gt;The most important difference Yarn has over npm is that it is deterministic. It automatically locks down all versions of your dependency tree, so everyone installing the same project will guaranteed get the exact same versions of dependencies.&lt;/p&gt;
+
+&lt;p&gt;So basically, Yarn is like npm + shrinkwrap, only better.&lt;/p&gt;
+
+&lt;p&gt;Also, besides from being deterministic and npm-compatible it is &lt;em&gt;way faster&lt;/em&gt; than npm when installing packages - you should definitely &lt;a href=&#34;https://yarnpkg.com/docs/install&#34;&gt;try it out&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;still-not-safe&#34;&gt;Still not safe&lt;/h2&gt;
+
+&lt;p&gt;Even if you do all these things you are still not safe. The way npm packages are constructed it might not contain the actual code you want, rather a package can hook up to the &lt;a href=&#34;https://docs.npmjs.com/misc/scripts&#34;&gt;npm-lifecycle&lt;/a&gt; and execute scripts as part of the installation. These scripts can do &lt;em&gt;whatever&lt;/em&gt; the executing user have access to, most commonly it download files from off the Internet and install on your system.&lt;/p&gt;
+
+&lt;p&gt;E.g. &lt;a href=&#34;https://github.com/Medium/phantomjs/blob/master/package.json&#34;&gt;&lt;code&gt;phantomjs&lt;/code&gt;&lt;/a&gt; use an install hook to download the correct version of phantom based on the current platform.&lt;/p&gt;
+
+&lt;p&gt;While this might seem like a good thing, it makes it &lt;strong&gt;very&lt;/strong&gt; hard to keep a backup of the version you rely on. An internal npm registry will only keep the package content, any &lt;code&gt;pre/post/install&lt;/code&gt; action is entirely up to the package maintainer. While some offer configuration to specify alternative URL:s for where additional files are downloaded - all such config is package specific. Another example is &lt;a href=&#34;https://github.com/sass/node-sass&#34;&gt;node-sass&lt;/a&gt; which downloads source code in order to build node bindings for libsass.&lt;/p&gt;
+
+&lt;p&gt;You need to be aware of which packages pulls stunts like this if you need to have a fully reproducible environment.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;A good way to test your builds is to block traffic to Internet during a clean build (with clean cache), that way it is easier to detect any outside source being requested.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;to-summarize&#34;&gt;To summarize&lt;/h2&gt;
+
+&lt;p&gt;The size and available options in the JavaScript ecosystem is one of its great strengths, you should use dependencies - but at least be aware of the risk they introduce. Maybe you don&amp;rsquo;t need, or cannot afford, to have 100% reproducible builds - just make sure you call that decision before the &lt;em&gt;SHTF&lt;/em&gt;.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Only use npm or yarn for package management&lt;/li&gt;
+&lt;li&gt;Use semantic versions, not tags, not git repositories, etc.&lt;/li&gt;
+&lt;li&gt;Use shrinkwrap or yarn for version locking&lt;/li&gt;
+&lt;li&gt;Use your own registry as proxy&lt;/li&gt;
+&lt;li&gt;Be aware of any package that relies on external sources&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Debugging Jest in Visual Studio Code</title>
+      <link>http://www.markuseliasson.se/article/debugging-jest-code/</link>
+      <pubDate>Wed, 23 Mar 2016 22:26:58 +0100</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/debugging-jest-code/</guid>
+      <description>&lt;p&gt;One of the reason I decided to start using
+&lt;a href=&#34;https://code.visualstudio.com&#34;&gt;Visual Studio Code&lt;/a&gt; over &lt;a href=&#34;https://atom.io&#34;&gt;Atom&lt;/a&gt;
+is due to the built-in debugger. Others are the integrated Git view, and that I
+find it faster than Atom (miss being able to have multiple projects open in the
+same window though).&lt;/p&gt;
+
+&lt;p&gt;In one of my pet-projects I started to use &lt;a href=&#34;https://github.com/facebook/jest&#34;&gt;Jest&lt;/a&gt;
+from Facebook as my Unit Testing framework of choice. And getting support for
+debugging my tests was only a matter of updating the &lt;code&gt;.vscode/launch.json&lt;/code&gt; file
+with this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+    &amp;quot;version&amp;quot;: &amp;quot;0.2.0&amp;quot;,
+    &amp;quot;configurations&amp;quot;: [
+        {
+            &amp;quot;name&amp;quot;: &amp;quot;Tests&amp;quot;,
+            &amp;quot;type&amp;quot;: &amp;quot;node&amp;quot;,
+            &amp;quot;request&amp;quot;: &amp;quot;launch&amp;quot;,
+            &amp;quot;program&amp;quot;: &amp;quot;${workspaceRoot}/node_modules/jest-cli/bin/jest.js&amp;quot;,
+            &amp;quot;stopOnEntry&amp;quot;: false,
+            &amp;quot;args&amp;quot;: [&amp;quot;--runInBand&amp;quot;],
+            &amp;quot;cwd&amp;quot;: &amp;quot;${workspaceRoot}&amp;quot;,
+            &amp;quot;preLaunchTask&amp;quot;: null,
+            &amp;quot;runtimeExecutable&amp;quot;: null,
+            &amp;quot;runtimeArgs&amp;quot;: [
+                &amp;quot;--nolazy&amp;quot;
+            ],
+            &amp;quot;env&amp;quot;: {
+                &amp;quot;NODE_ENV&amp;quot;: &amp;quot;development&amp;quot;
+            },
+            &amp;quot;externalConsole&amp;quot;: false,
+            &amp;quot;sourceMaps&amp;quot;: false,
+            &amp;quot;outDir&amp;quot;: null
+        }
+    ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The significant line here, is the use of argument &lt;code&gt;--runInBand&lt;/code&gt; which will
+cause Jest to run all tests in a single sequence in the current process
+(instead of spinning up multiple processes to run tests in parallel). You want
+to use this setting only for debugging, not for normal test runs.&lt;/p&gt;
+
+&lt;p&gt;If you have not yet tried Code, I recommend you give it a try, it&amp;rsquo;s awesome.&lt;/p&gt;
+
+&lt;p&gt;Happy hacking!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>An introduction to Python&#39;s asyncio &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">An introduction to Python&#39;s asyncio</h1>
+                        <div class="tidy-article-ingress">
+                            <p>This article gives a gentle introduction to the asyncio that arrived in Python 3.5. The purpose is to set the scene for a future article where I use asyncio to build a BitTorrent client in Python.</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/python">Python</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/bittorrent">BitTorrent</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Wednesday, August 24, 2016
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>In Python 3.4 a new module, <code>asyncio</code> was introduced, this module allows you to write <em>concurrent</em>, <em>single threaded</em> code in Python without relying on any third-party libraries (such as Twisted, or Tornado).</p>
+
+<p>I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write <em>concurrent</em> code in Python 3.5.</p>
+
+<p>Remember, <strong>concurrency</strong> is not the same as <strong>parallelism</strong>.</p>
+
+<ul>
+<li><p><strong>Concurrency</strong> is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time. This is possible with a single-core CPU.</p></li>
+
+<li><p><strong>Parallelism</strong> is when one or more functions run at the same time, this requires multi-core CPU.</p></li>
+</ul>
+
+<p><em>As a metaphor, consider when you are in the kitchen making dinner. You put your potato cake into the oven, setting your kitchen timer for 15 minutes. Meanwhile, you start frying some pork to go with it. After 15 minutes, the timer goes off with a beep, you put away the frying pan and take the cake out of the oven.</em></p>
+
+<p>Your are being concurrent, there is only one person (CPU) in the kitchen, doing multiple tasks at the same time.</p>
+
+<p>Single threaded, asynchronous programming is considered simpler than using multi-threaded programming. The reason is that you don&rsquo;t need to coordinate routines, and shared mutable state. Rather you write single-threaded programs that feels quite sequential. This is partially what made NodeJS as popular as
+it is - the async nature is built in to NodeJS and async is often default and a synchronous API is made an option.</p>
+
+<p><code>asyncio</code> gives us asynchronous I/O, thus it is suitable for file and network operations, where the process will be schedule to wait for data being available. It is <strong>not</strong> suitable for CPU-bound programming - here you need to fallback to threading or multi-processing.</p>
+
+<p>As it turns out, the intended example project - a BitTorrent client - have plenty of I/O and not so much CPU-bound work to do - it should match <code>asyncio</code> perfectly.</p>
+
+<h3 id="await-and-async">await and async</h3>
+
+<p>If you run the code snippet below, you will open two TCP connections to two of Google&rsquo;s DNS servers. Once the connection is open, we&rsquo;ll pretend to do some I/O but rather sleeping. Once the fictive work is done, the connection will be closed.</p>
+
+<p>This is all run on a single thread, yet two connections are open at the same time. If you run the program for a couple of times you will see that the order in which the connections are closed varies due to the randomized time to sleep.</p>
+
+<pre><code class="language-python">import asyncio
+from random import randint
+
+async def do_stuff(ip, port):
+    print('About to open a connection to {ip}'.format(ip=ip))
+    reader, writer = await asyncio.open_connection(ip, port)
+
+    print('Connection open to {ip}'.format(ip=ip))
+    await asyncio.sleep(randint(0, 5))
+
+    writer.close()
+    print('Closed connection to {ip}'.format(ip=ip))
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+
+    work = [
+        asyncio.ensure_future(do_stuff('8.8.8.8', '53')),
+        asyncio.ensure_future(do_stuff('8.8.4.4', '53')),
+    ]
+
+    loop.run_until_complete(asyncio.gather(*work))
+</code></pre>
+
+<p>Let&rsquo;s start with the main code block. First we get a reference to the default <a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop">event loop</a>. Then we create a list of two tasks calling the function <code>do_stuff</code> and tell the event loop to run until those tasks are complete.</p>
+
+<p>The function <code>do_stuff</code> is declared with the <code>async def</code> statement, which makes it into something called a <a href="https://docs.python.org/3/glossary.html#term-coroutine">coroutine</a>. A <em>coroutine</em> is a special kind of generator and to which you can send a value back. The nice thing about coroutines is that they can be suspended, and resumed at a later state - with the scoped variables intact.</p>
+
+<p>Whenever a <code>await</code> is reached inside the <code>do_stuff</code> that coroutine will be suspended until the response is ready (the sending values back to a generator). When resumed, it will continue execution at the same position and keep going until the next <code>await</code> is there - or until the return statement is reached ( Python use implicit return statements).</p>
+
+<p>Now, back to the <em>event loop</em>. Whenever a coroutine is suspended, the event loop will resume another coroutine (given that it is ready to be resumed). This is the <em>cooperative multi-tasking</em> - coroutines will take turns running on the same thread, but two coroutines will <strong>not</strong> run in parallel.</p>
+
+<p>Basically, any function that supports asyncio is either declared using <code>async def</code> <em>or</em> by using the decorator <code>@asyncio.coroutine</code>. Any code calling such functions needs to use the <code>await</code> statement <em>or</em> <code>yield from</code>.</p>
+
+<p>In Python 3.4 the asyncio used the decorator <code>@coroutine</code> for a special type of generator, and <code>yield from</code> to pause the the generator while waiting for something to happen (e.g. a read being ready to consume). In Python 3.5 this was replaced by the expressions <code>async</code> and <code>await</code>.</p>
+
+<p><em>Awaitable</em> functions (or coroutines) needs to be wrapped in a Future and handed
+over to the <em>event loop</em>. And finally the <em>event loop</em> needs to be instructed to run.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>This was a short introduction to asyncio in Python. If you have done async programming in another language (JavaScript, C#) you might feel just at home, if not there are great articles presenting Python&rsquo;s implementation in details and with a proper walkthrough from iterator, generator, corouties to async/await.</p>
+
+<p>Brett Cannon have written an excellent post <a href="http://www.snarky.ca/how-the-heck-does-async-await-work-in-python-3-5">How the heck does async/await work in Python 3.5</a>. And A. Jesse Jiryu Davis and Guido van Rossum gives great detail in their article <a href="http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html">A Web Crawler With asyncio Coroutines</a>. If you only read one, I recommend Brett Cannon&rsquo;s as I found it easier to digest.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'markus-eliasson';
+    var disqus_identifier = 'http:\/\/www.markuseliasson.se\/article\/introduction-to-asyncio\/';
+    var disqus_title = 'An introduction to Python\x27s asyncio';
+    var disqus_url = 'http:\/\/www.markuseliasson.se\/article\/introduction-to-asyncio\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+

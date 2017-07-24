@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Python pip virtualenv in Windows &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Python pip virtualenv in Windows</h1>
+                        <div class="tidy-article-ingress">
+                            <p>My personal notes on how to setup virtualenv for Python 2.7 in Windows</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/python">Python</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/windows">Windows</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Tuesday, February 24, 2015
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>I needed to setup my Windows 8 machine for Python and Django development as I
+was fed up with running virtualbox and I really wanted to run PyCharm native
+in Windows. I jotted down these simple steps for future reference, or if
+someone else needs a brief overview.</p>
+
+<h2 id="install-python">Install python</h2>
+
+<p>I chose the official Python Windows distribution, the later versions comes
+with pip bundled. All I needed to do was to add two directories to my PATH:</p>
+
+<pre><code>SET PATH=%PATH%;C:\&lt;path-to-python&gt;\;C:\&lt;path-to-python&gt;\Scripts\
+</code></pre>
+
+<h2 id="setup-a-new-virtualenv">Setup a new virtualenv</h2>
+
+<p>I do not use PowerShell and did not bother trying to find an alternative
+for virtualenvwrapper that I use in bash. Instead I just roll my virtualenvs
+manually. First thing you need to do is to install virtutalenv:</p>
+
+<pre><code>pip install virtualenv
+</code></pre>
+
+<p>Creating a virtual environment by running:</p>
+
+<pre><code>virtualenv C:\virtualenvs\foo-env
+</code></pre>
+
+<p>Activate this virtual environment by running:</p>
+
+<pre><code> C:\virtualenvs\foo-env\Scripts
+</code></pre>
+
+<p>From this stage it was only a matter of importing my project to PyCharm and
+select the right Python Interpreter.</p>
+
+<p>A side note, as I use Makefiles to wrap my Django tasks I can really
+recommend <a href="https://github.com/bmatzelle/gow">gow</a> a lightweight unix util
+distribution for windows.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'markus-eliasson';
+    var disqus_identifier = 'http:\/\/www.markuseliasson.se\/article\/python-pip-virtualenv-windows\/';
+    var disqus_title = 'Python pip virtualenv in Windows';
+    var disqus_url = 'http:\/\/www.markuseliasson.se\/article\/python-pip-virtualenv-windows\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+

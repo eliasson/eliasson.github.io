@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Taxonomies in liquorice &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Taxonomies in liquorice</h1>
+                        <div class="tidy-article-ingress">
+                            <p>Liquorice gets updated to support taxonomies in Hugo.</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/hugo">Hugo</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/liquorice">liquorice</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Tuesday, November 11, 2014
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        <p>My Hugo theme <a href="https://github.com/eliasson/liquorice">liquorice</a> was updated
+yesterday to add simple support for <a href="http://gohugo.io/taxonomies/overview/">Taxonomies</a>.
+Both <em>categories</em> and <em>tags</em> is supported both as list view and as the ingress
+part of a single article.</p>
+
+<p>In order to use it you need to configured in your site configuration (see
+<a href="http://gohugo.io/taxonomies/usage/">documentation</a>), in TOML
+this is basically adding:</p>
+
+<pre><code>[indexes]
+    category = &quot;categories&quot;
+    tag = &quot;tags&quot;
+</code></pre>
+
+<p>You then add the categories and / or tags per article in the front-matter like:</p>
+
+<pre><code>+++
+Categories = [&quot;Hugo&quot;]
+Description = &quot;Taxonomies in liquorice&quot;
+Tags = [&quot;liquorice&quot;]
+...
++++
+</code></pre>
+
+<p>Liquorice supports either both categories and tags, only one or neither of them.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'markus-eliasson';
+    var disqus_identifier = 'http:\/\/www.markuseliasson.se\/article\/taxonomies-in-liquorice\/';
+    var disqus_title = 'Taxonomies in liquorice';
+    var disqus_url = 'http:\/\/www.markuseliasson.se\/article\/taxonomies-in-liquorice\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+

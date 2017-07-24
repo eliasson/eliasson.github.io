@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on Markus Eliasson</title>
+    <link>http://www.markuseliasson.se/tags/python/</link>
+    <description>Recent content in Python on Markus Eliasson</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate>
+    <atom:link href="http://www.markuseliasson.se/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>A BitTorrent client in Python 3.5</title>
+      <link>http://www.markuseliasson.se/article/bittorrent-in-python/</link>
+      <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/bittorrent-in-python/</guid>
+      <description>
+
+&lt;p&gt;When Python 3.5 was released together with the new module asyncio I was curios to give it a try. Recently I decided to implement a simple BitTorrent client using asyncio - I have always been interested in peer-to-peer protocols and it seemed like a perfect fit.&lt;/p&gt;
+
+&lt;p&gt;The project is named &lt;strong&gt;Pieces&lt;/strong&gt;, all of the source code is available at &lt;a href=&#34;https://github.com/eliasson/pieces&#34;&gt;GitHub&lt;/a&gt; and released under the Apache 2 license. Feel free to learn from it, steal from it, improve it, laugh at it or just ignore it.&lt;/p&gt;
+
+&lt;p&gt;I previously posted a short &lt;a href=&#34;http://www.markuseliasson.se/article/introduction-to-asyncio&#34;&gt;introduction to Python&amp;rsquo;s async module&lt;/a&gt;. If this is your first time looking at &lt;code&gt;asyncio&lt;/code&gt; it might be a good idea to read through that one first.&lt;/p&gt;
+
+&lt;h2 id=&#34;an-introduction-to-bittorrent&#34;&gt;An introduction to BitTorrent&lt;/h2&gt;
+
+&lt;p&gt;BitTorrent has been around since 2001 when &lt;a href=&#34;https://en.wikipedia.org/wiki/Bram_Cohen&#34;&gt;Bram Cohen&lt;/a&gt; authored the first version of the protocol. The big breakthrough was when sites as &lt;em&gt;The Pirate Bay&lt;/em&gt; made it popular to use for downloading pirated material. Streaming sites, such as Netflix, might have resulted in a decrease of people using BitTorrent for downloading movies. But BitTorrent is still used in a number of different, legal, solutions where distribution of larger files are important.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://torrentfreak.com/facebook-uses-bittorrent-and-they-love-it-100625/&#34;&gt;Facebook&lt;/a&gt; use it to distribute updates within their huge data centers&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://docs.aws.amazon.com/AmazonS3/latest/dev/S3Torrent.html&#34;&gt;Amazon S3&lt;/a&gt; implement it for downloading of static files&lt;/li&gt;
+&lt;li&gt;Traditional downloads still used for larger files such as &lt;a href=&#34;http://www.ubuntu.com/download/alternative-downloads&#34;&gt;Linux distributions&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;BitTorrent is a peer-to-peer protocol, where &lt;em&gt;peers&lt;/em&gt; join a &lt;em&gt;swarm&lt;/em&gt; of other peers to exchange pieces of data between each other. Each peer is connected to multiple peers at the same time, and thus downloading or uploading to multiple peers at the same time. This is great in terms of limiting bandwidth compared to when a file is downloaded from a central server. It is also great for keeping a file available as it does not rely on a single source being online.&lt;/p&gt;
+
+&lt;p&gt;There is a &lt;code&gt;.torrent&lt;/code&gt; file that regulates how many pieces there is for a given file(s), how these should be exchanged between peers, as well as how the data integrity of these pieces can be confirmed by clients.&lt;/p&gt;
+
+&lt;p&gt;While going through the implementation it might be good to have read, or to have another tab open with the &lt;a href=&#34;https://wiki.theory.org/BitTorrentSpecification&#34;&gt;Unofficial BitTorrent Specification&lt;/a&gt;. This is without a doubt the best source of information on the BitTorrent protocol. The official specification is vague and lacks certain details so the unofficial is the one you want to study.&lt;/p&gt;
+
+&lt;h3 id=&#34;parsing-a-torrent-file&#34;&gt;Parsing a .torrent file&lt;/h3&gt;
+
+&lt;p&gt;The first thing a client needs to do is to find out what it is supposed to download and from where. This information is what is stored in the &lt;code&gt;.torrent&lt;/code&gt; file, a.k.a. the &lt;em&gt;meta-info&lt;/em&gt;. There is a number of properties stored in the &lt;em&gt;meta-info&lt;/em&gt; that we need in order to successfully implement a client.&lt;/p&gt;
+
+&lt;p&gt;Things like:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The name of the file to download&lt;/li&gt;
+&lt;li&gt;The size of the file to download&lt;/li&gt;
+&lt;li&gt;The URL to the tracker to connect to&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;All these properties are stored in a binary format called &lt;em&gt;Bencoding&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Bencoding supports four different data types, &lt;em&gt;dictionaries&lt;/em&gt;, &lt;em&gt;lists&lt;/em&gt;, &lt;em&gt;integers&lt;/em&gt; and &lt;em&gt;strings&lt;/em&gt; - it is fairly easy translate to Python&amp;rsquo;s &lt;em&gt;object literals&lt;/em&gt; or &lt;em&gt;JSON&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Below is bencoding described in &lt;a href=&#34;https://en.wikipedia.org/wiki/Augmented_Backus–Naur_Form&#34;&gt;Augmented Backus-Naur Form&lt;/a&gt; courtesy of the &lt;a href=&#34;https://hackage.haskell.org/package/bencoding-0.4.3.0/docs/Data-BEncode.html&#34;&gt;Haskell library&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;BE&amp;gt;    ::= &amp;lt;DICT&amp;gt; | &amp;lt;LIST&amp;gt; | &amp;lt;INT&amp;gt; | &amp;lt;STR&amp;gt;
+
+&amp;lt;DICT&amp;gt;  ::= &amp;quot;d&amp;quot; 1 * (&amp;lt;STR&amp;gt; &amp;lt;BE&amp;gt;) &amp;quot;e&amp;quot;
+&amp;lt;LIST&amp;gt;  ::= &amp;quot;l&amp;quot; 1 * &amp;lt;BE&amp;gt;         &amp;quot;e&amp;quot;
+&amp;lt;INT&amp;gt;   ::= &amp;quot;i&amp;quot;     &amp;lt;SNUM&amp;gt;       &amp;quot;e&amp;quot;
+&amp;lt;STR&amp;gt;   ::= &amp;lt;NUM&amp;gt; &amp;quot;:&amp;quot; n * &amp;lt;CHAR&amp;gt;; where n equals the &amp;lt;NUM&amp;gt;
+
+&amp;lt;SNUM&amp;gt;  ::= &amp;quot;-&amp;quot; &amp;lt;NUM&amp;gt; / &amp;lt;NUM&amp;gt;
+&amp;lt;NUM&amp;gt;   ::= 1 * &amp;lt;DIGIT&amp;gt;
+&amp;lt;CHAR&amp;gt;  ::= %
+&amp;lt;DIGIT&amp;gt; ::= &amp;quot;0&amp;quot; | &amp;quot;1&amp;quot; | &amp;quot;2&amp;quot; | &amp;quot;3&amp;quot; | &amp;quot;4&amp;quot; | &amp;quot;5&amp;quot; | &amp;quot;6&amp;quot; | &amp;quot;7&amp;quot; | &amp;quot;8&amp;quot; | &amp;quot;9&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In &lt;em&gt;pieces&lt;/em&gt; the encoding and decoding of &lt;em&gt;bencoded&lt;/em&gt; data is implemented in the &lt;code&gt;pieces.bencoding&lt;/code&gt; module (&lt;a href=&#34;https://github.com/eliasson/pieces/blob/master/pieces/bencoding.py&#34;&gt;source code&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Here are a few examples decoding bencoded data into a Python representation using that module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; from pieces.bencoding import Decoder
+
+# An integer value starts with an &#39;i&#39; followed by a series of
+# digits until terminated with a &#39;e&#39;.
+&amp;gt;&amp;gt;&amp;gt; Decoder(b&#39;i123e&#39;).decode()
+123
+
+# A string value, starts by defining the number of characters
+# contained in the string, followed by the actual string.
+# Notice that the string returned is a binary string, not unicode.
+&amp;gt;&amp;gt;&amp;gt; Decoder(b&#39;12:Middle Earth&#39;).decode()
+b&#39;Middle Earth&#39;
+
+# A list starts with a &#39;l&#39; followed by any number of objects, until
+# terminated with an &#39;e&#39;.
+# As in Python, a list may contain any type of object.
+&amp;gt;&amp;gt;&amp;gt; Decoder(b&#39;l4:spam4:eggsi123ee&#39;).decode()
+[b&#39;spam&#39;, b&#39;eggs&#39;, 123]
+
+# A dict starts with a &#39;d&#39; and is terminated with a &#39;e&#39;. objects
+# in between those characters must be pairs of string + object.
+# The order is significant in a dict, thus OrderedDict (from
+# Python 3.1) is used.
+&amp;gt;&amp;gt;&amp;gt; Decoder(b&#39;d3:cow3:moo4:spam4:eggse&#39;).decode()
+OrderedDict([(b&#39;cow&#39;, b&#39;moo&#39;), (b&#39;spam&#39;, b&#39;eggs&#39;)])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Likewise, a Python object structure can be encoded into a bencoded byte string using the same module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; from collections import OrderedDict
+&amp;gt;&amp;gt;&amp;gt; from pieces.bencoding import Encoder
+
+&amp;gt;&amp;gt;&amp;gt; Encoder(123).encode()
+b&#39;i123e&#39;
+
+&amp;gt;&amp;gt;&amp;gt; Encoder(&#39;Middle Earth&#39;).encode()
+b&#39;12:Middle Earth&#39;
+
+&amp;gt;&amp;gt;&amp;gt; Encoder([&#39;spam&#39;, &#39;eggs&#39;, 123]).encode()
+bytearray(b&#39;l4:spam4:eggsi123ee&#39;)
+
+&amp;gt;&amp;gt;&amp;gt; d = OrderedDict()
+&amp;gt;&amp;gt;&amp;gt; d[&#39;cow&#39;] = &#39;moo&#39;
+&amp;gt;&amp;gt;&amp;gt; d[&#39;spam&#39;] = &#39;eggs&#39;
+&amp;gt;&amp;gt;&amp;gt; Encoder(d).encode()
+bytearray(b&#39;d3:cow3:moo4:spam4:eggse&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;These examples can also be found in the &lt;a href=&#34;https://github.com/eliasson/pieces/blob/master/tests/test_bendoding.py&#34;&gt;unit tests&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The parser implementation is pretty straight forward, no asyncio is used here though, not even reading the &lt;code&gt;.torrent&lt;/code&gt; from disk.&lt;/p&gt;
+
+&lt;p&gt;Using the parser from &lt;code&gt;pieces.bencoding&lt;/code&gt;, let&amp;rsquo;s open the &lt;code&gt;.torrent&lt;/code&gt; for the popular Linux distribution Ubuntu:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; with open(&#39;tests/data/ubuntu-16.04-desktop-amd64.iso.torrent&#39;, &#39;rb&#39;) as f:
+...     meta_info = f.read()
+...     torrent = Decoder(meta_info).decode()
+...
+&amp;gt;&amp;gt;&amp;gt; torrent
+OrderedDict([(b&#39;announce&#39;, b&#39;http://torrent.ubuntu.com:6969/announce&#39;), (b&#39;announce-list&#39;, [[b&#39;http://torrent.ubuntu.com:6969/announce&#39;], [b&#39;http://ipv6.torrent.ubuntu.com:6969/announce&#39;]
+]), (b&#39;comment&#39;, b&#39;Ubuntu CD releases.ubuntu.com&#39;), (b&#39;creation date&#39;, 1461232732), (b&#39;info&#39;, OrderedDict([(b&#39;length&#39;, 1485881344), (b&#39;name&#39;, b&#39;ubuntu-16.04-desktop-amd64.iso&#39;), (b&#39;piece
+length&#39;, 524288), (b&#39;pieces&#39;, b&#39;\x1at\xfc\x84\xc8\xfaV\xeb\x12\x1c\xc5\xa4\x1c?\xf0\x96\x07P\x87\xb8\xb2\xa5G1\xc8L\x18\x81\x9bc\x81\xfc8*\x9d\xf4k\xe6\xdb6\xa3\x0b\x8d\xbe\xe3L\xfd\xfd4\...&#39;)]))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here you can read see some of the &lt;em&gt;meta-data&lt;/em&gt; such as the name of the destination file (ubuntu-16.04-desktop-amd64.iso) and the total size in bytes (1485881344).&lt;/p&gt;
+
+&lt;p&gt;Notice how the keys used in the &lt;code&gt;OrderedDict&lt;/code&gt; are &lt;em&gt;binary&lt;/em&gt; strings. Bencoding is a binary protocol, and using UTF-8 strings as keys &lt;em&gt;will not work&lt;/em&gt;!&lt;/p&gt;
+
+&lt;p&gt;A wrapper class &lt;code&gt;pieces.torrent.Torrent&lt;/code&gt; exposing these properties is implemented abstracting the binary strings, and other details away from the rest of the client. This class only implements the attributes used in pieces client.&lt;/p&gt;
+
+&lt;p&gt;I will not go through which attributes that is available, instead the rest of this article will refer back to attributes found in the &lt;code&gt;.torrent&lt;/code&gt; / &lt;em&gt;meta-info&lt;/em&gt; were used.&lt;/p&gt;
+
+&lt;h3 id=&#34;connecting-to-the-tracker&#34;&gt;Connecting to the tracker&lt;/h3&gt;
+
+&lt;p&gt;Now that we can decode a &lt;code&gt;.torrent&lt;/code&gt; file and we have a Python representation of the data, we need to get a list of peers to connect with. This is where the tracker comes in. A tracker is a central server keeping track of available peers for a given torrent. A tracker does &lt;strong&gt;NOT&lt;/strong&gt; contain any of the torrent data, only which peers that can be connected to and their statistics.&lt;/p&gt;
+
+&lt;h4 id=&#34;building-the-request&#34;&gt;Building the request&lt;/h4&gt;
+
+&lt;p&gt;The &lt;code&gt;announce&lt;/code&gt; property in the &lt;em&gt;meta-info&lt;/em&gt; is the HTTP URL to the tracker to connect to using the following URL parameters:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Parameter&lt;/th&gt;
+&lt;th&gt; Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;info_hash&lt;/td&gt;
+&lt;td&gt;The SHA1 hash of the info dict found in the &lt;code&gt;.torrent&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;peer_id&lt;/td&gt;
+&lt;td&gt;A unique ID generated for this client&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;uploaded&lt;/td&gt;
+&lt;td&gt;The total number of bytes uploaded&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;downloaded&lt;/td&gt;
+&lt;td&gt;The total number of bytes downloaded&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;left&lt;/td&gt;
+&lt;td&gt;The number of bytes left to download for this client&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;port&lt;/td&gt;
+&lt;td&gt;The TCP port this client listens on&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;compact&lt;/td&gt;
+&lt;td&gt;Whether or not the client accepts a compacted list of peers or not&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;The peer_id needs to be exactly 20 bytes, and there are two major conventions used on how to generate this ID. Pieces follows the &lt;a href=&#34;https://wiki.theory.org/BitTorrentSpecification#peer_id&#34;&gt;Azureus-style&lt;/a&gt; convention generating peer id like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import random
+# -&amp;lt;2 character id&amp;gt;&amp;lt;4 digit version number&amp;gt;-&amp;lt;random numbers&amp;gt;
+&amp;gt;&amp;gt;&amp;gt; &#39;-PC0001-&#39; + &#39;&#39;.join([str(random.randint(0, 9)) for _ in range(12)])
+&#39;-PC0001-478269329936&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A tracker request can look like this using &lt;a href=&#34;https://github.com/jkbrzt/httpie&#34;&gt;httpie&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-http&#34;&gt;http GET &amp;quot;http://torrent.ubuntu.com:6969/announce?info_hash=%90%28%9F%D3M%FC%1C%F8%F3%16%A2h%AD%D85L%853DX&amp;amp;peer_id=-PC0001-706887310628&amp;amp;uploaded=0&amp;amp;downloaded=0&amp;amp;left=699400192&amp;amp;port=6889&amp;amp;compact=1&amp;quot;
+HTTP/1.0 200 OK
+Content-Length: 363
+Content-Type: text/plain
+Pragma: no-cache
+
+d8:completei3651e10:incompletei385e8:intervali1800e5:peers300:£¬%ËÌyOkÝ.ê@_&amp;lt;K+Ô\Ý Ámb^TnÈÕ^AËO*ÈÕ1*ÈÕ&amp;gt;¥³ÈÕBä)ðþ¸ÐÞ¦Ô/ãÈÕÈuÉæÈÕ
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;The response data is truncated since it contains binary data that screws up the Markdown formatting.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;From the tracker response, there is two properties of interest:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;interval&lt;/strong&gt; - The interval in seconds until the client should make a new announce call to the tracker.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;peers&lt;/strong&gt; - The list of peers is a binary string with a length of multiple of 6 bytes. Where each peer consist of a 4 byte IP address and a 2 byte port number (since we are using the compact format).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;So, a successful announce call made to the tracker, gives you a list of peers to connect to. This might not be all available peers in this swarm, only the peers the tracker assigned your client to connect. A subsequent call to the tracker might result in another list of peers.&lt;/p&gt;
+
+&lt;h4 id=&#34;async-http&#34;&gt;Async HTTP&lt;/h4&gt;
+
+&lt;p&gt;Python does not come with a built-in support for async HTTP and my beloved &lt;a href=&#34;https://github.com/kennethreitz/requests&#34;&gt;requests library&lt;/a&gt; does not implement asyncio either. Scouting around the Internet it looks like most use &lt;a href=&#34;https://github.com/KeepSafe/aiohttp&#34;&gt;aiohttp&lt;/a&gt;, which implement both a HTTP client and server.&lt;/p&gt;
+
+&lt;p&gt;Pieces use &lt;code&gt;aiohttp&lt;/code&gt; in the &lt;code&gt;pieces.tracker.Tracker&lt;/code&gt; class for making the HTTP request to the tracker announce url. A shortened version of that code is this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;async def connect(self,
+                    first: bool=None,
+                    uploaded: int=0,
+                    downloaded: int=0):
+    params = { ...}
+    url = self.torrent.announce + &#39;?&#39; + urlencode(params)
+
+    async with self.http_client.get(url) as response:
+        if not response.status == 200:
+            raise ConnectionError(&#39;Unable to connect to tracker&#39;)
+        data = await response.read()
+        return TrackerResponse(bencoding.Decoder(data).decode())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The method is declared using &lt;code&gt;async&lt;/code&gt; and uses the new &lt;a href=&#34;https://www.python.org/dev/peps/pep-0492/#asynchronous-context-managers-and-async-with&#34;&gt;asynchronous context manager&lt;/a&gt; &lt;code&gt;async with&lt;/code&gt; to allow being suspended while the HTTP call is being made. Given a successful response, this method will be suspended again while reading the binary response data &lt;code&gt;await response.read()&lt;/code&gt;. Finally the response data is wrapped in a &lt;code&gt;TrackerResponse&lt;/code&gt; instance containing the list of peers, alternative an error message.&lt;/p&gt;
+
+&lt;p&gt;The result of using &lt;code&gt;aiohttp&lt;/code&gt; is that our event loop is free to schedule other work while we have an outstanding request to the tracker.&lt;/p&gt;
+
+&lt;p&gt;See the module &lt;code&gt;pieces.tracker&lt;/code&gt; &lt;a href=&#34;https://github.com/eliasson/pieces/blob/master/pieces/tracker.py&#34;&gt;source code&lt;/a&gt; for full details.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-loop&#34;&gt;The loop&lt;/h3&gt;
+
+&lt;p&gt;Everything up to this point could really have been made synchronously, but now that we are about to connect to multiple peers we need to go asynchronous.&lt;/p&gt;
+
+&lt;p&gt;The main function in &lt;code&gt;pieces.cli&lt;/code&gt; is responsible for setting up the asyncio event loop. If we get rid of some &lt;code&gt;argparse&lt;/code&gt; and error handling details it would look something like this (see &lt;a href=&#34;https://github.com/eliasson/pieces/blob/master/pieces/cli.py&#34;&gt;cli.py&lt;/a&gt; for the full details).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import asyncio
+
+from pieces.torrent import Torrent
+from pieces.client import TorrentClient
+
+loop = asyncio.get_event_loop()
+client = TorrentClient(Torrent(args.torrent))
+task = loop.create_task(client.start())
+
+try:
+    loop.run_until_complete(task)
+except CancelledError:
+    logging.warning(&#39;Event loop was canceled&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We start off by getting the default event loop for this thread. Then we construct the &lt;code&gt;TorrentClient&lt;/code&gt; with the given &lt;code&gt;Torrent&lt;/code&gt; (meta-info). This will parse the &lt;code&gt;.torrent&lt;/code&gt; file and validate everything is ok.&lt;/p&gt;
+
+&lt;p&gt;Calling the &lt;code&gt;async&lt;/code&gt; method &lt;code&gt;client.start()&lt;/code&gt; and wrapping that in a &lt;code&gt;asyncio.Future&lt;/code&gt; and later adding that future and instructing the event loop to keep running until that task is complete.&lt;/p&gt;
+
+&lt;p&gt;Is that it? No, not really - we have our own loop (&lt;strong&gt;not&lt;/strong&gt; event loop) implemented in the &lt;code&gt;pieces.client.TorrentClient&lt;/code&gt; that sets up the peer connections, schedules the announce call, etc.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;TorrentClient&lt;/code&gt; is something like a work coordinator, it starts by creating a &lt;a href=&#34;https://docs.python.org/3/library/asyncio-queue.html&#34;&gt;async.Queue&lt;/a&gt; which will hold the list of available peers that can be connected to.&lt;/p&gt;
+
+&lt;p&gt;Then it constructs &lt;em&gt;N&lt;/em&gt; number of &lt;code&gt;pieces.protocol.PeerConnection&lt;/code&gt; which will consume peers from off the queue. These &lt;code&gt;PeerConnection&lt;/code&gt; instances will wait (&lt;code&gt;await&lt;/code&gt;) until there is a peer available in the &lt;code&gt;Queue&lt;/code&gt; for one of them to connect to (&lt;em&gt;not blocking&lt;/em&gt;).&lt;/p&gt;
+
+&lt;p&gt;Since the queue is empty to begin with, no &lt;code&gt;PeerConnection&lt;/code&gt; will do any real work until we populate it with peers it can connect to. This is done in a loop inside of &lt;code&gt;TorrentClient.start&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s have a look at this loop:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;async def start(self):
+    self.peers = [PeerConnection(self.available_peers,
+                                    self.tracker.torrent.info_hash,
+                                    self.tracker.peer_id,
+                                    self.piece_manager,
+                                    self._on_block_retrieved)
+                    for _ in range(MAX_PEER_CONNECTIONS)]
+
+    # The time we last made an announce call (timestamp)
+    previous = None
+    # Default interval between announce calls (in seconds)
+    interval = 30*60
+
+    while True:
+        if self.piece_manager.complete:
+            break
+        if self.abort:
+            break
+
+        current = time.time()
+        if (not previous) or (previous + interval &amp;lt; current):
+            response = await self.tracker.connect(
+                first=previous if previous else False,
+                uploaded=self.piece_manager.bytes_uploaded,
+                downloaded=self.piece_manager.bytes_downloaded)
+
+            if response:
+                previous = current
+                interval = response.interval
+                self._empty_queue()
+                for peer in response.peers:
+                    self.available_peers.put_nowait(peer)
+        else:
+            await asyncio.sleep(5)
+    self.stop()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Basically, what that loop does is to:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Check if we have downloaded all pieces&lt;/li&gt;
+&lt;li&gt;Check if user aborted download&lt;/li&gt;
+&lt;li&gt;Make a annouce call to the tracker if needed&lt;/li&gt;
+&lt;li&gt;Add any retrieved peers to a queue of available peers&lt;/li&gt;
+&lt;li&gt;Sleep 5 seconds&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So, each time an announce call is made to the tracker, the list of peers to connect to is reset, and if no peers are retrieved, no &lt;code&gt;PeerConnection&lt;/code&gt; will run. This goes on until the download is complete or aborted.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-peer-protocol&#34;&gt;The peer protocol&lt;/h3&gt;
+
+&lt;p&gt;After receiving a peer IP and port-number from the tracker, our client will to open a TCP connection to that peer. Once the connection is open, these peers will start to exchange messages using the peer protocol.&lt;/p&gt;
+
+&lt;p&gt;First, lets go through the different parts of the peer protocol, and then go through how it is all implemented.&lt;/p&gt;
+
+&lt;h4 id=&#34;handshake&#34;&gt;Handshake&lt;/h4&gt;
+
+&lt;p&gt;The first message sent needs to be a &lt;code&gt;Handshake&lt;/code&gt; message, and it is the connecting client that is responsible for initiating this.&lt;/p&gt;
+
+&lt;p&gt;Immediately after sending the Handshake, our client should receive a Handshake message sent from the remote peer.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Handshake&lt;/code&gt; message contains two fields of importance:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;peer_id&lt;/strong&gt; - The unique ID of either peer&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;info_hash&lt;/strong&gt; - The SHA1 hash value for the info dict&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If the &lt;code&gt;info_hash&lt;/code&gt; does not match the torrent we are about to download, we
+close the connection.&lt;/p&gt;
+
+&lt;p&gt;Immediately after the Handshake, the remote peer &lt;em&gt;may&lt;/em&gt; send a &lt;code&gt;BitField&lt;/code&gt; message. The &lt;code&gt;BitField&lt;/code&gt; message serves to inform the client on which pieces the remote peer have. Pieces support receiving a &lt;code&gt;BitField&lt;/code&gt; message, and most BitTorrent clients seems to send it - but since pieces currently does not support seeding, it is never sent, only received.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;BitField&lt;/code&gt; message payload contains a sequence of bytes that when read binary each bit will represent one piece. If the bit is &lt;code&gt;1&lt;/code&gt; that means that the peer &lt;em&gt;have&lt;/em&gt; the piece with that index, while &lt;code&gt;0&lt;/code&gt; means that the peer &lt;em&gt;lacks&lt;/em&gt; that piece. I.e. Each byte in the payload represent up to 8 pieces with any spare bits set to &lt;code&gt;0&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Each client starts in the state &lt;em&gt;choked&lt;/em&gt; and &lt;em&gt;not interested&lt;/em&gt;. That means that the client is not allowed to request pieces from the remote peer, nor do we have intent of being interested.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Choked&lt;/strong&gt; A choked peer is not allowed to request any pieces from the other peer.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Unchoked&lt;/strong&gt; A unchoked peer is allowed to request pieces from the other peer.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Interested&lt;/strong&gt; Indicates that a peer is interested in requesting pieces.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Not interested&lt;/strong&gt; Indicates that the peer is not interested in requesting pieces.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;Consider &lt;strong&gt;Choked&lt;/strong&gt; and &lt;strong&gt;Unchoked&lt;/strong&gt; to be rules and &lt;strong&gt;Interested&lt;/strong&gt; and &lt;strong&gt;Not Interested&lt;/strong&gt; to be intents between two peers.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;After the handshake we send an &lt;code&gt;Interested&lt;/code&gt; message to the remote peer, telling that we would like to get &lt;em&gt;unchoked&lt;/em&gt; in order to start requesting pieces.&lt;/p&gt;
+
+&lt;p&gt;Until the client receives an &lt;code&gt;Unchoke&lt;/code&gt; message - it may &lt;strong&gt;not&lt;/strong&gt; request a piece from its remote peer - the &lt;code&gt;PeerConnection&lt;/code&gt; will be choked (passive) until either &lt;em&gt;unchoked&lt;/em&gt; or &lt;em&gt;disconnected&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;The following sequence of messages is what we are aiming for when setting up a &lt;code&gt;PeerConnection&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;              Handshake
+    client --------------&amp;gt; peer    We are initiating the handshake
+
+              Handshake
+    client &amp;lt;-------------- peer    Comparing the info_hash with our hash
+
+              BitField
+    client &amp;lt;-------------- peer    Might be receiving the BitField
+
+             Interested
+    client --------------&amp;gt; peer    Let peer know we want to download
+
+              Unchoke
+    client &amp;lt;-------------- peer    Peer allows us to start requesting pieces
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;requesting-pieces&#34;&gt;Requesting pieces&lt;/h4&gt;
+
+&lt;p&gt;As soon as the client gets into a &lt;em&gt;unchoked&lt;/em&gt; state it will start requesting pieces from the connected peer. The details surrounding which piece to request is detailed later, in &lt;a href=&#34;#managing-the-pieces&#34;&gt;Managing the pieces&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;If we know that the other peer have a given piece, we can send a &lt;code&gt;Request&lt;/code&gt; message asking the remote peer to send us data for the specified piece. If the peer complies it will send us a corresponding &lt;code&gt;Piece&lt;/code&gt; message where the message payload is the raw data.&lt;/p&gt;
+
+&lt;p&gt;This client will only ever have one outstanding &lt;code&gt;Request&lt;/code&gt; per peer and politely wait for a &lt;code&gt;Piece&lt;/code&gt; message until taking the next action. Since connections to multiple peers are open concurrently, the client will have multiple &lt;code&gt;Requests&lt;/code&gt; outstanding but only one per connection.&lt;/p&gt;
+
+&lt;p&gt;If, for some reason, the client do not want a piece anymore, it can send a &lt;code&gt;Cancel&lt;/code&gt; message to the remote peer to cancel any previously sent &lt;code&gt;Request&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h4 id=&#34;other-messages&#34;&gt;Other messages&lt;/h4&gt;
+
+&lt;h5 id=&#34;have&#34;&gt;Have&lt;/h5&gt;
+
+&lt;p&gt;The remote peer can at any point in time send us a &lt;code&gt;Have&lt;/code&gt; message. This is done when the remote peer have received a piece and makes that piece available for its connected peers to download.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Have&lt;/code&gt; message payload is the piece index.&lt;/p&gt;
+
+&lt;p&gt;When pieces receive a &lt;code&gt;Have&lt;/code&gt; message it updates the information on which pieces the peer has.&lt;/p&gt;
+
+&lt;h5 id=&#34;keepalive&#34;&gt;KeepAlive&lt;/h5&gt;
+
+&lt;p&gt;The &lt;code&gt;KeepAlive&lt;/code&gt; message can be sent at anytime in either direction. The message does not hold any payload.&lt;/p&gt;
+
+&lt;h4 id=&#34;implementation&#34;&gt;Implementation&lt;/h4&gt;
+
+&lt;p&gt;The &lt;code&gt;PeerConnection&lt;/code&gt; opens a TCP connection to a remote peer using &lt;code&gt;asyncio.open_connection&lt;/code&gt; to asynchronously open a TCP connection that returns a tuple of &lt;code&gt;StreamReader&lt;/code&gt; and a &lt;code&gt;StreamWriter&lt;/code&gt;. Given that the connection was created successfully, the &lt;code&gt;PeerConnection&lt;/code&gt; will send and receive a &lt;code&gt;Handshake&lt;/code&gt; message.&lt;/p&gt;
+
+&lt;p&gt;Once a handshake is made, the PeerConnection will use an asynchronous iterator to return a stream of &lt;code&gt;PeerMessages&lt;/code&gt; and take the appropriate action.&lt;/p&gt;
+
+&lt;p&gt;Using an async iterator separates the &lt;code&gt;PeerConnection&lt;/code&gt; from the details on how to read from sockets and how to parse the BitTorrent binary protocol. The &lt;code&gt;PeerConnection&lt;/code&gt; can focus on the semantics regarding the protocol - such as managing the peer state, receiving the pieces, closing the connection.&lt;/p&gt;
+
+&lt;p&gt;This allows the main code in &lt;code&gt;PeerConnection.start&lt;/code&gt; to basically look like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;async for message in PeerStreamIterator(self.reader, buffer):
+    if type(message) is BitField:
+        self.piece_manager.add_peer(self.remote_id, message.bitfield)
+    elif type(message) is Interested:
+        self.peer_state.append(&#39;interested&#39;)
+    elif type(message) is NotInterested:
+        if &#39;interested&#39; in self.peer_state:
+            self.peer_state.remove(&#39;interested&#39;)
+    elif type(message) is Choke:
+        ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;An &lt;a href=&#34;https://www.python.org/dev/peps/pep-0492/#asynchronous-iterators-and-async-for&#34;&gt;asynchronous iterator&lt;/a&gt; is a class that implements the methods &lt;code&gt;__aiter__&lt;/code&gt; and &lt;code&gt;__anext__&lt;/code&gt; which is just async versions of Python&amp;rsquo;s standard iterators that have implements the methods, &lt;code&gt;__iter__&lt;/code&gt; and &lt;code&gt;next&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Upon iterating (calling next) the &lt;code&gt;PeerStreamIterator&lt;/code&gt; will read data from the &lt;code&gt;StreamReader&lt;/code&gt; and if enough data is available try to parse and return a valid &lt;code&gt;PeerMessage&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The BitTorrent protocol uses messages with variable length, where all messages takes the form:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;length&amp;gt;&amp;lt;id&amp;gt;&amp;lt;payload&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;length&lt;/strong&gt; is a 4 byte integer value&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;id&lt;/strong&gt; is a single decimal byte&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;payload&lt;/strong&gt; is variable and message dependent&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;So as soon as the buffer have enough data for the next message it will be parsed and returned from the iterator.&lt;/p&gt;
+
+&lt;p&gt;All messages are decoded using Python&amp;rsquo;s module &lt;code&gt;struct&lt;/code&gt; which contains functions to convert to and from Pythons values and C structs. &lt;a href=&#34;https://docs.python.org/3.5/library/struct.html&#34;&gt;Struct&lt;/a&gt; use compact strings as descriptors on what to convert, e.g. &lt;code&gt;&amp;gt;Ib&lt;/code&gt; reads as &amp;ldquo;Big-Endian, 4 byte unsigned integer, 1 byte character.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note that all messages uses Big-Endian in BitTorrent.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;This makes it easy to create unit tests to encode and decode messages. Let&amp;rsquo;s have a look on the tests for the &lt;code&gt;Have&lt;/code&gt; message:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class HaveMessageTests(unittest.TestCase):
+    def test_can_construct_have(self):
+        have = Have(33)
+        self.assertEqual(
+            have.encode(),
+            b&amp;quot;\x00\x00\x00\x05\x04\x00\x00\x00!&amp;quot;)
+
+    def test_can_parse_have(self):
+        have = Have.decode(b&amp;quot;\x00\x00\x00\x05\x04\x00\x00\x00!&amp;quot;)
+        self.assertEqual(33, have.index)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;From the raw binary string we can tell that the Have message have a length of 5 bytes &lt;code&gt;\x00\x00\x00\x05&lt;/code&gt; an id of value 4 &lt;code&gt;\x04&lt;/code&gt; and the payload is 33 &lt;code&gt;\x00\x00\x00!&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Since the message length is 5 and ID only use a single byte we know that we have four bytes to interpret as the payload value. Using &lt;code&gt;struct.unpack&lt;/code&gt; we can easily convert it to a python integer like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import struct
+&amp;gt;&amp;gt;&amp;gt; struct.unpack(&#39;&amp;gt;I&#39;, b&#39;\x00\x00\x00!&#39;)
+(33,)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That is basically it regarding the protocol, all messages follow the same procedure and the iterator keeps reading from the socket until it gets disconnected. See the &lt;a href=&#34;https://github.com/eliasson/pieces/blob/master/pieces/protocol.py&#34;&gt;source code&lt;/a&gt; for details on all messages.&lt;/p&gt;
+
+&lt;h3 id=&#34;managing-the-pieces&#34;&gt;Managing the pieces&lt;/h3&gt;
+
+&lt;p&gt;So far we have only discussed pieces - pieces of data being exchanged by two peers. It turns out that pieces is not the entire truth, there is one more concept - &lt;em&gt;blocks&lt;/em&gt;. If you have looked through any of the source code you might have seen code refering to blocks, so lets go through what a &lt;em&gt;piece&lt;/em&gt; really is.&lt;/p&gt;
+
+&lt;p&gt;A &lt;em&gt;piece&lt;/em&gt; is, unsurprisingly, a partial piece of the torrents data. A torrent&amp;rsquo;s data is split into &lt;em&gt;N&lt;/em&gt; number of pieces of equal size (except the last piece in a torrent, which might be of smaller size than the others). The piece length is specified in the &lt;code&gt;.torrent&lt;/code&gt; file. Typically pieces are of sizes 512 kB or less, and should be a power of 2.&lt;/p&gt;
+
+&lt;p&gt;Pieces are still too big to be shared efficiently between peers, so pieces are further divided into something referred to as &lt;em&gt;blocks&lt;/em&gt;. Blocks is the chunks of data that is actually requested between peers, but pieces are still used to indicate which peer that have which pieces. If only blocks should have been used it would increase the overhead in the protocol greatly (resulting in longer BitFields, more Have message and larger &lt;code&gt;.torrent&lt;/code&gt; files).&lt;/p&gt;
+
+&lt;p&gt;A &lt;em&gt;block&lt;/em&gt; is 2^14 (16384) bytes in size, except the final block that most likely will be of a smaller size.&lt;/p&gt;
+
+&lt;p&gt;Consider an example where a &lt;code&gt;.torrent&lt;/code&gt; describes a single file &lt;code&gt;foo.txt&lt;/code&gt; to be downloaded.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;name: foo.txt
+length: 135168
+piece length: 49152
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That small torrent would result in 3 pieces:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;piece 0: 49 152 bytes
+piece 1: 49 152 bytes
+piece 2: 36 864 bytes (135168 - 49152 - 49152)
+        = 135 168
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now each piece is divided into blocks in sizes of &lt;code&gt;2^14&lt;/code&gt; bytes:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;piece 0:
+    block 0: 16 384 bytes (2^14)
+    block 1: 16 384 bytes
+    block 2: 16 384 bytes
+          =  49 152 bytes
+
+piece 1:
+    block 0: 16 384 bytes
+    block 1: 16 384 bytes
+    block 2: 16 384 bytes
+          =  49 152 bytes
+
+piece 2:
+    block 0: 16 384 bytes
+    block 1: 16 384 bytes
+    block 2:  4 096 bytes
+          =  36 864 bytes
+
+total:       49 152 bytes
+          +  49 152 bytes
+          +  36 864 bytes
+          = 135 168 bytes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exchanging these blocks between peers is basically what BitTorrent is about. Once all blocks for a piece is done, that piece is complete and can be shared with other peers (the &lt;code&gt;Have&lt;/code&gt; message is sent to connected peers). And once all pieces are complete the peer transform from a &lt;em&gt;downloader&lt;/em&gt; to only be a &lt;em&gt;seeder&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Two notes on where the official specification is a bit off:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;The official specification refer to both pieces and blocks as just pieces which is quite confusing. The unofficial specification and others seem to have agreed upon using the term block for the smaller piece which is what we will use as well.&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;em&gt;The official specification is stating another &lt;strong&gt;block size&lt;/strong&gt; that what we use. Reading the unofficial specification, it seems that 2^14 bytes is what is agreed among implementers - regardless of the official specification.&lt;/em&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;the-implementation&#34;&gt;The implementation&lt;/h3&gt;
+
+&lt;p&gt;When a &lt;code&gt;TorrentClient&lt;/code&gt; is constructed, so is a &lt;code&gt;PieceManager&lt;/code&gt; with the resposibility to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Determine which block to request next&lt;/li&gt;
+&lt;li&gt;Persisting received blocks to file&lt;/li&gt;
+&lt;li&gt;Determine when a download is complete.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When a &lt;code&gt;PeerConnection&lt;/code&gt; successfully &lt;em&gt;handshakes&lt;/em&gt; with another peer and receives a &lt;code&gt;BitField&lt;/code&gt; message it will inform the &lt;code&gt;PieceManager&lt;/code&gt; which peer (&lt;code&gt;peer_id&lt;/code&gt;) that have which pieces. This information will be updated on any received &lt;code&gt;Have&lt;/code&gt; message as well. Using this information, the &lt;code&gt;PeerManager&lt;/code&gt; knows the collective state on which pieces that are available from which peers.&lt;/p&gt;
+
+&lt;p&gt;When the first &lt;code&gt;PeerConnection&lt;/code&gt; goes into a &lt;em&gt;unchoked&lt;/em&gt; state it will request the next block from its peer. The next block is determined by calling the method &lt;code&gt;PieceManager.next_request&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;next_request&lt;/code&gt; implements a very simple strategy on which piece to request next.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;When the &lt;code&gt;PieceManager&lt;/code&gt; is constructed all pieces and blocks are pre-constructed based on the piece length from the &lt;code&gt;.torrent&lt;/code&gt; meta-info&lt;/li&gt;
+&lt;li&gt;All pieces are put in a missing list&lt;/li&gt;
+&lt;li&gt;When &lt;code&gt;next_request&lt;/code&gt; is called, the manager will do one of:
+
+&lt;ul&gt;
+&lt;li&gt;Re-request any previously requested block that has timed-out&lt;/li&gt;
+&lt;li&gt;Requst the next block in an ongoing piece&lt;/li&gt;
+&lt;li&gt;Request the first block in the next missing piece&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This way the blocks and pieces will be requsted in order. However, multiple pieces might be ongoing based on which piece a client have.&lt;/p&gt;
+
+&lt;p&gt;Since pieces aims to be a simple client, no effort have been made on implementing a smart or efficient strategy for which pieces to request. A better solution would be to request the rarest piece first, which would make the entire swarm healthier as well.&lt;/p&gt;
+
+&lt;p&gt;Whenever a block is received from a peer, it is stored (in memory) by the PieceManager. When all blocks for a piece is retrieved, a SHA1 hash is made on the piece. This hash is compared to the SHA1 hashes include in the &lt;code&gt;.torrent&lt;/code&gt; info dict - if it matches the piece is written to disk.&lt;/p&gt;
+
+&lt;p&gt;When all pieces are accounted for (matching hashes) the torrent is considered to be complete, which stops the &lt;code&gt;TorrentClient&lt;/code&gt; closing any open TCP connection and as a result the program exits with a message that the torrent is downloaded.&lt;/p&gt;
+
+&lt;h3 id=&#34;future-work&#34;&gt;Future work&lt;/h3&gt;
+
+&lt;p&gt;Seeding is not yet implemented, but it should not be that hard to implement. What is needed is something along the lines of this:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Whenever a peer is connected to, we should send a &lt;code&gt;BitField&lt;/code&gt; message to the remote peer indicating which pieces we have.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Whenever a new piece is received (and correctness of hash is confirmed), each &lt;code&gt;PeerConnection&lt;/code&gt; should send a &lt;code&gt;Have&lt;/code&gt; message to its remote peer to indicate the new piece that can be shared.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In order to do this the &lt;code&gt;PieceManager&lt;/code&gt; needs to be extended to return a list of 0 and 1 for the pieces we have. And the &lt;code&gt;TorrentClient&lt;/code&gt; to tell the &lt;code&gt;PeerConnection&lt;/code&gt; to send a &lt;code&gt;Have&lt;/code&gt; to its remote peer. Both &lt;code&gt;BitField&lt;/code&gt; and &lt;code&gt;Have&lt;/code&gt; messages should support encoding of these messages.&lt;/p&gt;
+
+&lt;p&gt;Having seeding implemented would make Pieces a good citizen, supporting both downloading and uploading of data within the swarm.&lt;/p&gt;
+
+&lt;p&gt;Additional features that probably can be added without too much effort is:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Multi-file torrent&lt;/strong&gt;, will hit &lt;code&gt;PieceManager&lt;/code&gt;, since Pieces and Blocks might span over multiple files, it affects how files are persisted (i.e. a single block might contain data for more than one file).&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Resume a download&lt;/strong&gt;, by seeing what parts of the file(s) are already downloaded (verified by making SHA1 hashes).&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;It was real fun to implement a BitTorrent client, having to handle binary protocols and networking was great to balance all that recent web development I have been doing.&lt;/p&gt;
+
+&lt;p&gt;Python continues to be one of my favourite programming language. Handling binary data was a breeze given the &lt;code&gt;struct&lt;/code&gt; module and the recent addition &lt;code&gt;asyncio&lt;/code&gt; feels very pythonic. Using &lt;em&gt;async iterator&lt;/em&gt; to implement the protocol  turned out to be a good fit as well.&lt;/p&gt;
+
+&lt;p&gt;Hopefully this article inspired you to write a BitTorrent client of your own, or to extend pieces in some way. If you spot any error in the article or the source code, feel free to open an issue over at &lt;a href=&#34;https://github.com/eliasson/pieces/&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>An introduction to Python&#39;s asyncio</title>
+      <link>http://www.markuseliasson.se/article/introduction-to-asyncio/</link>
+      <pubDate>Wed, 24 Aug 2016 21:00:00 +0200</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/introduction-to-asyncio/</guid>
+      <description>
+
+&lt;p&gt;In Python 3.4 a new module, &lt;code&gt;asyncio&lt;/code&gt; was introduced, this module allows you to write &lt;em&gt;concurrent&lt;/em&gt;, &lt;em&gt;single threaded&lt;/em&gt; code in Python without relying on any third-party libraries (such as Twisted, or Tornado).&lt;/p&gt;
+
+&lt;p&gt;I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write &lt;em&gt;concurrent&lt;/em&gt; code in Python 3.5.&lt;/p&gt;
+
+&lt;p&gt;Remember, &lt;strong&gt;concurrency&lt;/strong&gt; is not the same as &lt;strong&gt;parallelism&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Concurrency&lt;/strong&gt; is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time. This is possible with a single-core CPU.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Parallelism&lt;/strong&gt; is when one or more functions run at the same time, this requires multi-core CPU.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;em&gt;As a metaphor, consider when you are in the kitchen making dinner. You put your potato cake into the oven, setting your kitchen timer for 15 minutes. Meanwhile, you start frying some pork to go with it. After 15 minutes, the timer goes off with a beep, you put away the frying pan and take the cake out of the oven.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Your are being concurrent, there is only one person (CPU) in the kitchen, doing multiple tasks at the same time.&lt;/p&gt;
+
+&lt;p&gt;Single threaded, asynchronous programming is considered simpler than using multi-threaded programming. The reason is that you don&amp;rsquo;t need to coordinate routines, and shared mutable state. Rather you write single-threaded programs that feels quite sequential. This is partially what made NodeJS as popular as
+it is - the async nature is built in to NodeJS and async is often default and a synchronous API is made an option.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;asyncio&lt;/code&gt; gives us asynchronous I/O, thus it is suitable for file and network operations, where the process will be schedule to wait for data being available. It is &lt;strong&gt;not&lt;/strong&gt; suitable for CPU-bound programming - here you need to fallback to threading or multi-processing.&lt;/p&gt;
+
+&lt;p&gt;As it turns out, the intended example project - a BitTorrent client - have plenty of I/O and not so much CPU-bound work to do - it should match &lt;code&gt;asyncio&lt;/code&gt; perfectly.&lt;/p&gt;
+
+&lt;h3 id=&#34;await-and-async&#34;&gt;await and async&lt;/h3&gt;
+
+&lt;p&gt;If you run the code snippet below, you will open two TCP connections to two of Google&amp;rsquo;s DNS servers. Once the connection is open, we&amp;rsquo;ll pretend to do some I/O but rather sleeping. Once the fictive work is done, the connection will be closed.&lt;/p&gt;
+
+&lt;p&gt;This is all run on a single thread, yet two connections are open at the same time. If you run the program for a couple of times you will see that the order in which the connections are closed varies due to the randomized time to sleep.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import asyncio
+from random import randint
+
+async def do_stuff(ip, port):
+    print(&#39;About to open a connection to {ip}&#39;.format(ip=ip))
+    reader, writer = await asyncio.open_connection(ip, port)
+
+    print(&#39;Connection open to {ip}&#39;.format(ip=ip))
+    await asyncio.sleep(randint(0, 5))
+
+    writer.close()
+    print(&#39;Closed connection to {ip}&#39;.format(ip=ip))
+
+if __name__ == &#39;__main__&#39;:
+    loop = asyncio.get_event_loop()
+
+    work = [
+        asyncio.ensure_future(do_stuff(&#39;8.8.8.8&#39;, &#39;53&#39;)),
+        asyncio.ensure_future(do_stuff(&#39;8.8.4.4&#39;, &#39;53&#39;)),
+    ]
+
+    loop.run_until_complete(asyncio.gather(*work))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start with the main code block. First we get a reference to the default &lt;a href=&#34;https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop&#34;&gt;event loop&lt;/a&gt;. Then we create a list of two tasks calling the function &lt;code&gt;do_stuff&lt;/code&gt; and tell the event loop to run until those tasks are complete.&lt;/p&gt;
+
+&lt;p&gt;The function &lt;code&gt;do_stuff&lt;/code&gt; is declared with the &lt;code&gt;async def&lt;/code&gt; statement, which makes it into something called a &lt;a href=&#34;https://docs.python.org/3/glossary.html#term-coroutine&#34;&gt;coroutine&lt;/a&gt;. A &lt;em&gt;coroutine&lt;/em&gt; is a special kind of generator and to which you can send a value back. The nice thing about coroutines is that they can be suspended, and resumed at a later state - with the scoped variables intact.&lt;/p&gt;
+
+&lt;p&gt;Whenever a &lt;code&gt;await&lt;/code&gt; is reached inside the &lt;code&gt;do_stuff&lt;/code&gt; that coroutine will be suspended until the response is ready (the sending values back to a generator). When resumed, it will continue execution at the same position and keep going until the next &lt;code&gt;await&lt;/code&gt; is there - or until the return statement is reached ( Python use implicit return statements).&lt;/p&gt;
+
+&lt;p&gt;Now, back to the &lt;em&gt;event loop&lt;/em&gt;. Whenever a coroutine is suspended, the event loop will resume another coroutine (given that it is ready to be resumed). This is the &lt;em&gt;cooperative multi-tasking&lt;/em&gt; - coroutines will take turns running on the same thread, but two coroutines will &lt;strong&gt;not&lt;/strong&gt; run in parallel.&lt;/p&gt;
+
+&lt;p&gt;Basically, any function that supports asyncio is either declared using &lt;code&gt;async def&lt;/code&gt; &lt;em&gt;or&lt;/em&gt; by using the decorator &lt;code&gt;@asyncio.coroutine&lt;/code&gt;. Any code calling such functions needs to use the &lt;code&gt;await&lt;/code&gt; statement &lt;em&gt;or&lt;/em&gt; &lt;code&gt;yield from&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In Python 3.4 the asyncio used the decorator &lt;code&gt;@coroutine&lt;/code&gt; for a special type of generator, and &lt;code&gt;yield from&lt;/code&gt; to pause the the generator while waiting for something to happen (e.g. a read being ready to consume). In Python 3.5 this was replaced by the expressions &lt;code&gt;async&lt;/code&gt; and &lt;code&gt;await&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Awaitable&lt;/em&gt; functions (or coroutines) needs to be wrapped in a Future and handed
+over to the &lt;em&gt;event loop&lt;/em&gt;. And finally the &lt;em&gt;event loop&lt;/em&gt; needs to be instructed to run.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;This was a short introduction to asyncio in Python. If you have done async programming in another language (JavaScript, C#) you might feel just at home, if not there are great articles presenting Python&amp;rsquo;s implementation in details and with a proper walkthrough from iterator, generator, corouties to async/await.&lt;/p&gt;
+
+&lt;p&gt;Brett Cannon have written an excellent post &lt;a href=&#34;http://www.snarky.ca/how-the-heck-does-async-await-work-in-python-3-5&#34;&gt;How the heck does async/await work in Python 3.5&lt;/a&gt;. And A. Jesse Jiryu Davis and Guido van Rossum gives great detail in their article &lt;a href=&#34;http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html&#34;&gt;A Web Crawler With asyncio Coroutines&lt;/a&gt;. If you only read one, I recommend Brett Cannon&amp;rsquo;s as I found it easier to digest.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Python pip virtualenv in Windows</title>
+      <link>http://www.markuseliasson.se/article/python-pip-virtualenv-windows/</link>
+      <pubDate>Tue, 24 Feb 2015 22:00:33 +0100</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/python-pip-virtualenv-windows/</guid>
+      <description>
+
+&lt;p&gt;I needed to setup my Windows 8 machine for Python and Django development as I
+was fed up with running virtualbox and I really wanted to run PyCharm native
+in Windows. I jotted down these simple steps for future reference, or if
+someone else needs a brief overview.&lt;/p&gt;
+
+&lt;h2 id=&#34;install-python&#34;&gt;Install python&lt;/h2&gt;
+
+&lt;p&gt;I chose the official Python Windows distribution, the later versions comes
+with pip bundled. All I needed to do was to add two directories to my PATH:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SET PATH=%PATH%;C:\&amp;lt;path-to-python&amp;gt;\;C:\&amp;lt;path-to-python&amp;gt;\Scripts\
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;setup-a-new-virtualenv&#34;&gt;Setup a new virtualenv&lt;/h2&gt;
+
+&lt;p&gt;I do not use PowerShell and did not bother trying to find an alternative
+for virtualenvwrapper that I use in bash. Instead I just roll my virtualenvs
+manually. First thing you need to do is to install virtutalenv:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;pip install virtualenv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Creating a virtual environment by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;virtualenv C:\virtualenvs\foo-env
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Activate this virtual environment by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; C:\virtualenvs\foo-env\Scripts
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;From this stage it was only a matter of importing my project to PyCharm and
+select the right Python Interpreter.&lt;/p&gt;
+
+&lt;p&gt;A side note, as I use Makefiles to wrap my Django tasks I can really
+recommend &lt;a href=&#34;https://github.com/bmatzelle/gow&#34;&gt;gow&lt;/a&gt; a lightweight unix util
+distribution for windows.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

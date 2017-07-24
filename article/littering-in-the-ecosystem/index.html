@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Littering in the ecosystem &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Littering in the ecosystem</h1>
+                        <div class="tidy-article-ingress">
+                            <p>Are we littering the JavaScript ecosystem, or are we setting up a smorgasboard of choices?</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/javascript">JavaScript</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Monday, May 15, 2017
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        <p>The other day I was in a discussion on the general situation with JavaScript development. I argued that the JavaScript community many time feels like a youth centre, everyone trying to show off themselves and not everyone taking responsibility on what they do. I even expressed that publishing many small NPM packages should be seen as littering the JavaScript ecosystem. Heck, one <a href="https://www.npmjs.com/~mafintosh">developer</a> published over 500 packages and this behaviour seems to be encouraged by the community.</p>
+
+<p>Today, I revisited these thoughts and asked myself <em>why</em> I feel this way. What is the problem with having many packages to choose from? Sure, the dependencies your application have each introduce a risk - but the choice of additional dependencies cannot be seen as a risk but a smorgasbord, right? Does my feeling have any reason, or is it just that I am unused to these small modules comparing to Java or Python ecosystems?</p>
+
+<p>Some argue that people seems to have forgotten how to program, that we need help left padding a string. I don&rsquo;t worry too much about that, using tested and proven code make sense and allows you to focus on adding value to your product or to your client.</p>
+
+<p>After some thinking I reduced my concern down to two issues:</p>
+
+<ul>
+<li><strong>Discoverability</strong>, having many modules sharing the same namespace makes it harder to search for a package that fit you needs. Also, using nonsense or silly package names trying to be unique does not help.</li>
+<li><strong>Maintainability</strong>, can one developer with 500 packages really maintain all of those? Just managing PR can be a tedious job. Would it not be better with fewer packages that each have several maintainers?</li>
+</ul>
+
+<p>Think about the value your package brings, does it have to be a package? Does it really motivate a new package or can would it be better off as a module in an existing package? Can it just be a gist or a git repository allowing for people to discover and vendor if needed?</p>
+
+<p>If you publish a package you have the responsibility throughout its life-cycle, allow your potential consumers to distinguish between an abandoned package and a fully functional package that is just feature complete.</p>
+
+<p>Don&rsquo;t get me wrong, I think that small modules are a good thing, but some of the existing ones are <a href="https://github.com/gummesson/is-empty-object">tiny</a>, these should not be individual packages and there are far too many abandoned packages still around, littering the ecosystem.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'markus-eliasson';
+    var disqus_identifier = 'http:\/\/www.markuseliasson.se\/article\/littering-in-the-ecosystem\/';
+    var disqus_title = 'Littering in the ecosystem';
+    var disqus_url = 'http:\/\/www.markuseliasson.se\/article\/littering-in-the-ecosystem\/';
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+
