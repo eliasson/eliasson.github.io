@@ -7,7 +7,9 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 11 Nov 2014 22:21:10 +0100</lastBuildDate>
-    <atom:link href="http://www.markuseliasson.se/categories/hugo/index.xml" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="http://www.markuseliasson.se/categories/hugo/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Taxonomies in liquorice</title>
@@ -15,32 +17,9 @@
       <pubDate>Tue, 11 Nov 2014 22:21:10 +0100</pubDate>
       
       <guid>http://www.markuseliasson.se/article/taxonomies-in-liquorice/</guid>
-      <description>&lt;p&gt;My Hugo theme &lt;a href=&#34;https://github.com/eliasson/liquorice&#34;&gt;liquorice&lt;/a&gt; was updated
-yesterday to add simple support for &lt;a href=&#34;http://gohugo.io/taxonomies/overview/&#34;&gt;Taxonomies&lt;/a&gt;.
-Both &lt;em&gt;categories&lt;/em&gt; and &lt;em&gt;tags&lt;/em&gt; is supported both as list view and as the ingress
-part of a single article.&lt;/p&gt;
-
-&lt;p&gt;In order to use it you need to configured in your site configuration (see
-&lt;a href=&#34;http://gohugo.io/taxonomies/usage/&#34;&gt;documentation&lt;/a&gt;), in TOML
-this is basically adding:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[indexes]
-    category = &amp;quot;categories&amp;quot;
-    tag = &amp;quot;tags&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You then add the categories and / or tags per article in the front-matter like:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;+++
-Categories = [&amp;quot;Hugo&amp;quot;]
-Description = &amp;quot;Taxonomies in liquorice&amp;quot;
-Tags = [&amp;quot;liquorice&amp;quot;]
-...
-+++
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Liquorice supports either both categories and tags, only one or neither of them.&lt;/p&gt;
-</description>
+      <description>My Hugo theme liquorice was updated yesterday to add simple support for Taxonomies. Both categories and tags is supported both as list view and as the ingress part of a single article.
+In order to use it you need to configured in your site configuration (see documentation), in TOML this is basically adding:
+[indexes] category = &amp;quot;categories&amp;quot; tag = &amp;quot;tags&amp;quot;  You then add the categories and / or tags per article in the front-matter like:</description>
     </item>
     
     <item>
@@ -49,37 +28,9 @@ Tags = [&amp;quot;liquorice&amp;quot;]
       <pubDate>Mon, 18 Aug 2014 07:21:36 +0000</pubDate>
       
       <guid>http://www.markuseliasson.se/article/going-with-hugo/</guid>
-      <description>
-
-&lt;p&gt;After reading about &lt;a href=&#34;http://hugo.spf13.com/&#34;&gt;Hugo&lt;/a&gt; I decided to give it a go
-and leave the hand made pages behind.&lt;/p&gt;
-
-&lt;p&gt;To be honest, I first considered &lt;a href=&#34;https://ghost.org&#34;&gt;Ghost&lt;/a&gt; and gave that a
-quick spin. Although I really enjoyed Ghosts editor I really dislike the
-dependencies it put on my server, and why generate the same pages over and
-over again?&lt;/p&gt;
-
-&lt;h2 id=&#34;why-hugo-them&#34;&gt;Why hugo them?&lt;/h2&gt;
-
-&lt;p&gt;With Hugo, the site is generated from Markdown to static HTML ridiculously
-fast (we&amp;rsquo;re talking microseconds here). It has one dependency (hugo itself).
-It works on Windows as well as Mac. It uses Markdown.&lt;/p&gt;
-
-&lt;p&gt;And, the fact that it is implemented in go and open source does not hurt.&lt;/p&gt;
-
-&lt;h2 id=&#34;a-few-hours&#34;&gt;A few hours&lt;/h2&gt;
-
-&lt;p&gt;Setting up a basic site and creating a theme was only a matter of a few hours.
-The &lt;a href=&#34;http://hugo.spf13.com/overview/quickstart&#34;&gt;Hugo Quickstart&lt;/a&gt; is basically
-what you need to read, then your good to start publishing.&lt;/p&gt;
-
-&lt;p&gt;The theme for this site is &lt;a href=&#34;http://github.com/eliasson/liquorice&#34;&gt;liquorice&lt;/a&gt;,
-a theme I made myself and made available under the MIT license. I&amp;rsquo;ll try write
-another post on that topic, meanwhile feel free to download the theme at
-&lt;a href=&#34;http://github.com/eliasson/liquorice&#34;&gt;github&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Markus&lt;/em&gt;&lt;/p&gt;
-</description>
+      <description>After reading about Hugo I decided to give it a go and leave the hand made pages behind.
+To be honest, I first considered Ghost and gave that a quick spin. Although I really enjoyed Ghosts editor I really dislike the dependencies it put on my server, and why generate the same pages over and over again?
+Why hugo them? With Hugo, the site is generated from Markdown to static HTML ridiculously fast (we&amp;rsquo;re talking microseconds here).</description>
     </item>
     
   </channel>
