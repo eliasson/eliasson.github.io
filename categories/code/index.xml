@@ -6,10 +6,20 @@
     <description>Recent content in Code on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 15 May 2017 22:53:30 +0200</lastBuildDate>
+    <lastBuildDate>Fri, 23 Mar 2018 18:48:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.markuseliasson.se/categories/code/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Building your own DSL must not be hard</title>
+      <link>http://www.markuseliasson.se/article/building-your-own-dsl/</link>
+      <pubDate>Fri, 23 Mar 2018 18:48:00 +0100</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/building-your-own-dsl/</guid>
+      <description>Currently there is a lot of initiatives that everybody should learn how to program, schools are making programming part of the standard education. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people construct programs. And all in a rapid pace.
+Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language. Not only are we skilled in our languages of choice, we are also trained to be able to pick up new languages fairly quickly, sometimes we might not even be aware of it.</description>
+    </item>
     
     <item>
       <title>Littering in the ecosystem</title>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Building your own DSL must not be hard &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Building your own DSL must not be hard</h1>
+                        <div class="tidy-article-ingress">
+                            <p>The need for different types of computer languages is growing rapidly — luckily it turns out that creating your own Domain Specific Language does not have to be too hard.</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/software-development">Software Development</a>
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/software-development">Software Development</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/sequence">Sequence</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/dsl">DSL</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Friday, March 23, 2018
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>Currently there is a lot of initiatives that everybody should learn how to program, schools are making programming part of the standard education. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people construct programs. And all in a rapid pace.</p>
+
+<p>Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language. Not only are we skilled in our languages of choice, we are also trained to be able to pick up new languages fairly quickly, sometimes we might not even be aware of it. If you stop to think about it, how many computer languages have you worked with during your career - 5, 10, 20 or more?</p>
+
+<p>In short, programming is growing tremendously, it is finding its way into new domains and new people finds it way into programming - I think it is safe to say that we will see an increasing need for many different types of programming languages in the near future.</p>
+
+<h2 id="not-hard-really">Not hard - really?</h2>
+
+<p>I think many engineers mistakenly assume that a creating your own language, and especially the dreaded compiler is a huge undertaking and a very complex one. If the language is a General Purpose Language such as Java, C, Rust — yes the task is daunting to say the least. There must be a reason why some argue that the C compiler is one of the most complex piece of software out there.</p>
+
+<p>Thankfully, a Domain Specific Language is not a General Purpose Language per definition. A DSL can be, and often is much simpler, and it might not even need a complex compiler.</p>
+
+<p>A General Purpose Language i generic by definition. Its domain is not the domain in which it is being used, but rather the domain <em>computer science</em>. Scala is a great example of a GPL. It leans heavily on theories form both computer science and math (such as category theory) and can be used to write programs either in functional or object-oriented style - one cost of this is that both the language and the compiler is well known for its complexities.</p>
+
+<p>A DSL, as I see it, has a few different characteristics:</p>
+
+<p><strong>Simpler grammar</strong> - The grammar should be kept as simple as possible, or as <a href="https://www.python.org/dev/peps/pep-0020/">The Zen of Python</a> puts it <em>&ldquo;There should be one&ndash; and preferably only one &ndash;obvious way to do it.&rdquo;</em>. This goes well in hand when defining a <em>Ubiquitous Language</em> for domain experts to use.</p>
+
+<p><strong>A single abstraction level</strong> - A DSL should be designed to operate on a single abstraction level - its purpose is specific and not general. If you have a wide spectrum, maybe it is better to go with multiple DSL&rsquo;s, choose a GPL, or maybe even build an embedded DSL. HTML and CSS is an example where two different languages are used, one for describing the semantics of a document and the other for styling it (including graphical transitions). Although there is an overlap in domain, and HTML can inline style properties, it is two separate languages.</p>
+
+<p><strong>Tooling</strong> - A DSL is only as good as it&rsquo;s tooling. Putting an untrained programmer in front of a great language, but with poor tooling, will lower the adoption rate. Likewise, a well-trained programmer will most likely fall back and use one of the other languages he or she knows to get the job done. I do think that, for some reason, people are more forgiving when using a GPL when it comes to tooling (or at least I am).</p>
+
+<p><strong>No machine-code</strong> - Traditional programming languages compile to machine code, or to some sort of byte code like the JVM or CLR. For a DSL that is not always the case, a DSL can very well be used for configuration, modelling, etc. Thus, there might not be a need for a generator / compiler, instead the motivation might just be a language with editor support.</p>
+
+<p>This does not automatically mean that a DSL is simple, but for some use-cases you might get away with a smaller scope than a traditional language. Also, there is plenty of high quality, and free, tools available for you to use to get a pretty good tooling.</p>
+
+<p>To prove my point, I intend to illustrate this by developing an example language with associated tooling and publish both articles and code to follow up on that work.</p>
+
+<p>Finally, not only do I think this skill will be more valuable in the future, it is very fun to develop a language!</p>
+
+<h2 id="illustrating-with-an-example">Illustrating with an example</h2>
+
+<p>I often find myself creating sequence diagrams, whether it is to designing a system, explaining some details for a colleague or just when trying to understand something for myself. The last few years I have used the excellent service <a href="http://websequencediagrams.com">http://websequencediagrams.com</a> but I have two problems with that service:</p>
+
+<p>1) Version control, I needed to manually keep my source files under version control and copy paste into the web editor.</p>
+
+<p>2) Online only, I do a fair share of work while travelling and in the deep forests of Sweden you’re not always connected to the Internet.</p>
+
+<p>This will result in a blog series about creating a custom language where you can express a sequence flow and produce image representations out of these, both using a command line tool as well as Visual Studio Code.</p>
+
+<p>The upcoming posts are planned to cover the following topics:</p>
+
+<ul>
+<li>Defining a language</li>
+<li>Parsing source files</li>
+<li>Analyzing an AST</li>
+<li>Producing the target image</li>
+<li>Syntax highlight</li>
+<li>Showing diagnostics</li>
+<li>Producing images in VS Code</li>
+</ul>
+
+<p>The work for the tool is ongoing, and while not complete, there is a command line tool that is in a usable state.</p>
+
+<p>The source code is available on GitHub at <a href="http://github.com/eliasson/sequence">http://github.com/eliasson/sequence</a></p>
+
+<p>In the next post I will discuss the language, reasoning on why I designed it the way I did and how to use a tool called <em>parser generator</em> to create a parser for your language.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "markus-eliasson" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+
