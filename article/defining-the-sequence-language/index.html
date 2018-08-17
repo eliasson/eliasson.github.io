@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Defining the Sequence language &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Defining the Sequence language</h1>
+                        <div class="tidy-article-ingress">
+                            <p>Even a tiny language as Sequnce requires a careful and iterative process, you need to consider both the semantics and the synatax.</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/software-development">Software Development</a>
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/software-development">Software Development</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/sequence">Sequence</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/dsl">DSL</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Thursday, August 16, 2018
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>When discussing languages, especially computer language, I have noticed that people often start
+with expressing their view on syntax and grammar.  Just like it is easy to have opinions about
+the appearance of an application, they are both <em>user interfaces</em>. What is far more important
+is the <em>semantics</em>, what the language allows to be expressed. I do not think look and feel or syntax
+is superficial - it is still very important, but second to semantics.</p>
+
+<h3 id="start-with-the-semantics">Start with the semantics</h3>
+
+<p>When I drafted the Sequence language I sat down and tried to express sequence diagrams
+as natural as I could. I tried hard to completely ignored technical aspects, like complexity
+of parsing or the &ldquo;correctness&rdquo;. As this is a small language and one of the use-cases is to
+describe the process in which it was developed, I tried to not overthink or over-engineer the
+language.</p>
+
+<p>What I knew I wanted:</p>
+
+<ul>
+<li><strong>Fluent language</strong> - I wanted anyone be able to read and understand the sequence of messages</li>
+<li><strong>Focused</strong> - I did not want to support all use-cases there is for sequence diagrams, all I wanted was to cover the basic situations</li>
+<li><strong>Not UML</strong> - I had no ambition to fulfil UML or any other notation, unless it made sense to do so</li>
+</ul>
+
+<p>This was one of the first drafts I came up with:</p>
+
+<pre><code>Actor Alice:
+    Alices description in plain text
+
+System Acme
+
+Sequence Login:
+    Alice -&gt; Acme: Make me a sandwich
+    Acme -&gt; Acme: Housekeeping work
+        Indentend block under a single interaction becomes a
+        description for that interaction.
+</code></pre>
+
+<p>First off, I wanted to have a global definition of Actors and Systems, clearly defining any participant
+taking place in the upcoming message exchange. Participants should have an optional description to allow
+for shorter names, but still allow for a detailed description within the document.</p>
+
+<p>This also enables having multiple sequences in a single file, and later in a single diagram. Which is
+quite useful for describing alternative or very similar sequences involving the same participants (e.g.
+login, and failed login sequences).</p>
+
+<p>Each sequence should then define the list of messages containing <em>source</em>, <em>destination</em> and the actual
+<em>message</em>.</p>
+
+<h3 id="words-over-symbols">Words over symbols</h3>
+
+<p>I thought this was pretty good, it allows me to describe actors and systems separately, where an actor
+is a human and a system is a system. And it&rsquo;s clear that <strong>Alice</strong> sends a message to <strong>Acme</strong>. The
+arrow notation was also something I was used to from <a href="http://websequencediagrams.com">websequencediagrams.com</a></p>
+
+<p>Then I quickly realized that having different symbols for the type of message was problematic,
+would I render an asynchronous message as <code>~&gt;</code>, a reply as <code>&lt;-</code>? I came to the conclusion that
+using words are better than symbols.</p>
+
+<p>Symbols are only meaningful if the user has previous experience of those. Which in my case would require
+symbols to be established in the <em>domain</em> of sequence diagrams. This is a well-known fact among
+<a href="https://www.nngroup.com/articles/icon-usability/">usability experts</a>, which says that an icon needs a
+label and standalone icons can be problematic.</p>
+
+<p>Thus, I replaced the arrows with the wording of <strong>ask</strong> or <strong>tell</strong> to better communicate
+the nature of the message (asynchronous or synchronous). I also changed <strong>System</strong> to <strong>Object</strong> since I though
+<strong>System</strong> was a bit to narrow.</p>
+
+<p>My next iteration of the language draft now looked like this:</p>
+
+<pre><code class="language-bash">Actor Alice
+    Alices description in plain text
+
+Actor Bob
+Object Acme
+
+Sequence Hello
+    Alice tell Bob
+        | Sync call to Bob
+
+    Alice ask Bob
+        | Async call to Bob
+</code></pre>
+
+<h3 id="talk-to-your-users">Talk to your users</h3>
+
+<p>When I showed this for my collogue (<a href="https://twitter.com/provegard">@provegard</a>), he immediately pointed out that
+I swapped the semantic meaning of <code>tell</code> and <code>ask</code> - at least compared to how <a href="https://doc.akka.io/docs/akka/2.5/actors.html#send-messages">Akka</a>
+(a JVM actor implementation) defines them.</p>
+
+<p>This lead to an interesting discussion on the semantics of both <strong>ask</strong> and <strong>tell</strong> and was very valuable
+and made it obvious that I had mixed things up.</p>
+
+<ul>
+<li><strong>Tell</strong> - should be asynchronous since you when tell someone something you do not expect an answer.</li>
+<li><strong>Ask</strong> - should be synchronous since when you ask someone something, you wait for the answer.</li>
+</ul>
+
+<p>Lesson learned here is that it&rsquo;s easy to be blind to flaws if you&rsquo;re the only one using the language.
+This, however, is not to say that multiple people should define a language, I am a firm
+believer that a language should have a benevolent dictator.</p>
+
+<p>I also removed the free form text from both descriptions and message text. The reason was a combination
+of my familiarity of using strings combined with the fear of parsing inline text fragments.</p>
+
+<p>These changes resulted in the latest, and present, version of Sequence:</p>
+
+<pre><code class="language-bash">Name &quot;Sequence demo&quot;
+
+Actor User
+Object Alpha
+Object Bravo
+
+Sequence Test
+    User ask Alpha &quot;A synchronous message&quot;
+    Alpha tell Bravo &quot;An asynchronous message&quot;
+    Bravo replies Alpha &quot;A response message&quot;
+    Alpha replies User &quot;&quot;&quot;
+        This is a multi-line
+        message text!
+        &quot;&quot;&quot;
+</code></pre>
+
+<p>My primary takeaways from defining the Sequence language so far is:</p>
+
+<ul>
+<li><strong>Begin with the semantics</strong> - Start with what do you want to express and then move into grammar and syntax</li>
+<li><strong>Words over symbols</strong> - Icons and symbols are only valuable if they are established in the domain</li>
+<li><strong>Talk to your users</strong> - Avoid a self-centered language, is your choice of words shared by your users?</li>
+</ul>
+
+<p>Next up we will dive into the technical aspects of defining and parsing the language. I will show how to
+create a parser for the Sequence language and how you can use TDD your way through the grammar definition.</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "markus-eliasson" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+
