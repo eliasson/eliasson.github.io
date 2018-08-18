@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Building a parser for Sequence &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="tidy-page">
+    <div class="container">
+        <footer class="tidy-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+        </div>
+    </div>
+</footer>
+
+        <div class="row">
+            <div class="col-xs">
+                <article class="tidy-article">
+                    <header class="tidy-article-header">
+                        <h1 class="tidy-article-title">Building a parser for Sequence</h1>
+                        <div class="tidy-article-ingress">
+                            <p>Now that we have defined what we want the Sequence language to look like, we need to formalize this in a grammar and then build a parser to parse our input into an Abstract Syntax Tree</p>
+                            <span class="tidy-article-taxonomies">
+                                
+                                    Posted in
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/software-development">Software Development</a>
+                                    
+                                        <a href="http://www.markuseliasson.se/categories/code">Code</a>
+                                    
+                                
+
+                                
+                                    with tags
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/software-development">Software Development</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/sequence">Sequence</a>,
+                                    
+                                        <a href="http://www.markuseliasson.se/tags/dsl">DSL</a>,
+                                    
+                                
+                                 at 
+                            </span>
+                            <time class="tidy-article-date">
+                                Saturday, August 18, 2018
+                            </time>
+                        </div>
+                    </header>
+                    <section class="tidy-article-body">
+                        
+
+<p>Previously, in <a href="/article/defining-the-sequence-language/">Defining the Sequence language</a> we drafted a version
+of the <strong>Sequence</strong> language that were happy with, now we need to formalize this language and build a parser for it.</p>
+
+<p>The language, as we left it looks like:</p>
+
+<pre><code>Name &quot;Sequence demo&quot;
+
+Actor User
+Object Alpha
+Object Bravo
+
+Sequence Test
+    User ask Alpha &quot;A synchronous message&quot;
+    Alpha tell Bravo &quot;An asynchronous message&quot;
+    Bravo replies Alpha &quot;A response message&quot;
+    Alpha replies User &quot;&quot;&quot;
+        This is a multi-line
+        message text!
+        &quot;&quot;&quot;
+</code></pre>
+
+<p><em>For new readers, Sequence is a tiny domain specific language used to describe sequence diagrams. I use it as basis
+for a series of blog posts covering how to build such a tool together with a Visual Studio Code extension. See the
+initial post <a href="/article/building-your-own-dsl/">here</a>.</em></p>
+
+<h2 id="scanning-lexing-tokenizing-and-parsing">Scanning, lexing, tokenizing and parsing</h2>
+
+<p>There are many different terms used for the process of getting from a stream of characters (our source code) into a structure
+that reflects the grammar of our language. <strong>Scanning</strong> or <strong>lexing</strong> is the first part of this process - converting the stream
+of characters into a stream of <strong>tokens</strong>. This might also be referred to as <em>lexical analysis</em>, or by some, <em>tokenizing</em>.</p>
+
+<p>Tokenizing works by recognizing patterns of characters (e.g. by using regular expressions) into tokens that carries a type and the
+matched word (which is called <em>lexeme</em>).</p>
+
+<p>A <strong>parser</strong> will take this stream of <strong>tokens</strong> and transform into a tree-form data structure according to the <em>grammar</em> of the
+language.</p>
+
+<pre><code># Small piece of Sequence code
+Sequence Test
+    User ask Alpha &quot;Hi&quot;
+
+# The fragment above is really just a sequence of characters:
+characters = ['S', 'e', 'q', 'u', 'e', 'n', 'c', 'e', ' ', 'T', 'e', 's', 't', '\n', ' ', ' ', ' ', ' ', 'U', 's', 'e', 'r', ' ', 'a', 's', 'k', ' ', 'A', 'l', 'p', 'h', 'a', ' ', '&quot;', 'H', 'i', '&quot;']
+
+# Which gets converted into tokens
+tokens = [
+    {
+        &quot;type&quot;: &quot;sequence&quot;,
+        &quot;lexeme&quot;: &quot;Sequence&quot;
+    },
+    {
+        &quot;type&quot;: &quot;identifier&quot;,
+        &quot;lexeme&quot;: &quot;Test&quot;
+    },
+    {
+        &quot;type&quot;: &quot;identifier&quot;,
+        &quot;lexeme&quot;: &quot;User&quot;
+    },
+    {
+        &quot;type&quot;: &quot;ask&quot;,
+        &quot;lexeme&quot;: &quot;ask&quot;
+    },
+    {
+        &quot;type&quot;: &quot;identifier&quot;,
+        &quot;lexeme&quot;: &quot;Alpha&quot;
+    },
+    {
+        &quot;type&quot;: &quot;string&quot;,
+        &quot;lexeme&quot;: &quot;Hi!&quot;
+    }
+]
+
+# We convert that into a tree structure of nodes (called AST)
+tree = {
+    &quot;type&quot;: &quot;root&quot;,
+    &quot;children&quot;: [
+        {
+            &quot;type&quot;: &quot;sequence&quot;,
+            &quot;value&quot;: &quot;Test&quot;,
+            &quot;children&quot;: [
+                {
+                    &quot;type&quot;: &quot;interaction&quot;
+                    &quot;value&quot;: &quot;&quot;,
+                    &quot;children&quot;: [
+                        {
+                            &quot;type&quot;: &quot;source&quot;
+                            &quot;value&quot;: &quot;User&quot;,
+                            &quot;children&quot;: []
+                        },
+                        {
+                            &quot;type&quot;: &quot;ask&quot;
+                            &quot;value&quot;: &quot;&quot;,
+                            &quot;children&quot;: []
+                        }
+                        {
+                            &quot;type&quot;: &quot;source&quot;
+                            &quot;value&quot;: &quot;User&quot;,
+                            &quot;children&quot;: []
+                        },
+                        {
+                            &quot;type&quot;: &quot;destination&quot;
+                            &quot;value&quot;: &quot;Alpha&quot;,
+                            &quot;children&quot;: []
+                        },
+                        {
+                            &quot;type&quot;: &quot;message&quot;
+                            &quot;value&quot;: &quot;Hi!&quot;,
+                            &quot;children&quot;: []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+</code></pre>
+
+<p>There are multiple ways of implementing a parser in order to generate this tree, three common approaches are:</p>
+
+<p><strong>Hand-written</strong> - Unsurprisingly, is when you write all parts by yourself. This can be quite challenging
+depending on how your language is constructed (left recursion, etc.), but also gives you unlimited possibilities
+for error handling. I recommend Ruslan Spivak’s article series
+<a href="https://ruslanspivak.com/lsbasi-part1/">Let’s Build A Simple Interpreter</a> if you want to read up on how to build one yourself.</p>
+
+<p><br/>
+<strong>Parser combinator</strong> - A parser combinator provides a library of small functions that you can compose to
+write a complex parser in (often using functional composition). See <a href="https://medium.com/@chetcorcos/introduction-to-parsers-644d1b5d7f3d">this article</a>
+for a short introduction to parser combinators and examples using a JavaScript parser combinator.</p>
+
+<p><br/>
+<strong>Parser generator</strong> - A parser generator, is a separate program (a compiler actually) that generates a parser
+given a formal grammar definition. Often you describe your grammar in a format resembling
+<a href="https://en.wikipedia.org/wiki/Backus–Naur_form">Backus-Naur Form</a> and run a tool that generates the source
+code for a parser that you can use in your program.</p>
+
+<p><em>I will not explain lexical theory in this post as there are tons of good articles available online which do
+that better than I ever could. Instead this article will give you an overview and refer to a small implementation
+with code available on <a href="https://github.com/eliasson/sequence">GitHub</a>.</em></p>
+
+<h2 id="generating-a-parser">Generating a parser</h2>
+
+<p>For Sequence I settled on using a parser generator as I did not want to hand write a parser. I chose
+<a href="http://www.antlr.org">ANTLR4</a>, this is one of the most well-known parser generators out there. It has
+an active community, good documentation (including a few books) and generates
+<a href="https://sap.github.io/chevrotain/performance/">fairly performant parsers</a>.</p>
+
+<p>ANTLR, is a Java program but is not limited to you using Java, at it can output generators in several different
+programming languages – one of which is <code>JavaScript</code>. As Visual Studio Code extensions are implemented
+in <code>TypeScript</code> or <code>JavaScript</code> this fits perfectly.</p>
+
+<blockquote>
+<p>Also, I do believe that you do not have to be a compiler nerd to implement your own language - or at
+least I am not one. Based on you language and your needs a parser generator will be good enough and save
+you a lot of trouble. Of course, people on the Internet tends to disagree on this matter.</p>
+</blockquote>
+
+<p>In ANTLR you define your lexical rules, which patterns or stream of characters that should be recognized
+and then you use these lexical tokens when defining the grammar (the rules of token composition). The
+grammar rules (try reading the grammar rules as tree definitions).</p>
+
+<p>The grammar definition in ANTLR is also a DSL and for the Sequence language, a stripped-down version of
+the grammar definition looks like this:</p>
+
+<pre><code>grammar Sequence;
+
+// Defines two custom tokens to deal with the whitespace significance, which is omitted
+// from this example
+tokens { INDENT, DEDENT }
+
+// The root rule is where it all starts. This rule states what constructs that
+// is allowed on the root level. The EOF indicates that the full input should
+// be read and matched by the parser, else an error will be thrown.
+root
+    : NEWLINE* documentMeta definitions EOF
+    ;
+
+documentMeta
+    : documentName
+    ;
+
+documentName
+    : DOCUMENT_NAME string NEWLINE?
+    ;
+
+definitions
+    : (NEWLINE | actorDefinition | objectDefinition | sequenceDefinition)*
+    ;
+
+actorDefinition
+    : ACTOR IDENTIFIER IS string NEWLINE?
+    | ACTOR IDENTIFIER NEWLINE?
+    ;
+
+objectDefinition
+    : OBJECT IDENTIFIER IS string NEWLINE?
+    | OBJECT IDENTIFIER NEWLINE?
+    ;
+
+sequenceDefinition
+    : SEQUENCE IDENTIFIER sequenceBlock
+    ;
+
+sequenceBlock
+    : NEWLINE INDENT sequenceMessage* DEDENT
+    ;
+
+sequenceMessage
+    : IDENTIFIER (ASK|TELL|REPLIES) IDENTIFIER string NEWLINE?
+    | IDENTIFIER (ASK|TELL|REPLIES) IDENTIFIER NEWLINE?
+    ;
+
+// String exposed as a grammar rule to make it testable directly
+// without piggy-back on another rule.
+string
+    : STRING
+    ;
+
+// Definition of string tokens
+DOCUMENT_NAME                                           : 'Name';
+ACTOR                                                   : 'Actor';
+OBJECT                                                  : 'Object';
+IS                                                      : 'is';
+SEQUENCE                                                : 'Sequence';
+ASK                                                     : 'ask';
+TELL                                                    : 'tell';
+REPLIES                                                 : 'replies';
+
+// Captures any word that is not a keyword. Keep this after the keywords
+// are defined
+IDENTIFIER
+    : LETTER+ LETTERORDIGIT*
+    ;
+
+COMMENT
+    : '#' .+? (NEWLINE | EOF) -&gt; skip
+    ;
+
+STRING
+    : (SINGLE_LINE_STRING | MULTI_LINE_STRING)
+    ;
+
+SKIPPING
+    : SPACES -&gt; skip
+    ;
+
+// A fragment itself will (cannot) be interpreted as a token, it is only meant
+// to be reused from other lexer rules.
+
+fragment SPACES
+    : [ \t]+
+    ;
+
+fragment LETTER
+    : [a-zA-Z]
+    ;
+
+fragment LETTERORDIGIT
+    : [a-zA-Z0-9]
+    ;
+
+fragment DIGIT
+    : [0-9]
+    ;
+
+fragment SINGLE_LINE_STRING
+    : '&quot;' (. | ~[\r\n&quot;])*? '&quot;'
+    | '\'' (. | ~[\r\n'])*? '\''
+    ;
+
+fragment MULTI_LINE_STRING
+    : '&quot;&quot;&quot;' (.)*? '&quot;&quot;&quot;'
+    | '\'\'\'' (.)*? '\'\'\''
+    ;
+</code></pre>
+
+<p>Lexical rules are in <code>UPPER-CASE</code> and grammar must start with a <code>lower-case</code> character. Other than that, I think
+the ANTLR-grammar in this example is pretty easy to understand. (ANTLR has quite a few features, I am only using
+the very basic).</p>
+
+<p>The full grammar is available at <a href="https://github.com/eliasson/sequence/blob/master/parser/Sequence.g4"><code>parser/Sequence.g4</code></a></p>
+
+<h3 id="feedback-loop">Feedback loop</h3>
+
+<p>Defining all the grammar at once is not what I recommend, I argue that you should TDD your language just like
+any other implementation. The cycle I used for developing this language was:</p>
+
+<ol>
+<li>Implement the test for the new language construct</li>
+<li>Update the ANTLR grammar file with the new construct</li>
+<li>Generate a new parser (i.e. use the ANTLR compiler to generate source code)</li>
+<li>Run your tests</li>
+</ol>
+
+<p>As stated in (3) a new parser will be generated several times, overwriting the existing parser. For this reason,
+the generated parser is separated from the other source code, and no modifications should be made to the generated code.</p>
+
+<h3 id="using-the-antlr-generated-parser">Using the ANTLR generated parser</h3>
+
+<p>Generate the Sequence parser by running the following commands:</p>
+
+<pre><code class="language-bash"># The following command use the alias defined when installing ANTLR
+$ antlr4 -Dlanguage=JavaScript ./parser/Sequence.g4
+
+# Which is the equvivalent of this command
+$ java -Xmx500M -cp &quot;/usr/local/lib/antlr-4.7-complete.jar:$CLASSPATH&quot; org.antlr.v4.Tool -Dlanguage=JavaScript ./parser/Sequence.g4
+</code></pre>
+
+<p>ANTLR will output the source code for the parser next to where the <code>.g4</code> file is located. In the case
+of Sequence you can find them in the directory <a href="https://github.com/eliasson/sequence/tree/master/parser">./parser/</a>.</p>
+
+<p>We will import these modules in our code and use them to scan, lex, and parse the input to what is called a <em>Parser Tree</em>.</p>
+
+<p>A <strong>Parser Tree</strong> is very similar to an <em>Abstract Syntax Tree</em> - but is closer to the actual tokens. E.g.
+a parenthesis might be included in a parser tree to denote the start of a list, but is is not included
+in the AST (which might only contain a <code>List</code> and <code>ListItems</code>).</p>
+
+<pre><code class="language-javascript">import * as antlr4 from 'antlr4';
+import { SequenceLexer } from '../parser/SequenceLexer';
+import { SequenceParser } from '../parser/SequenceParser';
+
+const chars = new antlr4.InputStream(source);
+const lexer = new SequenceLexer(chars);
+const tokens  = new antlr4.CommonTokenStream(lexer);
+const parser = new SequenceParser(tokens);
+parser.buildParseTrees = true;
+
+// Initiate the parsing, and begin with the root rule.
+const parserResult = parser.root();
+</code></pre>
+
+<p>For Sequence there are two places where the generated parser is used, once for the entry point in <a href="https://github.com/eliasson/sequence/blob/master/src/index.js"><code>src/index.js</code></a>
+of our <em>compiler</em> (transpiler, generator or what you might call it). And another place is in the test utils at <a href="https://github.com/eliasson/sequence/blob/master/__tests__/test-utils.js"><code>__tests__/test-utils.js</code></a>, so that we can test individual grammar rules.</p>
+
+<p>One nice thing with the generated parser is that all the grammar rules are accessible. Notice the call made to
+<code>parser.root()</code> above? This will parse the input according to the grammar defined by <code>root</code> in the <code>.g4</code> file. This
+makes is super easy to write tests for only parts of your grammar.</p>
+
+<p>E.g. if we were to write a test to make sure that an actor definition can be successfully parsed, we could have
+the test only parse the input using the grammar defined in <code>parser.definitions()</code> (or if we wanted to be even
+more specific <code>parser.actorDefinition()</code>.</p>
+
+<h3 id="unit-test">Unit-test</h3>
+
+<p>Sometimes I write unit-tests for the grammar only - this gives the benefit of having early tests that there is no error or
+ambiguity in the grammar definition (the <code>.g4</code> files) but comes at a cost of some duplication of tests.</p>
+
+<p>Other times I test both the grammar parsing and construction of AST in a single test. This only benefit is that you need to
+write less tests.</p>
+
+<p>To start with I recommend having separate unit-tests for parsing the grammar without exercising your own code.</p>
+
+<p>Here is an example of a small from <a href="https://github.com/eliasson/sequence/blob/master/__tests__/grammar/definitions-grammar.spec.js"><code>__tests__/grammar/definitions-grammar.spec.js</code></a>
+that asserts that an actor definition can be parsed (targetting a single grammar rule as
+described earlier):</p>
+
+<pre><code class="language-javascript">const parse = (src) =&gt; createParser(src, false).definitions();
+
+describe('parse single Actor definition', () =&gt; {
+    let result;
+    beforeEach(() =&gt; {
+        result = parse(
+            'Actor Jane\n' +
+            '');
+    });
+
+    it('should parse without errors', () =&gt; {
+        expect(result.parser._syntaxErrors).toEqual(0);
+    });
+
+    it('should have &quot;Jane&quot; as the symbol name', () =&gt; {
+        expect(result.children[0].children[1].symbol.text).toEqual('Jane');
+    });
+});
+</code></pre>
+
+<p>Not that I even check that the Parser Tree contains the correct element. This is <em>not something I recommend</em>, instead leave
+these tests to check of errors only. Later when building your <strong>Abstract Syntax Tree</strong> you will you will implicitly test
+the parser tree as well. By testing explicitly, like above, you will be more fragile to grammatical changes in your test -
+treat parser tree as an internal implementation detail.</p>
+
+<h3 id="errors-and-warnings">Errors and warnings</h3>
+
+<p>What you eventually will notice is that ANTLR prints errors to standard out, both for parser and lexer-errors. I recommend you to
+substitute the built-in error handler with your own so that you can capture errors, this gives you the possibility to build better
+tests as well as improving how errors are presented to the user.</p>
+
+<pre><code class="language-javascript">const chars = new antlr4.InputStream(source);
+const lexer = new SequenceLexer(chars);
+const tokens  = new antlr4.CommonTokenStream(lexer);
+const parser = new SequenceParser(tokens);
+parser.buildParseTrees = true;
+
+// Remove the standard error listener since we do not want to
+// print to stdout, but to capture the errors ourself to present
+// a nice and tidy error message for the end-user.
+parser.removeErrorListeners();
+lexer.removeErrorListeners();
+
+// Register our listener used to build the AST while the parsing
+// is being done.
+const errorListener = new AntlrErrorListener();  // &lt;-- This is our own class
+parser.addErrorListener(errorListener);
+
+// Initiate the parsing, and begin with the root rule.
+const parserResult = parser.root();
+</code></pre>
+
+<h3 id="building-your-abstract-syntax-tree">Building your Abstract Syntax Tree</h3>
+
+<p>As said, the parser will generate a Parser Tree, which is closely related to the grammar definitions, while you can use this, it is a
+bit raw, a higher abstraction is generally what you want – this is what is known as the Abstract Syntax Tree (or AST for short).</p>
+
+<p>Our AST will be used to represent the participants and sequence of messages, we will use it later to produce the output
+SVG and we will use it to perform semantic analysis (such as not being able to address a message to a non-existing participant).</p>
+
+<p>Therefore, the AST should contain entities as actor, object, message, etc. as well as their associated identifier or value – but not
+lexical details such as parentheses, line-breaks. I have often found that it is enough to keep the parser details to location (file,
+line and column) and the symbol (lexeme) to be able to produce adequate diagnostic messages. My suggestion is to put as few things
+in there as possible, as you always should do when building things.</p>
+
+<p>For Sequence only a few types of nodes are needed, below is their definition in JavaScript.</p>
+
+<pre><code class="language-javascript">
+/**
+ * The root node represents the sequence document, containing the meta-data
+ * information, actors and the defined sequence flows.
+ */
+export class RootNode extends Node { ... }
+
+/**
+ * The declaration of the document name.
+ *
+ *     Name &quot;My sequence flow&quot;
+ */
+export class NameNode extends Node { ... }
+
+/**
+ * Represents an identifier of something (e.g. a sequence or a participant).
+ *
+ * E.g. the name of the actor is an identifier
+ *
+ *     Actor Alice
+ */
+export class IdentifierNode extends Node { ... }
+
+/**
+ * The definition of an actor, where the string at the end is the description.
+ *
+ *     Actor Alice is &quot;A user&quot;
+ */
+ export class ActorNode extends NodeWithIdentifier { ... }
+
+/**
+ * The definition of an object, where the string at the end is the description.
+ *
+ *     Object Bob is &quot;A fake system&quot;
+ */
+export class ObjectNode extends NodeWithIdentifier { ... }
+
+/**
+ * A Sequence of messages between one or more participants. This is what makes
+ * a sequence diagram.
+ *
+ *      Sequence Hello
+ *          Alice tell Bob &quot;Sudo, make me a sandwich&quot;
+ *          Alice tell Charlie &quot;Hello&quot;
+ */
+export class SequenceNode extends NodeWithIdentifier { ... }
+
+/**
+ * The message that is exchanged by two participants, both of which are refered
+ * to by their identifiers (names).
+ *
+ *      Alice ask Bob &quot;Sudo, make me a sandwich&quot;
+ */
+export class MessageNode extends Node { ... }
+
+/**
+ * Represents a string value, that can either be from a single line or a
+ * multi-line string. This is what is between the quotes in a message.
+ *
+ *     Alice ask Bob &quot;Sudo, make me a sandwich&quot;
+ *
+ */
+export class StringNode extends Node { ... } 
+</code></pre>
+
+<p>If you&rsquo;re curious, go and have a look at the file <a href="https://github.com/eliasson/sequence/blob/master/src/ast.js"><code>src/ast.js</code></a>
+for a full view on what the AST nodes looks like.</p>
+
+<h3 id="visit-your-parser-tree">Visit your parser tree</h3>
+
+<p>So, how exactly is this parser tree of ours transformed into a AST?</p>
+
+<p>When generating the parser ANTLR also generates a listener that defines <code>enter</code> and <code>exit</code> methods
+for all grammar rules defined, if you open the file <a href="https://github.com/eliasson/sequence/blob/master/parser/SequenceListener.js"><code>parser/SequenceListener.js</code></a>
+you will see a bunch of methods declared on the <code>SequenceListener</code> prototype looking like:</p>
+
+<pre><code class="language-javascript">// Enter a parse tree produced by SequenceParser#actorDefinition.
+SequenceListener.prototype.enterActorDefinition = function(ctx) {
+};
+
+// Exit a parse tree produced by SequenceParser#actorDefinition.
+SequenceListener.prototype.exitActorDefinition = function(ctx) {
+};
+</code></pre>
+
+<p>Since we do not want to touch the generated code, we do not modify this file directly, instead
+we declare our own <code>IntSequenceListener</code> which is derived from this one. The listener is then instantiated
+and registered in the parser in the code that sets up the parser (which should be familiar by now).</p>
+
+<pre><code class="language-javascript">// Register our listener used to build the AST while the parsing is being done.
+const errorListener = new AntlrErrorListener();
+const listener = new IntSequenceListener();      // &lt;-- This is our listener
+parser.addErrorListener(errorListener);
+parser.addParseListener(listener);                // &lt;-- Get notified  during the parsing
+
+// Initiate the parsing, and begin with the root rule.
+const parserResult = parser.root();
+</code></pre>
+
+<p>ANTLR will call the <code>enter</code> method with the contents of the parser tree as argument when it <em>starts</em>
+parse that grammar rule, and <code>exit</code> once that rule, and <em>all</em> its inner rules have been parsed. I.e.
+often there will calls to <code>enter</code> for other nodes before the current one is <code>exit</code>-ed.</p>
+
+<p>Let&rsquo;s look at the order of calls for a tiny example:</p>
+
+<pre><code>Name &quot;foo&quot;
+</code></pre>
+
+<p>With only the the interesting part of the grammar definition cut out:</p>
+
+<pre><code>root
+    : NEWLINE* documentMeta definitions EOF
+    ;
+
+documentMeta
+    : documentName
+    ;
+
+documentName
+    : DOCUMENT_NAME string NEWLINE?
+    ;
+
+string
+    : STRING
+    ;
+</code></pre>
+
+<ol>
+<li>The first grammar rule is the <code>root</code> grammar, thus a call to <code>listener.enterRoot(...)</code> is made</li>
+<li>The <code>Name &quot;foo&quot;</code> will match the <code>documentMeta</code> grammar, a call to <code>listener.enterDocumentMeta(...)</code> is made</li>
+<li>The documentMeta uses the <code>documentName</code> grammar, a call to <code>listener.enterDocumentName(...)</code> is made</li>
+<li>The document meta uses the <code>string</code> grammar to match <code>&quot;foo&quot;</code>,a call to <code>listener.enterString(...)</code> is made</li>
+<li>String only use lexical tokens, no additional call is made</li>
+<li>A call to <code>listener.exitString(...)</code> is made</li>
+<li>A call to <code>listener.exitDocumentName(...)</code> is made</li>
+<li>A call to <code>listener.exitDocumentMeta(...)</code> is made</li>
+<li>A call to <code>listener.exitRoot(...)</code> is made</li>
+</ol>
+
+<p>Our listener <code>IntSequenceListener</code> is keeping an internal stack (or <code>Array</code> in JavaScript) where it pushes
+all nodes as they are entered, when exited each node will attach itself to its parent - thus forming a tree.</p>
+
+<p>It is as simple as that.</p>
+
+<p>Inside the <code>exit</code> call the tokens in the parser tree is accessed to get the values needed (during exit, all
+tokes are present, during enter it is not fully parsed yet). It is also here that we fetch the source location
+and store in each node.</p>
+
+<p>Sequence implements this listener in the same file as we define our AST nodes, in
+<a href="https://github.com/eliasson/sequence/blob/master/src/ast.js"><code>src/ast.js</code></a></p>
+
+<h3 id="input-and-output">Input and output</h3>
+
+<p>The AST is also easy to test, you just parse the input and validate the presence of the expected nodes
+in the output - there is no such thing as a side effect.</p>
+
+<p>The difference is that the AST (at least for Sequence) cannot handle a delta or branch of Sequence code as
+used for the grammar unit-test. Instead the main program entry is being tested, which use the <code>root</code> grammar,
+so you have to specify &ldquo;full&rdquo; sequence descriptions in your test.</p>
+
+<p>The AST tests is located at <a href="https://github.com/eliasson/sequence/blob/master/__tests__/ast/ast.spec.js"><code>__tests__/ast/ast.spec.js</code></a></p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<p>A <strong>parser generator</strong> - is a good way of creating a custom parser, without the need to do the implement
+a parser by hand (which of course might be needed sometimes, or can be a fun exercise).</p>
+
+<p><strong>Separate the parser code from the AST</strong>, you want the smartness of your program to work
+on the AST as much as possible - it is a smaller data structure than the parser tree, and it reflects the
+semantics of your domain better.</p>
+
+<p>Parser and compilers are really well suited for <strong>TDD</strong>, it&rsquo;s all about input and output.</p>
+
+<p>The next step is to use the generated AST and verify that it is semantically correnct, not only syntactically,
+which is known as <em>static analysis</em> or <em>semantic analysis</em>.</p>
+
+<p>Happy hacking!</p>
+
+                    </section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <h3>Comments</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs">
+                <section>
+                    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "markus-eliasson" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                </section>
+            </div>
+        </div>
+        <footer class="tidy-page-footer">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            <h1 class="tidy-page-footer-header">
+                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
+            </h1>
+            <p class="tidy-page-footer-bio">
+                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
+            </p>
+            <p class="tidy-page-footer-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="tidy-page-footer-menu">
+                
+                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                
+                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                
+                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var burger = document.getElementById('menu-initiator');
+        var menu = document.getElementById('tidy-page-menu');
+
+        function _toggleClass(e, className) {
+            if (e.classList) {
+                if (e.classList.contains(className)) {
+                    e.classList.remove(className);
+                } else {
+                    e.classList.add(className);
+                }
+            } else {
+                if (e.className.indexOf(className) !== -1) {
+                    e.className = e.className.replace(className, '');
+                } else {
+                    e.className += ' ' + className;
+                }
+            }
+        }
+
+        function toggleMenu() {
+            _toggleClass(burger, 'is-active');
+            _toggleClass(menu, 'is-active');
+            
+        }
+    </script>
+</html>
+

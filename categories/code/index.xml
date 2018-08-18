@@ -6,10 +6,21 @@
     <description>Recent content in Code on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 16 Aug 2018 12:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 18 Aug 2018 13:00:00 +0100</lastBuildDate>
     
 	<atom:link href="http://www.markuseliasson.se/categories/code/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Building a parser for Sequence</title>
+      <link>http://www.markuseliasson.se/article/building-a-parser-for-sequence/</link>
+      <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/building-a-parser-for-sequence/</guid>
+      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.
+The language, as we left it looks like:
+Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;quot;A synchronous message&amp;quot; Alpha tell Bravo &amp;quot;An asynchronous message&amp;quot; Bravo replies Alpha &amp;quot;A response message&amp;quot; Alpha replies User &amp;quot;&amp;quot;&amp;quot; This is a multi-line message text!</description>
+    </item>
     
     <item>
       <title>Defining the Sequence language</title>
