@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Markus Eliasson</title>
-    <link>https://markuseliasson.se/</link>
+    <link>/</link>
     <description>Recent content on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 13 Jun 2019 14:35:00 +0200</lastBuildDate>
     
-	<atom:link href="https://markuseliasson.se/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Best practices for ScalaTest</title>
-      <link>https://markuseliasson.se/article/scalatest-best-practices/</link>
+      <link>/article/scalatest-best-practices/</link>
       <pubDate>Thu, 13 Jun 2019 14:35:00 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/article/scalatest-best-practices/</guid>
+      <guid>/article/scalatest-best-practices/</guid>
       <description>Like many things in the Scala ecosystem, ScalaTest does not come short on features or alternatives to use when writing tests. This is seen as a strength and is advertised on their webpage as:
  ScalaTest does not try to impose a testing philosophy on you, but rather is designed from the philosophy that the tool should get out of your way and let you work the way you find most productive.</description>
     </item>
     
     <item>
       <title>Building a parser for Sequence</title>
-      <link>https://markuseliasson.se/article/building-a-parser-for-sequence/</link>
+      <link>/article/building-a-parser-for-sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
+      <guid>/article/building-a-parser-for-sequence/</guid>
       <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.
 The language, as we left it looks like:
 Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;quot;A synchronous message&amp;quot; Alpha tell Bravo &amp;quot;An asynchronous message&amp;quot; Bravo replies Alpha &amp;quot;A response message&amp;quot; Alpha replies User &amp;quot;&amp;quot;&amp;quot; This is a multi-line message text!</description>
@@ -34,67 +34,67 @@ Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequ
     
     <item>
       <title>Defining the Sequence language</title>
-      <link>https://markuseliasson.se/article/defining-the-sequence-language/</link>
+      <link>/article/defining-the-sequence-language/</link>
       <pubDate>Thu, 16 Aug 2018 12:00:00 +0000</pubDate>
       
-      <guid>https://markuseliasson.se/article/defining-the-sequence-language/</guid>
+      <guid>/article/defining-the-sequence-language/</guid>
       <description>When discussing languages, especially computer language, I have noticed that people often start with expressing their view on syntax and grammar. Just like it is easy to have opinions about the appearance of an application, they are both user interfaces. What is far more important is the semantics, what the language allows to be expressed. I do not think look and feel or syntax is superficial - it is still very important, but second to semantics.</description>
     </item>
     
     <item>
       <title>Building your own DSL does not have to be hard</title>
-      <link>https://markuseliasson.se/article/building-your-own-dsl/</link>
+      <link>/article/building-your-own-dsl/</link>
       <pubDate>Fri, 23 Mar 2018 18:48:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/building-your-own-dsl/</guid>
+      <guid>/article/building-your-own-dsl/</guid>
       <description>Currently there are a lot of initiatives saying that everybody should learn how to program, and schools are making programming part of the curriculum. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people to construct programs. And it&amp;rsquo;s all happening at a rapid pace.
 Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language.</description>
     </item>
     
     <item>
       <title>Bytes do not destroy software — people do</title>
-      <link>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</link>
+      <link>/article/bytes-do-not-destroy-software-people-do/</link>
       <pubDate>Fri, 20 Oct 2017 22:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</guid>
+      <guid>/article/bytes-do-not-destroy-software-people-do/</guid>
       <description>Most of the times, people seem to refer to organic growth — much like a garden that grows wild when there’s no-one that’s maintaining it. This is not a valid metaphor — biological growth happens thanks to photosynthesis and is not by the hand of man. Software on the other side is static — it does not change by itself — it changes when someone change it or change the environment it operates in.</description>
     </item>
     
     <item>
       <title>Littering in the ecosystem</title>
-      <link>https://markuseliasson.se/article/littering-in-the-ecosystem/</link>
+      <link>/article/littering-in-the-ecosystem/</link>
       <pubDate>Mon, 15 May 2017 22:53:30 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/article/littering-in-the-ecosystem/</guid>
+      <guid>/article/littering-in-the-ecosystem/</guid>
       <description>The other day I was in a discussion on the general situation with JavaScript development. I argued that the JavaScript community many time feels like a youth centre, everyone trying to show off themselves and not everyone taking responsibility on what they do. I even expressed that publishing many small NPM packages should be seen as littering the JavaScript ecosystem. Heck, one developer published over 500 packages and this behaviour seems to be encouraged by the community.</description>
     </item>
     
     <item>
       <title>Managing your JavaScript dependencies</title>
-      <link>https://markuseliasson.se/article/managing-your-javascript-dependencies/</link>
+      <link>/article/managing-your-javascript-dependencies/</link>
       <pubDate>Thu, 02 Feb 2017 23:40:47 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/managing-your-javascript-dependencies/</guid>
+      <guid>/article/managing-your-javascript-dependencies/</guid>
       <description>Recently a colleague of mine and I had a discussion on npm dependencies, in where he asked “Why is it bad to have many dependencies, really, why do you care?”. I think it is a fair question, npm gets bashed all the time for resulting in a ridiculous number of dependencies, is that really a problem?
 I don’t think the number of dependencies is the major problem though. Sure too many dependencies can lead to performance issues and Windows did have its problem coping with npm&amp;rsquo;s file structure.</description>
     </item>
     
     <item>
       <title>A BitTorrent client in Python 3.5</title>
-      <link>https://markuseliasson.se/article/bittorrent-in-python/</link>
+      <link>/article/bittorrent-in-python/</link>
       <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/article/bittorrent-in-python/</guid>
+      <guid>/article/bittorrent-in-python/</guid>
       <description>When Python 3.5 was released together with the new module asyncio I was curios to give it a try. Recently I decided to implement a simple BitTorrent client using asyncio - I have always been interested in peer-to-peer protocols and it seemed like a perfect fit.
 The project is named Pieces, all of the source code is available at GitHub and released under the Apache 2 license. Feel free to learn from it, steal from it, improve it, laugh at it or just ignore it.</description>
     </item>
     
     <item>
       <title>An introduction to Python&#39;s asyncio</title>
-      <link>https://markuseliasson.se/article/introduction-to-asyncio/</link>
+      <link>/article/introduction-to-asyncio/</link>
       <pubDate>Wed, 24 Aug 2016 21:00:00 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/article/introduction-to-asyncio/</guid>
+      <guid>/article/introduction-to-asyncio/</guid>
       <description>In Python 3.4 a new module, asyncio was introduced, this module allows you to write concurrent, single threaded code in Python without relying on any third-party libraries (such as Twisted, or Tornado).
 I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write concurrent code in Python 3.5.
 Remember, concurrency is not the same as parallelism.</description>
@@ -102,30 +102,30 @@ Remember, concurrency is not the same as parallelism.</description>
     
     <item>
       <title>Debugging Jest in Visual Studio Code</title>
-      <link>https://markuseliasson.se/article/debugging-jest-code/</link>
+      <link>/article/debugging-jest-code/</link>
       <pubDate>Wed, 23 Mar 2016 22:26:58 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/debugging-jest-code/</guid>
+      <guid>/article/debugging-jest-code/</guid>
       <description>One of the reason I decided to start using Visual Studio Code over Atom is due to the built-in debugger. Others are the integrated Git view, and that I find it faster than Atom (miss being able to have multiple projects open in the same window though).
 In one of my pet-projects I started to use Jest from Facebook as my Unit Testing framework of choice. And getting support for debugging my tests was only a matter of updating the .</description>
     </item>
     
     <item>
       <title>Python pip virtualenv in Windows</title>
-      <link>https://markuseliasson.se/article/python-pip-virtualenv-windows/</link>
+      <link>/article/python-pip-virtualenv-windows/</link>
       <pubDate>Tue, 24 Feb 2015 22:00:33 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/python-pip-virtualenv-windows/</guid>
+      <guid>/article/python-pip-virtualenv-windows/</guid>
       <description>I needed to setup my Windows 8 machine for Python and Django development as I was fed up with running virtualbox and I really wanted to run PyCharm native in Windows. I jotted down these simple steps for future reference, or if someone else needs a brief overview.
 Install python I chose the official Python Windows distribution, the later versions comes with pip bundled. All I needed to do was to add two directories to my PATH:</description>
     </item>
     
     <item>
       <title>Taxonomies in liquorice</title>
-      <link>https://markuseliasson.se/article/taxonomies-in-liquorice/</link>
+      <link>/article/taxonomies-in-liquorice/</link>
       <pubDate>Tue, 11 Nov 2014 22:21:10 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/article/taxonomies-in-liquorice/</guid>
+      <guid>/article/taxonomies-in-liquorice/</guid>
       <description>My Hugo theme liquorice was updated yesterday to add simple support for Taxonomies. Both categories and tags is supported both as list view and as the ingress part of a single article.
 In order to use it you need to configured in your site configuration (see documentation), in TOML this is basically adding:
 [indexes] category = &amp;quot;categories&amp;quot; tag = &amp;quot;tags&amp;quot;  You then add the categories and / or tags per article in the front-matter like:</description>
@@ -133,20 +133,20 @@ In order to use it you need to configured in your site configuration (see docume
     
     <item>
       <title>Adventures in Go</title>
-      <link>https://markuseliasson.se/article/adventures-in-go/</link>
+      <link>/article/adventures-in-go/</link>
       <pubDate>Sun, 31 Aug 2014 12:34:15 +0000</pubDate>
       
-      <guid>https://markuseliasson.se/article/adventures-in-go/</guid>
+      <guid>/article/adventures-in-go/</guid>
       <description>I am in my mid thirties and like many of my peers I need to take som action to stay(?) cool. Since I don&amp;rsquo;t fancy running a marathon, nor do I have the money to buy me a brand new car - my only choice is to learn a new programming language.
 My choices were Scala, Clojure or Go. I already done some work in Clojure (which I really enjoyed) so that was out.</description>
     </item>
     
     <item>
       <title>Going with hugo</title>
-      <link>https://markuseliasson.se/article/going-with-hugo/</link>
+      <link>/article/going-with-hugo/</link>
       <pubDate>Mon, 18 Aug 2014 07:21:36 +0000</pubDate>
       
-      <guid>https://markuseliasson.se/article/going-with-hugo/</guid>
+      <guid>/article/going-with-hugo/</guid>
       <description>After reading about Hugo I decided to give it a go and leave the hand made pages behind.
 To be honest, I first considered Ghost and gave that a quick spin. Although I really enjoyed Ghosts editor I really dislike the dependencies it put on my server, and why generate the same pages over and over again?
 Why hugo them? With Hugo, the site is generated from Markdown to static HTML ridiculously fast (we&amp;rsquo;re talking microseconds here).</description>

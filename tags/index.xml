@@ -2,120 +2,120 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on Markus Eliasson</title>
-    <link>https://markuseliasson.se/tags/</link>
+    <link>/tags/</link>
     <description>Recent content in Tags on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate>
     
-	<atom:link href="https://markuseliasson.se/tags/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Bittorrent</title>
-      <link>https://markuseliasson.se/tags/bittorrent/</link>
+      <link>/tags/bittorrent/</link>
       <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/tags/bittorrent/</guid>
+      <guid>/tags/bittorrent/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Code Quality</title>
-      <link>https://markuseliasson.se/tags/code-quality/</link>
+      <link>/tags/code-quality/</link>
       <pubDate>Fri, 20 Oct 2017 22:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/code-quality/</guid>
+      <guid>/tags/code-quality/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Dsl</title>
-      <link>https://markuseliasson.se/tags/dsl/</link>
+      <link>/tags/dsl/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/dsl/</guid>
+      <guid>/tags/dsl/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Go</title>
-      <link>https://markuseliasson.se/tags/go/</link>
+      <link>/tags/go/</link>
       <pubDate>Sun, 31 Aug 2014 12:34:15 +0000</pubDate>
       
-      <guid>https://markuseliasson.se/tags/go/</guid>
+      <guid>/tags/go/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Javascript</title>
-      <link>https://markuseliasson.se/tags/javascript/</link>
+      <link>/tags/javascript/</link>
       <pubDate>Mon, 15 May 2017 22:53:30 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/tags/javascript/</guid>
+      <guid>/tags/javascript/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Liquorice</title>
-      <link>https://markuseliasson.se/tags/liquorice/</link>
+      <link>/tags/liquorice/</link>
       <pubDate>Tue, 11 Nov 2014 22:21:10 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/liquorice/</guid>
+      <guid>/tags/liquorice/</guid>
       <description></description>
     </item>
     
     <item>
       <title>People</title>
-      <link>https://markuseliasson.se/tags/people/</link>
+      <link>/tags/people/</link>
       <pubDate>Fri, 20 Oct 2017 22:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/people/</guid>
+      <guid>/tags/people/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Python</title>
-      <link>https://markuseliasson.se/tags/python/</link>
+      <link>/tags/python/</link>
       <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/tags/python/</guid>
+      <guid>/tags/python/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Scala</title>
-      <link>https://markuseliasson.se/tags/scala/</link>
+      <link>/tags/scala/</link>
       <pubDate>Thu, 13 Jun 2019 14:35:00 +0200</pubDate>
       
-      <guid>https://markuseliasson.se/tags/scala/</guid>
+      <guid>/tags/scala/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Sequence</title>
-      <link>https://markuseliasson.se/tags/sequence/</link>
+      <link>/tags/sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/sequence/</guid>
+      <guid>/tags/sequence/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Software Development</title>
-      <link>https://markuseliasson.se/tags/software-development/</link>
+      <link>/tags/software-development/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/software-development/</guid>
+      <guid>/tags/software-development/</guid>
       <description></description>
     </item>
     
     <item>
       <title>Windows</title>
-      <link>https://markuseliasson.se/tags/windows/</link>
+      <link>/tags/windows/</link>
       <pubDate>Tue, 24 Feb 2015 22:00:33 +0100</pubDate>
       
-      <guid>https://markuseliasson.se/tags/windows/</guid>
+      <guid>/tags/windows/</guid>
       <description></description>
     </item>
     
