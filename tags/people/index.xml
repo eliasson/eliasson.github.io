@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>People on Markus Eliasson</title>
-    <link>http://www.markuseliasson.se/tags/people/</link>
+    <link>https://www.markuseliasson.se/tags/people/</link>
     <description>Recent content in People on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 20 Oct 2017 22:00:00 +0100</lastBuildDate>
     
-	<atom:link href="http://www.markuseliasson.se/tags/people/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.markuseliasson.se/tags/people/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Bytes do not destroy software — people do</title>
-      <link>http://www.markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</link>
+      <link>https://www.markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</link>
       <pubDate>Fri, 20 Oct 2017 22:00:00 +0100</pubDate>
       
-      <guid>http://www.markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</guid>
+      <guid>https://www.markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</guid>
       <description>Most of the times, people seem to refer to organic growth — much like a garden that grows wild when there’s no-one that’s maintaining it. This is not a valid metaphor — biological growth happens thanks to photosynthesis and is not by the hand of man. Software on the other side is static — it does not change by itself — it changes when someone change it or change the environment it operates in.</description>
     </item>
     

@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Windows on Markus Eliasson</title>
-    <link>http://www.markuseliasson.se/tags/windows/</link>
+    <link>https://www.markuseliasson.se/tags/windows/</link>
     <description>Recent content in Windows on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 24 Feb 2015 22:00:33 +0100</lastBuildDate>
     
-	<atom:link href="http://www.markuseliasson.se/tags/windows/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://www.markuseliasson.se/tags/windows/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Python pip virtualenv in Windows</title>
-      <link>http://www.markuseliasson.se/article/python-pip-virtualenv-windows/</link>
+      <link>https://www.markuseliasson.se/article/python-pip-virtualenv-windows/</link>
       <pubDate>Tue, 24 Feb 2015 22:00:33 +0100</pubDate>
       
-      <guid>http://www.markuseliasson.se/article/python-pip-virtualenv-windows/</guid>
+      <guid>https://www.markuseliasson.se/article/python-pip-virtualenv-windows/</guid>
       <description>I needed to setup my Windows 8 machine for Python and Django development as I was fed up with running virtualbox and I really wanted to run PyCharm native in Windows. I jotted down these simple steps for future reference, or if someone else needs a brief overview.
 Install python I chose the official Python Windows distribution, the later versions comes with pip bundled. All I needed to do was to add two directories to my PATH:</description>
     </item>
