@@ -2,40 +2,40 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Javascript on Markus Eliasson</title>
-    <link>https://www.markuseliasson.se/tags/javascript/</link>
+    <link>https://markuseliasson.se/tags/javascript/</link>
     <description>Recent content in Javascript on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Mon, 15 May 2017 22:53:30 +0200</lastBuildDate>
     
-	<atom:link href="https://www.markuseliasson.se/tags/javascript/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markuseliasson.se/tags/javascript/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Littering in the ecosystem</title>
-      <link>https://www.markuseliasson.se/article/littering-in-the-ecosystem/</link>
+      <link>https://markuseliasson.se/article/littering-in-the-ecosystem/</link>
       <pubDate>Mon, 15 May 2017 22:53:30 +0200</pubDate>
       
-      <guid>https://www.markuseliasson.se/article/littering-in-the-ecosystem/</guid>
+      <guid>https://markuseliasson.se/article/littering-in-the-ecosystem/</guid>
       <description>The other day I was in a discussion on the general situation with JavaScript development. I argued that the JavaScript community many time feels like a youth centre, everyone trying to show off themselves and not everyone taking responsibility on what they do. I even expressed that publishing many small NPM packages should be seen as littering the JavaScript ecosystem. Heck, one developer published over 500 packages and this behaviour seems to be encouraged by the community.</description>
     </item>
     
     <item>
       <title>Managing your JavaScript dependencies</title>
-      <link>https://www.markuseliasson.se/article/managing-your-javascript-dependencies/</link>
+      <link>https://markuseliasson.se/article/managing-your-javascript-dependencies/</link>
       <pubDate>Thu, 02 Feb 2017 23:40:47 +0100</pubDate>
       
-      <guid>https://www.markuseliasson.se/article/managing-your-javascript-dependencies/</guid>
+      <guid>https://markuseliasson.se/article/managing-your-javascript-dependencies/</guid>
       <description>Recently a colleague of mine and I had a discussion on npm dependencies, in where he asked “Why is it bad to have many dependencies, really, why do you care?”. I think it is a fair question, npm gets bashed all the time for resulting in a ridiculous number of dependencies, is that really a problem?
 I don’t think the number of dependencies is the major problem though. Sure too many dependencies can lead to performance issues and Windows did have its problem coping with npm&amp;rsquo;s file structure.</description>
     </item>
     
     <item>
       <title>Debugging Jest in Visual Studio Code</title>
-      <link>https://www.markuseliasson.se/article/debugging-jest-code/</link>
+      <link>https://markuseliasson.se/article/debugging-jest-code/</link>
       <pubDate>Wed, 23 Mar 2016 22:26:58 +0100</pubDate>
       
-      <guid>https://www.markuseliasson.se/article/debugging-jest-code/</guid>
+      <guid>https://markuseliasson.se/article/debugging-jest-code/</guid>
       <description>One of the reason I decided to start using Visual Studio Code over Atom is due to the built-in debugger. Others are the integrated Git view, and that I find it faster than Atom (miss being able to have multiple projects open in the same window though).
 In one of my pet-projects I started to use Jest from Facebook as my Unit Testing framework of choice. And getting support for debugging my tests was only a matter of updating the .</description>
     </item>
