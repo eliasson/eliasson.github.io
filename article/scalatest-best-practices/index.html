@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Best practices for ScalaTest &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/red.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
+    </head>
+
+
+
+
+
+
+<body class="red-page">
+    <div class="container">
+        <div class="red-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2><a href="http://www.markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
+        </div>
+    </div>
+</div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <article class="red-article">
+                    <header class="red-article-header">
+                        <h1 class="red-article-title">Best practices for ScalaTest</h1>
+                        <div class="red-article-ingress">
+                            <p>Writing clear, consice and maintainable tests can be quite challeging regardless of tool and language. Following the practices discussed here will hopefully help you achieve this if you are using ScalaTest.</p>
+                            <time class="red-article-date">
+                                Thursday, June 13, 2019
+                            </time>
+                        </div>
+                    </header>
+                    <section class="red-article-body">
+
+<p>Like many things in the Scala ecosystem, <a href="~http://www.scalatest.org~">ScalaTest</a> does not come short
+on features or alternatives to use when writing tests. This is seen as a strength and is advertised on their webpage as:</p>
+
+<blockquote>
+<p>ScalaTest does not try to impose a testing philosophy on you, but rather is designed from the philosophy that the tool should get out of your way and let you work the way you find most productive.</p>
+</blockquote>
+
+<p>The last two years I have been working a fair share with ScalaTest, both writing new tests as well as extending and modifying existing tests. Working with different code bases, where different features of ScalaTest are being used can be quite frustrating given the vast number of features and alternatives ScalaTest offers. The number of features can sometimes be overwhelming when writing test, and I would argue that it increases the cognitive load when reading code as well (such as reviewing Pull Requests).</p>
+
+<p>This led me to define a core list of conventions and practices of the features that I find most useful and that I think gives clear, readable and maintainable tests.</p>
+
+<h2 id="use-freespec">Use FreeSpec</h2>
+
+<p>I prefer to use <code>FreeSpec</code> as the basis for my tests for the following reasons:</p>
+
+<ul>
+<li>Low ceremony</li>
+<li>No specific keywords such as <code>test</code> or <code>describe</code></li>
+<li>Tests can be nested as deep as you want</li>
+</ul>
+
+<pre><code>import org.scalatest.FreeSpec
+
+class UserRepositoryTest extends FreeSpec {
+    &quot;UserRepository&quot; - {
+        &quot;after initial setup&quot; - {
+            &quot;there should be zero users&quot; in {
+                // assertion
+            }
+        }
+    }
+
+    // helpers
+}
+</code></pre>
+
+<p>I tend to write hierarchical tests as I think it is a great way to structure tests both when writing and later when I need
+to find the corresponding tests for a given piece of functionality.</p>
+
+<p>The tests are often structured into <em>Component</em> / <em>State</em> / <em>Behaviour</em> and while reading the path should make sense, it does not have to be a well-formed sentence, and does not have
+to start using <em>&ldquo;should&rdquo;</em> or <em>&ldquo;test&rdquo;</em> either.</p>
+
+<h2 id="use-fixture-context-objects">Use fixture-context objects</h2>
+
+<p>I am a firm believer in that a test only should test one thing, and multiple assertions in a single test should be avoided whenever possible. In order to achieve this, some sort of test setup is needed.</p>
+
+<p>A common way of structuring tests and data is to use separate setup methods (such as <code>beforeEach</code> and <code>afterEach</code>) - these can be very useful but my biggest concern is that they often lead to a disconnect between setup and test, which obviously is coherent.</p>
+
+<p>ScalaTest has a feature named <a href="http://www.scalatest.org/user_guide/sharing_fixtures">fixture-context objects</a> that helps keeping the test data setup next to the test, it basically instantiates a class and makes its members available in the scope of the test, e.g.:</p>
+
+<pre><code>import org.scalatest.{FreeSpec, Matchers}
+import scala.concurrent.Future
+
+class UserRepository {
+    def count: Long = 0
+}
+
+class UserRepositoryTest extends FreeSpec
+    with Matchers {
+
+    &quot;UserRepository&quot; - {
+        &quot;initial setup&quot; - {
+            &quot;has zero users&quot; in new TestData(new UserRepository()) {
+                repository.count should equal (0)
+            }
+        }
+    }
+
+    class TestData(val repository: UserRepository)
+}
+</code></pre>
+
+<p>Here the <code>TestData</code> is parameterized via constructor arguments for the specific test and it stays close to the test code. Compared to using <code>beforeEach</code> which cannot be parameterized and often relies on mutable variables that are modified inside the test. Not to mention that the test and the <code>beforeEach</code> sometimes are separated by hundreds of lines.</p>
+
+<p>You might have noticed that ScalaTest offers another implementation of <code>FreeSpec</code>, namely <code>org.scalatest.fixture.FreeSpec</code> that
+offers similar functionality. It is the <em>officially recommended solution</em> to use when many tests share the same fixture, and even
+so I would recommend against using due to:</p>
+
+<ul>
+<li>You must supply an internal case class named <code>FixtureParam</code></li>
+<li>The setup is done at a distance (not close to the test)</li>
+<li>It&rsquo;s cumbersome as you have to call the test with the fixture</li>
+</ul>
+
+<pre><code>class UserRepositoryTestSyncWithFixture extends org.scalatest.fixture.FreeSpec
+  with Matchers {
+
+  case class FixtureParam(repository: UserRepository)
+
+  override def withFixture(test: OneArgTest): Outcome = {
+    val theFixture = FixtureParam(new UserRepository())
+    withFixture(test.toNoArgTest(theFixture))
+  }
+
+  &quot;UserRepository&quot; - {
+    &quot;when loaded&quot; - {
+      &quot;has three active users&quot; in { fixture =&gt;
+        fixture.repository.activeUsers.size should equal (3)
+      }
+    }
+  }
+}
+</code></pre>
+
+<h2 id="be-async">Be async</h2>
+
+<p>Working with Scala, sooner or later you will need to test functions that returns <code>Future[T]</code>, and there are basically two options.</p>
+
+<p>Mix in the trait <code>ScalaFutures</code> in your test class and use <code>whenReady</code> to handle your future responses, like this:</p>
+
+<pre><code>import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.concurrent.ScalaFutures
+import scala.concurrent.Future
+
+class UserRepositoryTest extends FreeSpec
+    with Matchers
+    with ScalaFutures {
+
+    &quot;UserRepository&quot; - {
+        &quot;initial setup&quot; - {
+            &quot;has zero users&quot; in new TestData(new UserRepository()) {
+                whenReady(repository.countAsync) { count =&gt;
+                    count should equal (0)
+                }
+            }
+        }
+    }
+
+    class TestData(val repository: UserRepository)
+}
+</code></pre>
+
+<p><code>whenReady</code> will keep polling the future until it is ready, or the (implicit) timeout has expired. It is blocking, which enables a flatter structure (similar to <code>await</code> in other languages) so that the following snippet is valid:</p>
+
+<pre><code>whenReady(firstFuture) { () }
+whenReady(secondFuture) { somethingOfInterest =&gt;
+  somethingOfInterest.value should be (42)
+}
+</code></pre>
+
+<p>The alternative is to use the trait <code>AsyncFreeSpec</code>, which then expect each test to return a <code>Future[Assertion]</code>. Unfortunately, <em>async specs</em> does not mix with <em>fixture-context object</em> out-of-the-box as the fixture needs to be created asynchronous as well.</p>
+
+<p>This <a href="https://stackoverflow.com/questions/46801118/how-to-use-fixture-context-objects-with-async-specs-in-scalatest">thread on StackOverflow</a> describes the situation, based on that thread and some helper functions we get the following test code:</p>
+
+<pre><code>import org.scalatest.{Assertion, AsyncFreeSpec, FreeSpec, Matchers}
+import scala.concurrent.Future
+
+class UserRepositoryTestAsyncOther extends AsyncFreeSpec
+    with Matchers {
+
+    &quot;UserRepository&quot; - {
+        &quot;initial setup&quot; - {
+            &quot;has zero users&quot; in async(new TestData(new UserRepository())) { testData =&gt;
+                testData.repository.countAsync.map { count =&gt;
+                    count should equal (0)
+                }
+            }
+        }
+    }
+
+    class TestData(val repository: UserRepository)
+
+    def async(data: TestData)(fn: TestData =&gt; Future[Assertion]) = fn(data)
+}
+</code></pre>
+
+<p>Note, that by default ScalaTest will run the test in a single suite sequentially and not in parallel unless the test mixin <code>ParallelTestExecution</code> (rational is available in the <a href="http://www.scalatest.org/user_guide/async_testing">documentation</a>). Even though the performance wins might be small in parallel testing, I would recommend turning this on - as it helps</p>
+
+<p>I would consider running tests in parallel even if there is little to no performance win. Running tests sequential might hide concurrency related bugs in your code - parallel and random execution order will give you the best coverage.</p>
+
+<h2 id="be-eventual">Be eventual</h2>
+
+<p>When writing tests for an eventual consistent system you might need to test an asynchronous behavior that <em>does not</em> return a <code>Future</code>. ScalaTest comes
+with the trait <code>Eventually</code> which fills this need so that you don&rsquo;t have to sleep.</p>
+
+<pre><code>import org.scalatest.{FreeSpec, Matchers}
+import org.scalatest.concurrent.Eventually
+
+class TestEventualConsistency extends FreeSpec
+  with Matchers
+  with Eventually {
+
+  &quot;Trigger a change&quot; - {
+    &quot;should eventually be processed&quot; in new TestData() {
+      fireEvent()
+
+      eventually {
+        eventProcessed() should be (true)
+      }
+    }
+  }
+
+  case class TestData() {
+    def fireEvent(): Unit = ???
+    def eventProcessed(): Boolean = ???
+  }
+}
+</code></pre>
+
+<p>In this example, the assertion will be periodically evaluated using a timeout. If the assertion fails after the specified timeout the test will fail.</p>
+
+<p>For how long and at what interval the evaluation should be performed is specified using a <em>patience</em>. The default is tuned for unit-testing, but there is a handy trait named <code>IntegrationPatience</code> that increase the timeout to 15 seconds instead of 150 ms which is the default.</p>
+
+<p>Based on your need you can defined your own patience, it&rsquo;s just an implicit parameter to <code>eventually</code>, see the <a href="http://doc.scalatest.org/3.0.0/index.html#org.scalatest.concurrent.Eventually">Scaladoc</a>.</p>
+
+<h2 id="use-beforeeach-carefully">Use beforeEach carefully</h2>
+
+<p>If your tests are using test-fixtures there are less of a need to run code before and after each test. But if it still is needed the test class needs to mix-in the trait <code>BeforeAndAfterEach</code>.</p>
+
+<pre><code>import org.scalatest.{FreeSpec, Matchers, BeforeAndAfterEach}
+
+class UserRepositoryTest extends FreeSpec
+    with Matchers
+    with BeforeAndAfterEach {
+
+    &quot;UserRepository&quot; - {
+        println(&quot;describe 1 st level&quot;)
+
+        &quot;initial setup&quot; - {
+            println(&quot;describe 2 nd level&quot;)
+
+            &quot;has zero users&quot; in {
+                println(&quot;the test&quot;)
+                1 should equal(1)
+            }
+        }
+    }
+
+    override def beforeEach() = {
+        println(&quot;beforeEach&quot;)
+    }
+}
+</code></pre>
+
+<p>The call to <code>beforeEach</code> will literally come just before the test, so the output the test above will be:</p>
+
+<pre><code>describe 1 st level (during discovery phase)
+describe 2 nd level (during discovery phase)
+beforeEach (during test execution)
+the test (during test execution)
+</code></pre>
+
+<p>Note that both mix-ins mentioned above are synchronous so you cannot do any async setup in them without blocking (e.g. using <code>Await.result</code>).</p>
+
+<p>It is quite easy to end up putting setup code that gets executed in the discovery phase which often lead to subtle bugs and non-deterministic behavior. Only put constants here, or preferably, nothing at all.</p>
+
+<p>Sharing test setup is much easier done using <em>fixture-context objects</em> described earlier.</p>
+
+<h2 id="define-a-focused-tag">Define a focused tag</h2>
+
+<p>In many unit-testing frameworks it is common to be able to focus on a specific test or suite - e.g. using <code>fit</code> in Jasmine (JavaScript).</p>
+
+<p>And while your IDE might support running individual tests, I often find that when changing existing code, it is very handy to be able
+to highlight a few individual tests that does not necessarily exist in the same hierarchy.</p>
+
+<p>ScalaTest handles this a bit differently, where you tag your test using symbols you define yourself and then filter tags when you run the tests using the parameter <code>-n focused</code></p>
+
+<pre><code>import org.scalatest.{FreeSpec, Matchers, Tag}
+
+object Focused extends Tag(&quot;focused&quot;)
+
+class UserRepositoryTestSync extends FreeSpec
+  with Matchers {
+
+  &quot;UserRepository&quot; - {
+    &quot;initial setup&quot; - {
+      &quot;has zero users&quot; taggedAs(Focused) in new TestData(new UserRepository()) {
+        repository.count should equal (0)
+      }
+
+      &quot;has zero users again&quot; in new TestData(new UserRepository()) {
+        repository.count should equal (0)
+      }
+    }
+  }
+
+  class TestData(val repository: UserRepository)
+}
+</code></pre>
+
+<p>While this is slightly more cumbersome than just using <code>fit</code> it comes with the benefit that the test-runner controls what is executed without changes to code, which of course is great to use in a CI pipeline to run integration-tests, nightly, etc.</p>
+
+<p>My recommendation here is to define your tags in a <a href="https://docs.scala-lang.org/tour/package-objects.html">top-level package object</a> so that they are available in all your test automatically:</p>
+
+<pre><code>package foo
+
+import org.scalatest.Tag
+
+package object util {
+  object Focused extends Tag(&quot;focused&quot;)
+}
+</code></pre>
+
+<h2 id="keep-your-matchers-few">Keep your matchers few</h2>
+
+<p>Here is a glance on the available flavours of matchers in ScalaTest:</p>
+
+<pre><code>repository.activeUsers.size should equal (3)  // Must have parens
+repository.activeUsers.size shouldEqual 3     // May have parens
+repository.activeUsers.size should === (3)
+repository.activeUsers.size should be (3)
+repository.activeUsers.size shouldBe 3
+repository.activeUsers should have size 3     // An implicit Length[T] exists
+repository.activeUsers shouldNot be ('empty)  // ' is a shorthand for parameterless methods returning Boolean
+</code></pre>
+
+<p>More matchers and descriptions available in the <a href="http://www.scalatest.org/user_guide/using_matchers">documentation</a>.</p>
+
+<p>I tend to use the <code>equal</code> matcher as much as possible. Even though ScalaTest comes with quite a lot of matchers I stick to basic ones - there are two reasons for that;</p>
+
+<p>First, I don’t find them intuitive, so I have to search for which one to use when writing a test, and then often once again whenever I review some code later on. Some require parenthesis, others don&rsquo;t - it is quite confusing.</p>
+
+<p>Second, using familiar Scala constructs makes the test more readable and I prefer to process the data prior to any assertion which often let me use simpler matchers.</p>
+
+<pre><code>case class User(username: String, fullName: String)
+
+class UserRepository {
+  def activeUsers: Seq[User] = Seq(User(&quot;John&quot;, &quot;John doe&quot;), User(&quot;Jane&quot;, &quot;Jane Doe&quot;), User(&quot;janet&quot;, &quot;Janet Doe&quot;))
+}
+
+class UserRepositoryTestSync extends FreeSpec
+  with Matchers
+  with BeforeAndAfterEach {
+
+  &quot;UserRepository&quot; - {
+    &quot;when loaded&quot; - {
+      &quot;has three active users (3)&quot; in new TestData(new UserRepository()) {
+        var usernames = repository.activeUsers.map(_.username).map(_.toLowerCase)
+        usernames should equal (Seq(&quot;john&quot;, &quot;jane&quot;, &quot;janet&quot;))
+      }
+    }
+  }
+
+  class TestData(val repository: UserRepository)
+}
+</code></pre>
+
+<p>This test uses a pattern called <em>Transform to Identity</em>, it was coined by my college in his talk <a href="https://www.youtube.com/watch?v=jJRgSy2vVF8">Supercharge your automated tests to fail better</a>. The assertion is made simple, both while reading and it is expressive when failing, win-win.</p>
+
+<h2 id="other-considerations">Other considerations</h2>
+
+<p>When composing this list, I identified a few things that is unrelated to ScalaTest, or at least not dependent of its features. But there are a few things that I have started to apply more and more regardless of language and framework when I write unit-tests.</p>
+
+<h3 id="don-t-name-things-sut">Don’t name things SUT</h3>
+
+<p>Stay away from using the name <code>sut</code> such as in variables. While it makes perfect sense when writing the test, I find that when I come back later, or when reviewing an isolated delta it is easy to make mistakes on what is being tested. It might be that the test file is too large, but I still think spelling out what it is you are testing improves readability.</p>
+
+<h3 id="put-your-test-first">Put your test first</h3>
+
+<p>Do not put class member declarations, test-fixtures, helper functions, <code>beforeEach/afterEach</code> at the top of the class body. A future developer, or future you, are primarily interested in reading the test and not boilerplate and setup. Put the most relevant first and everything else at the end of the class / file.</p>
+
+<p>And for shared helpers I find Scala package object to be a great container.</p>
+
+<pre><code>package foo
+
+import org.scalatest.Tag
+
+package object util {
+  def randomPort(): Integer = 4000 + scala.util.Random.nextInt(6999)
+}
+</code></pre>
+
+<p>Will make the method <code>randomPort</code> available in your tests in the same package.</p>
+
+<h2 id="in-summary">In summary</h2>
+
+<ul>
+<li>Use FreeSpec</li>
+<li>Use fixture-context objects</li>
+<li>Be async</li>
+<li>Be eventual</li>
+<li>Use beforeEach and beforeAll carefully</li>
+<li>Define a focused tag</li>
+<li>Keep your matchers few</li>
+<li>Don’t name things SUT</li>
+<li>Put your test first</li>
+</ul>
+
+<p>I find this list helpful when I write my tests, and even if you don’t agree on all the practices described you have hopefully picked up something useful.</p>
+
+<p>As shown I use only a limited set of features from ScalaTest, I don’t think that is in conflict with their design goals, rather the opposite - using ScalaTest a team can cherry pick features and have it done their way - just like Scala itself.</p>
+
+<p>Oh, even though it goes without saying, when adding a new single test to an existing spec adhering to the existing style - whatever it is - is outweighs the recommendations here.</p>
+
+<p>Happy hacking!</p>
+</section>
+                </article>
+            </div>
+        </div>
+        <footer>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+            <p class="red-landing-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+            <p class="red-landing-affiliation">
+                Consultant at <a href="http://factor10.com" class="no-feedback">
+                    <img src="http://www.markuseliasson.se/factor10.png" alt="factor10" />
+                </a>
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <ul class="red-landing-social">
+                
+                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
+                
+                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
+                
+                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
+                
+            </ul>
+            <div class="break"></div>
+        </div>
+    </div>
+</footer>
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-42999256-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+</html>
+

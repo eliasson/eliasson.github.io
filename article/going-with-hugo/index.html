@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
-        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/red.css" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
     </head>
@@ -17,41 +17,29 @@
 
 
 
-<body class="tidy-page">
+<body class="red-page">
     <div class="container">
-        <footer class="tidy-page-header">
+        <div class="red-page-header">
     <div class="row">
         <div class="col-xs-12">
-            <h4><a href="http://www.markuseliasson.se/">M.E.</a></h4>
+            <h2><a href="http://www.markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
         </div>
     </div>
-</footer>
+</div>
 
         <div class="row">
-            <div class="col-xs">
-                <article class="tidy-article">
-                    <header class="tidy-article-header">
-                        <h1 class="tidy-article-title">Going with hugo</h1>
-                        <div class="tidy-article-ingress">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <article class="red-article">
+                    <header class="red-article-header">
+                        <h1 class="red-article-title">Going with hugo</h1>
+                        <div class="red-article-ingress">
                             <p>Changing from handmade pages to Hugo</p>
-                            <span class="tidy-article-taxonomies">
-                                
-                                    Posted in
-                                    
-                                        <a href="http://www.markuseliasson.se/categories/hugo">Hugo</a>
-                                    
-                                
-
-                                
-                                 at 
-                            </span>
-                            <time class="tidy-article-date">
+                            <time class="red-article-date">
                                 Monday, August 18, 2014
                             </time>
                         </div>
                     </header>
-                    <section class="tidy-article-body">
-                        
+                    <section class="red-article-body">
 
 <p>After reading about <a href="http://hugo.spf13.com/">Hugo</a> I decided to give it a go
 and leave the hand made pages behind.</p>
@@ -81,67 +69,39 @@ another post on that topic, meanwhile feel free to download the theme at
 <a href="http://github.com/eliasson/liquorice">github</a></p>
 
 <p><em>Markus</em></p>
-
-                    </section>
+</section>
                 </article>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs">
-                <h3>Comments</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs">
-                <section>
-                    <div id="disqus_thread"></div>
-<script>
-    var disqus_config = function () {
-    
-    
-    
-    };
-    (function() {
-        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
-            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
-            return;
-        }
-        var d = document, s = d.createElement('script'); s.async = true;
-        s.src = '//' + "markus-eliasson" + '.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-                </section>
-            </div>
-        </div>
-        <footer class="tidy-page-footer">
+        <footer>
     <div class="row">
-        <div class="col-xs-12 col-sm-6">
-            <h1 class="tidy-page-footer-header">
-                <a href="http://www.markuseliasson.se">Markus Eliasson.</a>
-            </h1>
-            <p class="tidy-page-footer-bio">
-                A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.
-            </p>
-            <p class="tidy-page-footer-email">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+            <p class="red-landing-email">
                 <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
             </p>
+            <p class="red-landing-affiliation">
+                Consultant at <a href="http://factor10.com" class="no-feedback">
+                    <img src="http://www.markuseliasson.se/factor10.png" alt="factor10" />
+                </a>
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-12">
-            <ul class="tidy-page-footer-menu">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <ul class="red-landing-social">
                 
-                    <li><a href="https://github.com/eliasson"> GitHub </a></li>
+                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
                 
-                    <li><a href="https://twitter.com/markuseliasson"> Twitter </a></li>
+                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
                 
-                    <li><a href="http://www.linkedin.com/in/markuseliasson"> LinkedIn </a></li>
+                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
                 
             </ul>
+            <div class="break"></div>
         </div>
     </div>
 </footer>
@@ -160,30 +120,6 @@ ga('send', 'pageview');
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
     <script>
         hljs.initHighlightingOnLoad();
-        var burger = document.getElementById('menu-initiator');
-        var menu = document.getElementById('tidy-page-menu');
-
-        function _toggleClass(e, className) {
-            if (e.classList) {
-                if (e.classList.contains(className)) {
-                    e.classList.remove(className);
-                } else {
-                    e.classList.add(className);
-                }
-            } else {
-                if (e.className.indexOf(className) !== -1) {
-                    e.className = e.className.replace(className, '');
-                } else {
-                    e.className += ' ' + className;
-                }
-            }
-        }
-
-        function toggleMenu() {
-            _toggleClass(burger, 'is-active');
-            _toggleClass(menu, 'is-active');
-            
-        }
     </script>
 </html>
 

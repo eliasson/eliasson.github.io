@@ -6,10 +6,20 @@
     <description>Recent content on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Aug 2018 13:00:00 +0100</lastBuildDate>
+    <lastBuildDate>Thu, 13 Jun 2019 14:35:00 +0200</lastBuildDate>
     
 	<atom:link href="http://www.markuseliasson.se/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Best practices for ScalaTest</title>
+      <link>http://www.markuseliasson.se/article/scalatest-best-practices/</link>
+      <pubDate>Thu, 13 Jun 2019 14:35:00 +0200</pubDate>
+      
+      <guid>http://www.markuseliasson.se/article/scalatest-best-practices/</guid>
+      <description>Like many things in the Scala ecosystem, ScalaTest does not come short on features or alternatives to use when writing tests. This is seen as a strength and is advertised on their webpage as:
+ ScalaTest does not try to impose a testing philosophy on you, but rather is designed from the philosophy that the tool should get out of your way and let you work the way you find most productive.</description>
+    </item>
     
     <item>
       <title>Building a parser for Sequence</title>

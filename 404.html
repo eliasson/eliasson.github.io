@@ -7,35 +7,23 @@
         <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
-        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/tidy.css" />
+        <link rel="stylesheet" type="text/css" href="http://www.markuseliasson.se/css/red.css" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="alternate" type="application/rss+xml" href="http://www.markuseliasson.se/index.xml" title="Markus Eliasson" />
     </head>
 
 
-<body class="tidy-page">
+<body class="red-page">
     <div class="container">
         <div class="row">
             <div class="col-xs-12 col-sm-6">
-                <h1 class="tidy-page-header">Not found</h1>
-                <p class="tidy-landing-bio">
+                <h1 class="red-page-header">Not found</h1>
+                <p class="red-page-ingress">
                     The page you were looking for could not be found. May I interest you in one of my lastest articles instead?
                 </p>
             </div>
         </div>
         <div class="row">
-            <div class="col-xs">
-                <div class="tidy-list">
-                    
-                        <h4 class="tidy-list-title"><a href="http://www.markuseliasson.se/article/building-a-parser-for-sequence/">&gt; Building a parser for Sequence</a></h4>
-                    
-                        <h4 class="tidy-list-title"><a href="http://www.markuseliasson.se/article/defining-the-sequence-language/">&gt; Defining the Sequence language</a></h4>
-                    
-                        <h4 class="tidy-list-title"><a href="http://www.markuseliasson.se/article/building-your-own-dsl/">&gt; Building your own DSL does not have to be hard</a></h4>
-                    
-                    <h4 class="tidy-list-title"><a href="/article/">&gt; More...</a></h4>
-                </div>
-            </div>
         </div>
     </div>
 </body>
@@ -43,30 +31,6 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
     <script>
         hljs.initHighlightingOnLoad();
-        var burger = document.getElementById('menu-initiator');
-        var menu = document.getElementById('tidy-page-menu');
-
-        function _toggleClass(e, className) {
-            if (e.classList) {
-                if (e.classList.contains(className)) {
-                    e.classList.remove(className);
-                } else {
-                    e.classList.add(className);
-                }
-            } else {
-                if (e.className.indexOf(className) !== -1) {
-                    e.className = e.className.replace(className, '');
-                } else {
-                    e.className += ' ' + className;
-                }
-            }
-        }
-
-        function toggleMenu() {
-            _toggleClass(burger, 'is-active');
-            _toggleClass(menu, 'is-active');
-            
-        }
     </script>
 </html>
 
