@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Software Development on Markus Eliasson</title>
-    <link>/categories/software-development/</link>
+    <link>https://markuseliasson.se/categories/software-development/</link>
     <description>Recent content in Software Development on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Aug 2018 13:00:00 +0100</lastBuildDate>
     
-	<atom:link href="/categories/software-development/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://markuseliasson.se/categories/software-development/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>Building a parser for Sequence</title>
-      <link>/article/building-a-parser-for-sequence/</link>
+      <link>https://markuseliasson.se/article/building-a-parser-for-sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       
-      <guid>/article/building-a-parser-for-sequence/</guid>
+      <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
       <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.
 The language, as we left it looks like:
 Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;quot;A synchronous message&amp;quot; Alpha tell Bravo &amp;quot;An asynchronous message&amp;quot; Bravo replies Alpha &amp;quot;A response message&amp;quot; Alpha replies User &amp;quot;&amp;quot;&amp;quot; This is a multi-line message text!</description>
@@ -24,19 +24,19 @@ Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequ
     
     <item>
       <title>Defining the Sequence language</title>
-      <link>/article/defining-the-sequence-language/</link>
+      <link>https://markuseliasson.se/article/defining-the-sequence-language/</link>
       <pubDate>Thu, 16 Aug 2018 12:00:00 +0000</pubDate>
       
-      <guid>/article/defining-the-sequence-language/</guid>
+      <guid>https://markuseliasson.se/article/defining-the-sequence-language/</guid>
       <description>When discussing languages, especially computer language, I have noticed that people often start with expressing their view on syntax and grammar. Just like it is easy to have opinions about the appearance of an application, they are both user interfaces. What is far more important is the semantics, what the language allows to be expressed. I do not think look and feel or syntax is superficial - it is still very important, but second to semantics.</description>
     </item>
     
     <item>
       <title>Building your own DSL does not have to be hard</title>
-      <link>/article/building-your-own-dsl/</link>
+      <link>https://markuseliasson.se/article/building-your-own-dsl/</link>
       <pubDate>Fri, 23 Mar 2018 18:48:00 +0100</pubDate>
       
-      <guid>/article/building-your-own-dsl/</guid>
+      <guid>https://markuseliasson.se/article/building-your-own-dsl/</guid>
       <description>Currently there are a lot of initiatives saying that everybody should learn how to program, and schools are making programming part of the curriculum. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people to construct programs. And it&amp;rsquo;s all happening at a rapid pace.
 Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language.</description>
     </item>
