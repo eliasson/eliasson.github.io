@@ -1,16 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Go on Markus Eliasson</title>
+    <title>go on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/go/</link>
-    <description>Recent content in Go on Markus Eliasson</description>
+    <description>Recent content in go on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 31 Aug 2014 12:34:15 +0000</lastBuildDate>
-    
-	<atom:link href="https://markuseliasson.se/tags/go/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Sun, 31 Aug 2014 12:34:15 +0000</lastBuildDate><atom:link href="https://markuseliasson.se/tags/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Adventures in Go</title>
       <link>https://markuseliasson.se/article/adventures-in-go/</link>

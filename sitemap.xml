@@ -1,194 +1,100 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
-  <url>
-    <loc>https://markuseliasson.se/article/scalatest-best-practices/</loc>
-    <lastmod>2019-06-13T14:35:00+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/building-a-parser-for-sequence/</loc>
-    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/defining-the-sequence-language/</loc>
-    <lastmod>2018-08-16T12:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/building-your-own-dsl/</loc>
-    <lastmod>2018-03-23T18:48:00+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</loc>
-    <lastmod>2017-10-20T22:00:00+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/littering-in-the-ecosystem/</loc>
-    <lastmod>2017-05-15T22:53:30+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/managing-your-javascript-dependencies/</loc>
-    <lastmod>2017-02-02T23:40:47+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/bittorrent-in-python/</loc>
-    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/introduction-to-asyncio/</loc>
-    <lastmod>2016-08-24T21:00:00+02:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/debugging-jest-code/</loc>
-    <lastmod>2016-03-23T22:26:58+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/python-pip-virtualenv-windows/</loc>
-    <lastmod>2015-02-24T22:00:33+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/taxonomies-in-liquorice/</loc>
-    <lastmod>2014-11-11T22:21:10+01:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/adventures-in-go/</loc>
-    <lastmod>2014-08-31T12:34:15+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/article/going-with-hugo/</loc>
-    <lastmod>2014-08-18T07:21:36+00:00</lastmod>
-  </url>
-  
   <url>
     <loc>https://markuseliasson.se/article/</loc>
-    <lastmod>2019-06-13T14:35:00+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/bittorrent/</loc>
-    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/categories/code/</loc>
-    <lastmod>2019-06-13T14:35:00+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/code-quality/</loc>
-    <lastmod>2017-10-20T22:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/dsl/</loc>
-    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/go/</loc>
-    <lastmod>2014-08-31T12:34:15+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/categories/hugo/</loc>
-    <lastmod>2014-11-11T22:21:10+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/javascript/</loc>
-    <lastmod>2017-05-15T22:53:30+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/liquorice/</loc>
-    <lastmod>2014-11-11T22:21:10+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
     <loc>https://markuseliasson.se/</loc>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/obstacles/</loc>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/software-development/</loc>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/</loc>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</loc>
+    <lastmod>2021-09-16T15:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/scalatest-best-practices/</loc>
     <lastmod>2019-06-13T14:35:00+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/people/</loc>
-    <lastmod>2017-10-20T22:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/python/</loc>
-    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
+  </url><url>
     <loc>https://markuseliasson.se/tags/scala/</loc>
     <lastmod>2019-06-13T14:35:00+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
+  </url><url>
+    <loc>https://markuseliasson.se/article/building-a-parser-for-sequence/</loc>
+    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/dsl/</loc>
+    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
+  </url><url>
     <loc>https://markuseliasson.se/tags/sequence/</loc>
     <lastmod>2018-08-18T13:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/categories/software-development/</loc>
-    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/software-development/</loc>
-    <lastmod>2018-08-18T13:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/tags/</loc>
-    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://markuseliasson.se/categories/thoughts/</loc>
+  </url><url>
+    <loc>https://markuseliasson.se/article/defining-the-sequence-language/</loc>
+    <lastmod>2018-08-16T12:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/building-your-own-dsl/</loc>
+    <lastmod>2018-03-23T18:48:00+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</loc>
     <lastmod>2017-10-20T22:00:00+01:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/code-quality/</loc>
+    <lastmod>2017-10-20T22:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/people/</loc>
+    <lastmod>2017-10-20T22:00:00+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/javascript/</loc>
+    <lastmod>2017-05-15T22:53:30+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/littering-in-the-ecosystem/</loc>
+    <lastmod>2017-05-15T22:53:30+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/managing-your-javascript-dependencies/</loc>
+    <lastmod>2017-02-02T23:40:47+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/bittorrent-in-python/</loc>
+    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/bittorrent/</loc>
+    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/python/</loc>
+    <lastmod>2016-08-24T22:48:17+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/introduction-to-asyncio/</loc>
+    <lastmod>2016-08-24T21:00:00+02:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/debugging-jest-code/</loc>
+    <lastmod>2016-03-23T22:26:58+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/python-pip-virtualenv-windows/</loc>
+    <lastmod>2015-02-24T22:00:33+01:00</lastmod>
+  </url><url>
     <loc>https://markuseliasson.se/tags/windows/</loc>
     <lastmod>2015-02-24T22:00:33+01:00</lastmod>
-    <priority>0</priority>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/liquorice/</loc>
+    <lastmod>2014-11-11T22:21:10+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/taxonomies-in-liquorice/</loc>
+    <lastmod>2014-11-11T22:21:10+01:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/adventures-in-go/</loc>
+    <lastmod>2014-08-31T12:34:15+00:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/tags/go/</loc>
+    <lastmod>2014-08-31T12:34:15+00:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/article/going-with-hugo/</loc>
+    <lastmod>2014-08-18T07:21:36+00:00</lastmod>
+  </url><url>
+    <loc>https://markuseliasson.se/categories/</loc>
   </url>
-  
 </urlset>

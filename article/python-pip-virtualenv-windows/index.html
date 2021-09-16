@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -39,43 +37,29 @@
                             </time>
                         </div>
                     </header>
-                    <section class="red-article-body">
-
-<p>I needed to setup my Windows 8 machine for Python and Django development as I
+                    <section class="red-article-body"><p>I needed to setup my Windows 8 machine for Python and Django development as I
 was fed up with running virtualbox and I really wanted to run PyCharm native
 in Windows. I jotted down these simple steps for future reference, or if
 someone else needs a brief overview.</p>
-
 <h2 id="install-python">Install python</h2>
-
 <p>I chose the official Python Windows distribution, the later versions comes
 with pip bundled. All I needed to do was to add two directories to my PATH:</p>
-
 <pre><code>SET PATH=%PATH%;C:\&lt;path-to-python&gt;\;C:\&lt;path-to-python&gt;\Scripts\
 </code></pre>
-
 <h2 id="setup-a-new-virtualenv">Setup a new virtualenv</h2>
-
 <p>I do not use PowerShell and did not bother trying to find an alternative
 for virtualenvwrapper that I use in bash. Instead I just roll my virtualenvs
 manually. First thing you need to do is to install virtutalenv:</p>
-
 <pre><code>pip install virtualenv
 </code></pre>
-
 <p>Creating a virtual environment by running:</p>
-
 <pre><code>virtualenv C:\virtualenvs\foo-env
 </code></pre>
-
 <p>Activate this virtual environment by running:</p>
-
 <pre><code> C:\virtualenvs\foo-env\Scripts
 </code></pre>
-
 <p>From this stage it was only a matter of importing my project to PyCharm and
 select the right Python Interpreter.</p>
-
 <p>A side note, as I use Makefiles to wrap my Django tasks I can really
 recommend <a href="https://github.com/bmatzelle/gow">gow</a> a lightweight unix util
 distribution for windows.</p>
@@ -83,6 +67,17 @@ distribution for windows.</p>
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/python" class="red-tag">Python</a>
+            
+                <a href="/tags/windows" class="red-tag">Windows</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -116,12 +111,16 @@ distribution for windows.</p>
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

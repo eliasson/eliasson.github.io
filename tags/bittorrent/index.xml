@@ -1,16 +1,12 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Bittorrent on Markus Eliasson</title>
+    <title>bittorrent on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/bittorrent/</link>
-    <description>Recent content in Bittorrent on Markus Eliasson</description>
+    <description>Recent content in bittorrent on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate>
-    
-	<atom:link href="https://markuseliasson.se/tags/bittorrent/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/bittorrent/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>A BitTorrent client in Python 3.5</title>
       <link>https://markuseliasson.se/article/bittorrent-in-python/</link>
@@ -29,7 +25,8 @@ The project is named Pieces, all of the source code is available at GitHub and r
       <guid>https://markuseliasson.se/article/introduction-to-asyncio/</guid>
       <description>In Python 3.4 a new module, asyncio was introduced, this module allows you to write concurrent, single threaded code in Python without relying on any third-party libraries (such as Twisted, or Tornado).
 I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write concurrent code in Python 3.5.
-Remember, concurrency is not the same as parallelism.</description>
+Remember, concurrency is not the same as parallelism.
+  Concurrency is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time.</description>
     </item>
     
     <item>

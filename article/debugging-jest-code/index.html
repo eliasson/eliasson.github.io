@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -44,12 +42,10 @@
 is due to the built-in debugger. Others are the integrated Git view, and that I
 find it faster than Atom (miss being able to have multiple projects open in the
 same window though).</p>
-
 <p>In one of my pet-projects I started to use <a href="https://github.com/facebook/jest">Jest</a>
 from Facebook as my Unit Testing framework of choice. And getting support for
 debugging my tests was only a matter of updating the <code>.vscode/launch.json</code> file
 with this:</p>
-
 <pre><code>{
     &quot;version&quot;: &quot;0.2.0&quot;,
     &quot;configurations&quot;: [
@@ -76,19 +72,25 @@ with this:</p>
     ]
 }
 </code></pre>
-
 <p>The significant line here, is the use of argument <code>--runInBand</code> which will
 cause Jest to run all tests in a single sequence in the current process
 (instead of spinning up multiple processes to run tests in parallel). You want
 to use this setting only for debugging, not for normal test runs.</p>
-
 <p>If you have not yet tried Code, I recommend you give it a try, it&rsquo;s awesome.</p>
-
 <p>Happy hacking!</p>
 </section>
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/javascript" class="red-tag">JavaScript</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -122,12 +124,16 @@ to use this setting only for debugging, not for normal test runs.</p>
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

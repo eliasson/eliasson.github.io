@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -43,18 +41,14 @@
 yesterday to add simple support for <a href="http://gohugo.io/taxonomies/overview/">Taxonomies</a>.
 Both <em>categories</em> and <em>tags</em> is supported both as list view and as the ingress
 part of a single article.</p>
-
 <p>In order to use it you need to configured in your site configuration (see
 <a href="http://gohugo.io/taxonomies/usage/">documentation</a>), in TOML
 this is basically adding:</p>
-
 <pre><code>[indexes]
     category = &quot;categories&quot;
     tag = &quot;tags&quot;
 </code></pre>
-
 <p>You then add the categories and / or tags per article in the front-matter like:</p>
-
 <pre><code>+++
 Categories = [&quot;Hugo&quot;]
 Description = &quot;Taxonomies in liquorice&quot;
@@ -62,12 +56,20 @@ Tags = [&quot;liquorice&quot;]
 ...
 +++
 </code></pre>
-
 <p>Liquorice supports either both categories and tags, only one or neither of them.</p>
 </section>
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/liquorice" class="red-tag">liquorice</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -101,12 +103,16 @@ Tags = [&quot;liquorice&quot;]
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -39,28 +37,16 @@
                             </time>
                         </div>
                     </header>
-                    <section class="red-article-body">
-
-<p>Recently a colleague of mine and I had a discussion on npm dependencies, in where he asked <em>“Why is it bad to have many dependencies, really, why do you care?”.</em> I think it is a fair question, npm gets bashed all the time for resulting in a ridiculous number of dependencies, is that really a problem?</p>
-
+                    <section class="red-article-body"><p>Recently a colleague of mine and I had a discussion on npm dependencies, in where he asked <em>“Why is it bad to have many dependencies, really, why do you care?”.</em> I think it is a fair question, npm gets bashed all the time for resulting in a ridiculous number of dependencies, is that really a problem?</p>
 <p>I don’t think the number of dependencies is the major problem though. Sure too many dependencies can lead to <a href="https://nolanlawson.com/2016/08/15/the-cost-of-small-modules/">performance issues</a> and Windows did have its <a href="https://github.com/npm/npm/issues/3697">problem</a> coping with npm&rsquo;s file structure. The major problem, in my experience, is that developers still - almost a year after the <a href="https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/">left pad incident</a> - do a poor job managing their dependencies.</p>
-
-<p>The way I see it is that each dependency is a risk. It can introduce a bug, a breaking change or just disappear. If you have many dependencies (including transient dependencies) the risk that one of them will break increase the more you have. Do you trust all of these maintainers? Do you trust npm, Inc. to keep the registry online, and free, <sup>24</sup>&frasl;<sub>7</sub>?</p>
-
+<p>The way I see it is that each dependency is a risk. It can introduce a bug, a breaking change or just disappear. If you have many dependencies (including transient dependencies) the risk that one of them will break increase the more you have. Do you trust all of these maintainers? Do you trust npm, Inc. to keep the registry online, and free, 24/7?</p>
 <p>Depending on your project it might be OK not being able to reproduce a previous build. But not all organisations move fast and break things, some still work using waterfall process. There it is absolutely crucial to be able to reproduce build both during QA and after release for potential emergency corrections. Not only do you have to be able to reproduce, you might need to step only a single dependency up or down - how can you guarantee that no other dependency was changed?</p>
-
 <p>Most of these advice is based on first-hand experience, helping a Swedish governmental organization with their frontend development.</p>
-
 <h2 id="use-npm">Use NPM</h2>
-
 <p>Last few years more and more developers have gone the route of just using npm for dependency management. If you are still using Bower for managing your frontend dependencies you should really let it go, it does not add anything npm cannot do and it still <a href="https://github.com/bower/bower/issues/505">lack important features</a> such as locking versions.</p>
-
 <p>Also, with the increase support for module exports and ES2015, I would argue that it is easier to use npm + <a href="http://browserify.org">Browserify</a>, <a href="http://rollupjs.org">rollup.js</a> or <a href="https://webpack.github.io/">webpack</a> than to mix package managers.</p>
-
 <h2 id="use-semantic-versioning">Use semantic versioning</h2>
-
 <p>Npm comes with semantic versioning for packages and you should use that. Besides from version, npm do support <a href="https://docs.npmjs.com/files/package.json#dependencies">other values</a>:</p>
-
 <ul>
 <li>HTTP URL:s</li>
 <li>Git URL:s</li>
@@ -68,55 +54,30 @@
 <li>Tags</li>
 <li>Etc.</li>
 </ul>
-
 <p>Do <strong>not</strong> rely on anything but semantic versions. Using any other type of dependencies will make it close to impossible to reproduce a build unless you have full control over the remote media. Also, running <code>npm install</code> will not update git repositories, and <code>npm update</code> might <a href="https://github.com/npm/npm/issues/1727">behave different</a> depending on host.</p>
-
 <p><em>Sure, it might be OK using tags during development phase, as long as you know what you are doing.</em></p>
-
 <h2 id="lock-your-dependency-tree">Lock your dependency tree</h2>
-
 <p>The way npm is built, it will honour <a href="https://docs.npmjs.com/misc/semver">SemVer</a>, but as long as your dependencies resolve accordingly (i.e. respects <code>*</code>, <code>~</code>, <code>^</code> and any range definition) it will not be updated unless you explicitly run <code>npm update</code>. And running a fresh <code>npm install</code> might very well give two users different dependency versions based on npm cache and such.</p>
-
 <p>So, you, your colleagues and your CI server might not be running the same version of your dependencies. Again, this might or might not be ok in your situation, but it will definitely make it harder to reproduce builds.</p>
-
 <p>In order to solve this, npm has a built in feature called <a href="https://docs.npmjs.com/cli/shrinkwrap">shinkwrap</a>. Using this feature the npm client will generate a parallel file named <code>npm-shrinkwrap.json</code> that locks down the versions for all installed packages in <code>package.json</code>, and as long as that file exist any <code>npm install</code> will use the package versions stated therein instead of resolving according to SemVer.</p>
-
 <h2 id="roll-your-own-registry">Roll your own registry</h2>
-
 <p>Most rely on <a href="http://www.npmjs.org">http://www.npmjs.org</a> when downloading packages, it&rsquo;s free, it has <strong>tons</strong> of packages and they do a great job keeping it online. Still, it is a commercial company running that service, <a href="https://www.npmjs.com/about">npm, Inc.</a> Do you trust them to always keep your dependencies around? What if the service suddenly goes away, transfers to a paid service, or it gets bought and shut down?</p>
-
 <p>During the left-pad incident, npm, Inc. decided to transfer a package name in use to another owner than the current owner due to brand infringement claims. What guarantee is there that something like this does not happen again?</p>
-
 <p>What you should do is host your own repository, that proxies npmjs.org. That way you can keep a copy of all packages you rely on, including the version history (based on your installations). So even if you do not have the need to publish internal packages, keeping a proxy registry can be extremely valuable in the future, if a package is taken off the Internet.</p>
-
 <p>There are several free, open source, solutions available - I have successfully used the npm support in <a href="https://www.sonatype.com/nexus-repository-oss">Sonatype Nexus</a> in several projects.</p>
-
 <h2 id="yarn">Yarn</h2>
-
 <p>In 2016 Facebook introduced <a href="https://yarnpkg.com/">Yarn</a>, a drop-in replacement for the npm client. It still use the same <code>node_modules</code> directory and the same package registry as npm and can be used side-by-side with npm.</p>
-
 <p>The most important difference Yarn has over npm is that it is deterministic. It automatically locks down all versions of your dependency tree, so everyone installing the same project will guaranteed get the exact same versions of dependencies.</p>
-
 <p>So basically, Yarn is like npm + shrinkwrap, only better.</p>
-
 <p>Also, besides from being deterministic and npm-compatible it is <em>way faster</em> than npm when installing packages - you should definitely <a href="https://yarnpkg.com/docs/install">try it out</a>.</p>
-
 <h2 id="still-not-safe">Still not safe</h2>
-
 <p>Even if you do all these things you are still not safe. The way npm packages are constructed it might not contain the actual code you want, rather a package can hook up to the <a href="https://docs.npmjs.com/misc/scripts">npm-lifecycle</a> and execute scripts as part of the installation. These scripts can do <em>whatever</em> the executing user have access to, most commonly it download files from off the Internet and install on your system.</p>
-
 <p>E.g. <a href="https://github.com/Medium/phantomjs/blob/master/package.json"><code>phantomjs</code></a> use an install hook to download the correct version of phantom based on the current platform.</p>
-
 <p>While this might seem like a good thing, it makes it <strong>very</strong> hard to keep a backup of the version you rely on. An internal npm registry will only keep the package content, any <code>pre/post/install</code> action is entirely up to the package maintainer. While some offer configuration to specify alternative URL:s for where additional files are downloaded - all such config is package specific. Another example is <a href="https://github.com/sass/node-sass">node-sass</a> which downloads source code in order to build node bindings for libsass.</p>
-
 <p>You need to be aware of which packages pulls stunts like this if you need to have a fully reproducible environment.</p>
-
 <p><em>A good way to test your builds is to block traffic to Internet during a clean build (with clean cache), that way it is easier to detect any outside source being requested.</em></p>
-
 <h2 id="to-summarize">To summarize</h2>
-
 <p>The size and available options in the JavaScript ecosystem is one of its great strengths, you should use dependencies - but at least be aware of the risk they introduce. Maybe you don&rsquo;t need, or cannot afford, to have 100% reproducible builds - just make sure you call that decision before the <em>SHTF</em>.</p>
-
 <ul>
 <li>Only use npm or yarn for package management</li>
 <li>Use semantic versions, not tags, not git repositories, etc.</li>
@@ -128,6 +89,15 @@
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/javascript" class="red-tag">JavaScript</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -161,12 +131,16 @@
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

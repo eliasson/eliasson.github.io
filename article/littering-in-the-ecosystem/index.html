@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -40,27 +38,29 @@
                         </div>
                     </header>
                     <section class="red-article-body"><p>The other day I was in a discussion on the general situation with JavaScript development. I argued that the JavaScript community many time feels like a youth centre, everyone trying to show off themselves and not everyone taking responsibility on what they do. I even expressed that publishing many small NPM packages should be seen as littering the JavaScript ecosystem. Heck, one <a href="https://www.npmjs.com/~mafintosh">developer</a> published over 500 packages and this behaviour seems to be encouraged by the community.</p>
-
 <p>Today, I revisited these thoughts and asked myself <em>why</em> I feel this way. What is the problem with having many packages to choose from? Sure, the dependencies your application have each introduce a risk - but the choice of additional dependencies cannot be seen as a risk but a smorgasbord, right? Does my feeling have any reason, or is it just that I am unused to these small modules comparing to Java or Python ecosystems?</p>
-
 <p>Some argue that people seems to have forgotten how to program, that we need help left padding a string. I don&rsquo;t worry too much about that, using tested and proven code make sense and allows you to focus on adding value to your product or to your client.</p>
-
 <p>After some thinking I reduced my concern down to two issues:</p>
-
 <ul>
 <li><strong>Discoverability</strong>, having many modules sharing the same namespace makes it harder to search for a package that fit you needs. Also, using nonsense or silly package names trying to be unique does not help.</li>
 <li><strong>Maintainability</strong>, can one developer with 500 packages really maintain all of those? Just managing PR can be a tedious job. Would it not be better with fewer packages that each have several maintainers?</li>
 </ul>
-
 <p>Think about the value your package brings, does it have to be a package? Does it really motivate a new package or can would it be better off as a module in an existing package? Can it just be a gist or a git repository allowing for people to discover and vendor if needed?</p>
-
 <p>If you publish a package you have the responsibility throughout its life-cycle, allow your potential consumers to distinguish between an abandoned package and a fully functional package that is just feature complete.</p>
-
 <p>Don&rsquo;t get me wrong, I think that small modules are a good thing, but some of the existing ones are <a href="https://github.com/gummesson/is-empty-object">tiny</a>, these should not be individual packages and there are far too many abandoned packages still around, littering the ecosystem.</p>
 </section>
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/javascript" class="red-tag">JavaScript</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -94,12 +94,16 @@
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

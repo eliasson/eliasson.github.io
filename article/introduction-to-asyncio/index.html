@@ -15,8 +15,6 @@
 
 
 
-
-
 <body class="red-page">
     <div class="container">
         <div class="red-page-header">
@@ -39,85 +37,74 @@
                             </time>
                         </div>
                     </header>
-                    <section class="red-article-body">
-
-<p>In Python 3.4 a new module, <code>asyncio</code> was introduced, this module allows you to write <em>concurrent</em>, <em>single threaded</em> code in Python without relying on any third-party libraries (such as Twisted, or Tornado).</p>
-
+                    <section class="red-article-body"><p>In Python 3.4 a new module, <code>asyncio</code> was introduced, this module allows you to write <em>concurrent</em>, <em>single threaded</em> code in Python without relying on any third-party libraries (such as Twisted, or Tornado).</p>
 <p>I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write <em>concurrent</em> code in Python 3.5.</p>
-
 <p>Remember, <strong>concurrency</strong> is not the same as <strong>parallelism</strong>.</p>
-
 <ul>
-<li><p><strong>Concurrency</strong> is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time. This is possible with a single-core CPU.</p></li>
-
-<li><p><strong>Parallelism</strong> is when one or more functions run at the same time, this requires multi-core CPU.</p></li>
+<li>
+<p><strong>Concurrency</strong> is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time. This is possible with a single-core CPU.</p>
+</li>
+<li>
+<p><strong>Parallelism</strong> is when one or more functions run at the same time, this requires multi-core CPU.</p>
+</li>
 </ul>
-
 <p><em>As a metaphor, consider when you are in the kitchen making dinner. You put your potato cake into the oven, setting your kitchen timer for 15 minutes. Meanwhile, you start frying some pork to go with it. After 15 minutes, the timer goes off with a beep, you put away the frying pan and take the cake out of the oven.</em></p>
-
 <p>Your are being concurrent, there is only one person (CPU) in the kitchen, doing multiple tasks at the same time.</p>
-
 <p>Single threaded, asynchronous programming is considered simpler than using multi-threaded programming. The reason is that you don&rsquo;t need to coordinate routines, and shared mutable state. Rather you write single-threaded programs that feels quite sequential. This is partially what made NodeJS as popular as
 it is - the async nature is built in to NodeJS and async is often default and a synchronous API is made an option.</p>
-
 <p><code>asyncio</code> gives us asynchronous I/O, thus it is suitable for file and network operations, where the process will be schedule to wait for data being available. It is <strong>not</strong> suitable for CPU-bound programming - here you need to fallback to threading or multi-processing.</p>
-
 <p>As it turns out, the intended example project - a BitTorrent client - have plenty of I/O and not so much CPU-bound work to do - it should match <code>asyncio</code> perfectly.</p>
-
 <h3 id="await-and-async">await and async</h3>
-
 <p>If you run the code snippet below, you will open two TCP connections to two of Google&rsquo;s DNS servers. Once the connection is open, we&rsquo;ll pretend to do some I/O but rather sleeping. Once the fictive work is done, the connection will be closed.</p>
-
 <p>This is all run on a single thread, yet two connections are open at the same time. If you run the program for a couple of times you will see that the order in which the connections are closed varies due to the randomized time to sleep.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> asyncio
+<span style="color:#f92672">from</span> random <span style="color:#f92672">import</span> randint
 
-<pre><code class="language-python">import asyncio
-from random import randint
+<span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">do_stuff</span>(ip, port):
+    print(<span style="color:#e6db74">&#39;About to open a connection to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
+    reader, writer <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>open_connection(ip, port)
 
-async def do_stuff(ip, port):
-    print('About to open a connection to {ip}'.format(ip=ip))
-    reader, writer = await asyncio.open_connection(ip, port)
+    print(<span style="color:#e6db74">&#39;Connection open to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
+    <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>sleep(randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">5</span>))
 
-    print('Connection open to {ip}'.format(ip=ip))
-    await asyncio.sleep(randint(0, 5))
+    writer<span style="color:#f92672">.</span>close()
+    print(<span style="color:#e6db74">&#39;Closed connection to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
 
-    writer.close()
-    print('Closed connection to {ip}'.format(ip=ip))
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+    loop <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>get_event_loop()
 
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-
-    work = [
-        asyncio.ensure_future(do_stuff('8.8.8.8', '53')),
-        asyncio.ensure_future(do_stuff('8.8.4.4', '53')),
+    work <span style="color:#f92672">=</span> [
+        asyncio<span style="color:#f92672">.</span>ensure_future(do_stuff(<span style="color:#e6db74">&#39;8.8.8.8&#39;</span>, <span style="color:#e6db74">&#39;53&#39;</span>)),
+        asyncio<span style="color:#f92672">.</span>ensure_future(do_stuff(<span style="color:#e6db74">&#39;8.8.4.4&#39;</span>, <span style="color:#e6db74">&#39;53&#39;</span>)),
     ]
 
-    loop.run_until_complete(asyncio.gather(*work))
-</code></pre>
-
-<p>Let&rsquo;s start with the main code block. First we get a reference to the default <a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop">event loop</a>. Then we create a list of two tasks calling the function <code>do_stuff</code> and tell the event loop to run until those tasks are complete.</p>
-
+    loop<span style="color:#f92672">.</span>run_until_complete(asyncio<span style="color:#f92672">.</span>gather(<span style="color:#f92672">*</span>work))
+</code></pre></div><p>Let&rsquo;s start with the main code block. First we get a reference to the default <a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop">event loop</a>. Then we create a list of two tasks calling the function <code>do_stuff</code> and tell the event loop to run until those tasks are complete.</p>
 <p>The function <code>do_stuff</code> is declared with the <code>async def</code> statement, which makes it into something called a <a href="https://docs.python.org/3/glossary.html#term-coroutine">coroutine</a>. A <em>coroutine</em> is a special kind of generator and to which you can send a value back. The nice thing about coroutines is that they can be suspended, and resumed at a later state - with the scoped variables intact.</p>
-
 <p>Whenever a <code>await</code> is reached inside the <code>do_stuff</code> that coroutine will be suspended until the response is ready (the sending values back to a generator). When resumed, it will continue execution at the same position and keep going until the next <code>await</code> is there - or until the return statement is reached ( Python use implicit return statements).</p>
-
 <p>Now, back to the <em>event loop</em>. Whenever a coroutine is suspended, the event loop will resume another coroutine (given that it is ready to be resumed). This is the <em>cooperative multi-tasking</em> - coroutines will take turns running on the same thread, but two coroutines will <strong>not</strong> run in parallel.</p>
-
 <p>Basically, any function that supports asyncio is either declared using <code>async def</code> <em>or</em> by using the decorator <code>@asyncio.coroutine</code>. Any code calling such functions needs to use the <code>await</code> statement <em>or</em> <code>yield from</code>.</p>
-
 <p>In Python 3.4 the asyncio used the decorator <code>@coroutine</code> for a special type of generator, and <code>yield from</code> to pause the the generator while waiting for something to happen (e.g. a read being ready to consume). In Python 3.5 this was replaced by the expressions <code>async</code> and <code>await</code>.</p>
-
 <p><em>Awaitable</em> functions (or coroutines) needs to be wrapped in a Future and handed
 over to the <em>event loop</em>. And finally the <em>event loop</em> needs to be instructed to run.</p>
-
 <h2 id="summary">Summary</h2>
-
 <p>This was a short introduction to asyncio in Python. If you have done async programming in another language (JavaScript, C#) you might feel just at home, if not there are great articles presenting Python&rsquo;s implementation in details and with a proper walkthrough from iterator, generator, corouties to async/await.</p>
-
 <p>Brett Cannon have written an excellent post <a href="http://www.snarky.ca/how-the-heck-does-async-await-work-in-python-3-5">How the heck does async/await work in Python 3.5</a>. And A. Jesse Jiryu Davis and Guido van Rossum gives great detail in their article <a href="http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html">A Web Crawler With asyncio Coroutines</a>. If you only read one, I recommend Brett Cannon&rsquo;s as I found it easier to digest.</p>
 </section>
                 </article>
             </div>
         </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/python" class="red-tag">Python</a>
+            
+                <a href="/tags/bittorrent" class="red-tag">BitTorrent</a>
+            
+        </div>
+    </div>
+</div>
         <footer>
     <div class="row">
         <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
@@ -151,12 +138,16 @@ over to the <em>event loop</em>. And finally the <em>event loop</em> needs to be
     </div>
 </footer>
 
-<script>
-window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-ga('create', 'UA-42999256-1', 'auto');
-ga('send', 'pageview');
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
 </script>
-<script async src='//www.google-analytics.com/analytics.js'></script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
 
 
     </div>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Software Development on Markus Eliasson</title>
@@ -6,10 +6,16 @@
     <description>Recent content in Software Development on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 18 Aug 2018 13:00:00 +0100</lastBuildDate>
-    
-	<atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Thu, 16 Sep 2021 15:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Your obstacles are YOUR obstacles</title>
+      <link>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</link>
+      <pubDate>Thu, 16 Sep 2021 15:00:00 +0200</pubDate>
+      
+      <guid>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</guid>
+      <description>Software is magic, there are few physical limitations on what can be done. A change can be made quickly and its benefits are immediate. The same is true for how we work with developing software, there are very few rules or obstacles that stop us from doing what is required as swift and efficiently as possible.
+Looking at the pre-conditions, we have the speed of light and we have 24 hours per day, if we are strict those are the only ones.</description>
+    </item>
     
     <item>
       <title>Building a parser for Sequence</title>
