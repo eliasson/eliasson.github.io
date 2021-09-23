@@ -6,7 +6,17 @@
     <description>Recent content in Obstacles on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 16 Sep 2021 15:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 23 Sep 2021 10:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Technical debt</title>
+      <link>https://markuseliasson.se/article/technical-debt/</link>
+      <pubDate>Thu, 23 Sep 2021 10:00:00 +0200</pubDate>
+      
+      <guid>https://markuseliasson.se/article/technical-debt/</guid>
+      <description>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read the first article here.
+ Have you ever experienced a full stop on new features due to the team is busy working on technical debt?</description>
+    </item>
+    
     <item>
       <title>Your obstacles are YOUR obstacles</title>
       <link>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</link>

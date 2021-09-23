@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+        <title>Technical debt &middot; Markus Eliasson</title>
+        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
+        <link rel="stylesheet" type="text/css" href="https://markuseliasson.se/css/red.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="alternate" type="application/rss+xml" href="https://markuseliasson.se/index.xml" title="Markus Eliasson" />
+    </head>
+
+
+
+
+<body class="red-page">
+    <div class="container">
+        <div class="red-page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2><a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
+        </div>
+    </div>
+</div>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <article class="red-article">
+                    <header class="red-article-header">
+                        <h1 class="red-article-title">Technical debt</h1>
+                        <div class="red-article-ingress">
+                            <p>What is technical debt, who owns it and when is it due? Post #2 in a series of post about obstacles around software development.</p>
+                            <time class="red-article-date">
+                                Thursday, September 23, 2021
+                            </time>
+                        </div>
+                    </header>
+                    <section class="red-article-body"><blockquote>
+<p>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. <a href="/article/your-obstacles-are-your-obstacles/">Read the first article here.</a></p>
+</blockquote>
+<p>Have you ever experienced a full stop on new features due to the team is busy working on technical debt?</p>
+<p>What is technical debt, who owns it and when is it due? Ask that question to a development team and you will likely get vague answers, something about architecture, slow development time, lack of unit-tests or that the code is too old.</p>
+<p>The truth is that <strong>there is no such thing as technical debt!</strong></p>
+<p>You either have a problem or you do not. Everything else is speculation.</p>
+<h2 id="veto">Veto</h2>
+<p>If I were to be cynical, I would say that some developers use the term technical debt as a veto in discussions with project managers or product managers. If you are not technically oriented in the system it is hard, near impossible, to separate what is actually a problem from what is a desire to use the latest technology or to polish something into perfection.</p>
+<p>No, I am not saying that developers are playing the technical debt card out of evil. They are most likely blinded by their relation to the code, they want to improve it in some way. If a piece of code is terrible to work with, but you only do it very rarely, is it worth fixing?</p>
+<p>Remember the ingress, that we alone choose where to spend our time and energy? If that piece of code really is blocking revenue, fix it! But, if there are other more important areas that would benefit more from the same effort I would choose the one with the greatest customer value.</p>
+<h2 id="stuck-with-bad-code">Stuck with bad code?</h2>
+<p>Sure, you might be stuck with a codebase that is terrible and that stops you from making changes in a steady and safe manner. Calling it technical debt in such a situation is in my experience not productive. Technical debt tends to be rooted in emotions and is overly focused on code - not why that code came to be that way.</p>
+<p>There are many reasons for why a codebase is in a bad shape, here are a few reasons I have identified during my years as a developer.</p>
+<p><strong>Overcomplicating things</strong> - there are many reasons for why developers overcomplicate things. I would say that most often it is about trying to predict the future. Adding variations, features or options that will enable future use-cases.</p>
+<p>Predicting the future however is super-hard and you are better off making your code robust to future changes (unit-tests, boundaries, etc) rather than adapting the code to potential changes too soon.</p>
+<p><strong>Bad test-coverage</strong> - some of the systems I have worked with did not have any unit-tests, some had a few unit-tests and a few of them had many unit-tests.</p>
+<p>Needless to say, the systems with more unit-tests were <em>a lot</em> simpler to change and grow with new features. Not having good test coverage is either <em>extremely risky</em> or <em>extremely slow</em> - either you hope your change is OK and then you ship it, or you need extensive manual testing.</p>
+<p><strong>Lack of understanding</strong> - building the wrong thing is not only expensive in time and resources. The cost of having the wrong solution or abstractions in the code base should not be ignored.</p>
+<p>A developer obviously needs to understand the existing design and code. This is most likely the easy part, most developers are used to working in different codebases and have their colleagues at arms length when in doubt. The other part of understanding is to understand what to build and why. If this is not clear there is a great risk that what is built is not solving the right problem. The developers need to collaborate with key stakeholders for a feature, this is crucial. The further away you keep your developers, the further away you put your chance of success!</p>
+<p><strong>Stress</strong> - is an obvious factor, people perform badly under too much stress, regardless of profession. Stress leads to mistakes, ignoring code-hygiene such as unit-tests or not taking the time to understand the task at hand.</p>
+<p><strong>Incompetence</strong> - a harsh word maybe, but sometimes it is as simple as that. The person(s) who wrote a piece of code might just not know better. To be clear, I think there is a difference in being incompetent and not yet knowing it all. If you keep practicing and are willing to learn new things throughout your career you will probably be fine. Incompetence is a tough problem though, sometimes it can be mitigated with training, coaching and pair-programming. Other times, different actions are needed.</p>
+<h2 id="cause-and-effect">Cause and effect</h2>
+<p>As you can see far from every reason originates from code, many of them span across the organisation. What is common for all these reasons however is that they manifest themselves in the code. Hence it is easy to label these problems as <em>technical debt</em>. The developers have the responsibility of the code, they should make sure it is correct and in overall good shape, but it is naive to think that it solely lies within the developers domain. Hence, to correct technical debt you have to broaden your view and look over the entire organisation.</p>
+<p>What you need to do is to find your bottlenecks to increase customer value. Find out ways to improve that, label it and prioritize it as any other work. If you do not name and describe work correctly, how can you know that you are working on the correct task?</p>
+<ul>
+<li>Technical debt is a vague term, define concrete tasks</li>
+<li>Use techniques as Test-Driven Development and pair programming to avoid the situation in the first place</li>
+<li>Collaborate and make sure features are well understood</li>
+</ul>
+<div class="red-article-post-scriptium">
+<p>This was the second part of a series of articles, you can find the first one here:</p>
+<ul>
+<li><a href="/article/your-obstacles-are-your-obstacles/">Your obstacles are YOUR obstacles</a></li>
+</ul>
+</div>
+</section>
+                </article>
+            </div>
+        </div>
+        <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="red-article-tags">
+            
+                <a href="/tags/software-development" class="red-tag">Software Development</a>
+            
+                <a href="/tags/obstacles" class="red-tag">Obstacles</a>
+            
+        </div>
+    </div>
+</div>
+        <footer>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+            <p class="red-landing-email">
+                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
+            </p>
+            <p class="red-landing-affiliation">
+                Consultant at <a href="http://factor10.com" class="no-feedback">
+                    <img src="https://markuseliasson.se/factor10.png" alt="factor10" />
+                </a>
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+            <ul class="red-landing-social">
+                
+                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
+                
+                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
+                
+                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
+                
+            </ul>
+            <div class="break"></div>
+        </div>
+    </div>
+</footer>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-42999256-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+    </div>
+</body>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
+</html>
+
