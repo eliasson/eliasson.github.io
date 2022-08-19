@@ -6,7 +6,17 @@
     <description>Recent content in Obstacles on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Sep 2021 10:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 19 Aug 2022 13:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The fear of releasing</title>
+      <link>https://markuseliasson.se/article/the-fear-of-releasing/</link>
+      <pubDate>Fri, 19 Aug 2022 13:00:00 +0200</pubDate>
+      
+      <guid>https://markuseliasson.se/article/the-fear-of-releasing/</guid>
+      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.
+ The fear of releasing is real, it is the fear of failure. Will this feature work as intended?</description>
+    </item>
+    
     <item>
       <title>Technical debt</title>
       <link>https://markuseliasson.se/article/technical-debt/</link>

@@ -63,72 +63,72 @@
 <p>Below is bencoding described in <a href="https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form">Augmented Backus-Naur Form</a> courtesy of the <a href="https://hackage.haskell.org/package/bencoding-0.4.3.0/docs/Data-BEncode.html">Haskell library</a>.</p>
 <pre tabindex="0"><code>&lt;BE&gt;    ::= &lt;DICT&gt; | &lt;LIST&gt; | &lt;INT&gt; | &lt;STR&gt;
 
-&lt;DICT&gt;  ::= &quot;d&quot; 1 * (&lt;STR&gt; &lt;BE&gt;) &quot;e&quot;
-&lt;LIST&gt;  ::= &quot;l&quot; 1 * &lt;BE&gt;         &quot;e&quot;
-&lt;INT&gt;   ::= &quot;i&quot;     &lt;SNUM&gt;       &quot;e&quot;
-&lt;STR&gt;   ::= &lt;NUM&gt; &quot;:&quot; n * &lt;CHAR&gt;; where n equals the &lt;NUM&gt;
+&lt;DICT&gt;  ::= &#34;d&#34; 1 * (&lt;STR&gt; &lt;BE&gt;) &#34;e&#34;
+&lt;LIST&gt;  ::= &#34;l&#34; 1 * &lt;BE&gt;         &#34;e&#34;
+&lt;INT&gt;   ::= &#34;i&#34;     &lt;SNUM&gt;       &#34;e&#34;
+&lt;STR&gt;   ::= &lt;NUM&gt; &#34;:&#34; n * &lt;CHAR&gt;; where n equals the &lt;NUM&gt;
 
-&lt;SNUM&gt;  ::= &quot;-&quot; &lt;NUM&gt; / &lt;NUM&gt;
+&lt;SNUM&gt;  ::= &#34;-&#34; &lt;NUM&gt; / &lt;NUM&gt;
 &lt;NUM&gt;   ::= 1 * &lt;DIGIT&gt;
 &lt;CHAR&gt;  ::= %
-&lt;DIGIT&gt; ::= &quot;0&quot; | &quot;1&quot; | &quot;2&quot; | &quot;3&quot; | &quot;4&quot; | &quot;5&quot; | &quot;6&quot; | &quot;7&quot; | &quot;8&quot; | &quot;9&quot;
+&lt;DIGIT&gt; ::= &#34;0&#34; | &#34;1&#34; | &#34;2&#34; | &#34;3&#34; | &#34;4&#34; | &#34;5&#34; | &#34;6&#34; | &#34;7&#34; | &#34;8&#34; | &#34;9&#34;
 </code></pre><p>In <em>pieces</em> the encoding and decoding of <em>bencoded</em> data is implemented in the <code>pieces.bencoding</code> module (<a href="https://github.com/eliasson/pieces/blob/master/pieces/bencoding.py">source code</a>).</p>
 <p>Here are a few examples decoding bencoded data into a Python representation using that module.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> pieces.bencoding <span style="color:#f92672">import</span> Decoder
-
-<span style="color:#75715e"># An integer value starts with an &#39;i&#39; followed by a series of</span>
-<span style="color:#75715e"># digits until terminated with a &#39;e&#39;.</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;i123e&#39;</span>)<span style="color:#f92672">.</span>decode()
-<span style="color:#ae81ff">123</span>
-
-<span style="color:#75715e"># A string value, starts by defining the number of characters</span>
-<span style="color:#75715e"># contained in the string, followed by the actual string.</span>
-<span style="color:#75715e"># Notice that the string returned is a binary string, not unicode.</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;12:Middle Earth&#39;</span>)<span style="color:#f92672">.</span>decode()
-<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Middle Earth&#39;</span>
-
-<span style="color:#75715e"># A list starts with a &#39;l&#39; followed by any number of objects, until</span>
-<span style="color:#75715e"># terminated with an &#39;e&#39;.</span>
-<span style="color:#75715e"># As in Python, a list may contain any type of object.</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;l4:spam4:eggsi123ee&#39;</span>)<span style="color:#f92672">.</span>decode()
-[<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;eggs&#39;</span>, <span style="color:#ae81ff">123</span>]
-
-<span style="color:#75715e"># A dict starts with a &#39;d&#39; and is terminated with a &#39;e&#39;. objects</span>
-<span style="color:#75715e"># in between those characters must be pairs of string + object.</span>
-<span style="color:#75715e"># The order is significant in a dict, thus OrderedDict (from</span>
-<span style="color:#75715e"># Python 3.1) is used.</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;d3:cow3:moo4:spam4:eggse&#39;</span>)<span style="color:#f92672">.</span>decode()
-OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;cow&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;moo&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;eggs&#39;</span>)])
-</code></pre></div><p>Likewise, a Python object structure can be encoded into a bencoded byte string using the same module.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> OrderedDict
-<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> pieces.bencoding <span style="color:#f92672">import</span> Encoder
-
-<span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(<span style="color:#ae81ff">123</span>)<span style="color:#f92672">.</span>encode()
-<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;i123e&#39;</span>
-
-<span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(<span style="color:#e6db74">&#39;Middle Earth&#39;</span>)<span style="color:#f92672">.</span>encode()
-<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;12:Middle Earth&#39;</span>
-
-<span style="color:#f92672">&gt;&gt;&gt;</span> Encoder([<span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">&#39;eggs&#39;</span>, <span style="color:#ae81ff">123</span>])<span style="color:#f92672">.</span>encode()
-bytearray(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;l4:spam4:eggsi123ee&#39;</span>)
-
-<span style="color:#f92672">&gt;&gt;&gt;</span> d <span style="color:#f92672">=</span> OrderedDict()
-<span style="color:#f92672">&gt;&gt;&gt;</span> d[<span style="color:#e6db74">&#39;cow&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;moo&#39;</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> d[<span style="color:#e6db74">&#39;spam&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;eggs&#39;</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(d)<span style="color:#f92672">.</span>encode()
-bytearray(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;d3:cow3:moo4:spam4:eggse&#39;</span>)
-</code></pre></div><p>These examples can also be found in the <a href="https://github.com/eliasson/pieces/blob/master/tests/test_bendoding.py">unit tests</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> pieces.bencoding <span style="color:#f92672">import</span> Decoder
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># An integer value starts with an &#39;i&#39; followed by a series of</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># digits until terminated with a &#39;e&#39;.</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;i123e&#39;</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span><span style="color:#ae81ff">123</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># A string value, starts by defining the number of characters</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># contained in the string, followed by the actual string.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Notice that the string returned is a binary string, not unicode.</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;12:Middle Earth&#39;</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Middle Earth&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># A list starts with a &#39;l&#39; followed by any number of objects, until</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># terminated with an &#39;e&#39;.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># As in Python, a list may contain any type of object.</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;l4:spam4:eggsi123ee&#39;</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span>[<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;eggs&#39;</span>, <span style="color:#ae81ff">123</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># A dict starts with a &#39;d&#39; and is terminated with a &#39;e&#39;. objects</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># in between those characters must be pairs of string + object.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The order is significant in a dict, thus OrderedDict (from</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Python 3.1) is used.</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Decoder(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;d3:cow3:moo4:spam4:eggse&#39;</span>)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span>OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;cow&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;moo&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;eggs&#39;</span>)])
+</span></span></code></pre></div><p>Likewise, a Python object structure can be encoded into a bencoded byte string using the same module.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> collections <span style="color:#f92672">import</span> OrderedDict
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">from</span> pieces.bencoding <span style="color:#f92672">import</span> Encoder
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(<span style="color:#ae81ff">123</span>)<span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;i123e&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(<span style="color:#e6db74">&#39;Middle Earth&#39;</span>)<span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;12:Middle Earth&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Encoder([<span style="color:#e6db74">&#39;spam&#39;</span>, <span style="color:#e6db74">&#39;eggs&#39;</span>, <span style="color:#ae81ff">123</span>])<span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span>bytearray(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;l4:spam4:eggsi123ee&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> d <span style="color:#f92672">=</span> OrderedDict()
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> d[<span style="color:#e6db74">&#39;cow&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;moo&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> d[<span style="color:#e6db74">&#39;spam&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;eggs&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> Encoder(d)<span style="color:#f92672">.</span>encode()
+</span></span><span style="display:flex;"><span>bytearray(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;d3:cow3:moo4:spam4:eggse&#39;</span>)
+</span></span></code></pre></div><p>These examples can also be found in the <a href="https://github.com/eliasson/pieces/blob/master/tests/test_bendoding.py">unit tests</a>.</p>
 <p>The parser implementation is pretty straight forward, no asyncio is used here though, not even reading the <code>.torrent</code> from disk.</p>
 <p>Using the parser from <code>pieces.bencoding</code>, let&rsquo;s open the <code>.torrent</code> for the popular Linux distribution Ubuntu:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;tests/data/ubuntu-16.04-desktop-amd64.iso.torrent&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
-<span style="color:#f92672">...</span>     meta_info <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
-<span style="color:#f92672">...</span>     torrent <span style="color:#f92672">=</span> Decoder(meta_info)<span style="color:#f92672">.</span>decode()
-<span style="color:#f92672">...</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> torrent
-OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;announce&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://torrent.ubuntu.com:6969/announce&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;announce-list&#39;</span>, [[<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://torrent.ubuntu.com:6969/announce&#39;</span>], [<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://ipv6.torrent.ubuntu.com:6969/announce&#39;</span>]
-]), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;comment&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Ubuntu CD releases.ubuntu.com&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;creation date&#39;</span>, <span style="color:#ae81ff">1461232732</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;info&#39;</span>, OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;length&#39;</span>, <span style="color:#ae81ff">1485881344</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;ubuntu-16.04-desktop-amd64.iso&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;piece</span>
-length<span style="color:#e6db74">&#39;, 524288), (b&#39;</span>pieces<span style="color:#e6db74">&#39;, b&#39;</span>\x1at\xfc\x84\xc8\xfaV\xeb\x12\x1c\xc5\xa4\x1c<span style="color:#960050;background-color:#1e0010">?</span>\xf0\x96\x07P\x87\xb8\xb2\xa5G1\xc8L\x18\x81\x9bc\x81\xfc8<span style="color:#f92672">*</span>\x9d\xf4k\xe6\xdb6\xa3\x0b\x8d\xbe\xe3L\xfd\xfd4\<span style="color:#f92672">...</span><span style="color:#e6db74">&#39;)]))])</span>
-</code></pre></div><p>Here you can read see some of the <em>meta-data</em> such as the name of the destination file (ubuntu-16.04-desktop-amd64.iso) and the total size in bytes (1485881344).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;tests/data/ubuntu-16.04-desktop-amd64.iso.torrent&#39;</span>, <span style="color:#e6db74">&#39;rb&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>     meta_info <span style="color:#f92672">=</span> f<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>     torrent <span style="color:#f92672">=</span> Decoder(meta_info)<span style="color:#f92672">.</span>decode()
+</span></span><span style="display:flex;"><span><span style="color:#f92672">...</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> torrent
+</span></span><span style="display:flex;"><span>OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;announce&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://torrent.ubuntu.com:6969/announce&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;announce-list&#39;</span>, [[<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://torrent.ubuntu.com:6969/announce&#39;</span>], [<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;http://ipv6.torrent.ubuntu.com:6969/announce&#39;</span>]
+</span></span><span style="display:flex;"><span>]), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;comment&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;Ubuntu CD releases.ubuntu.com&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;creation date&#39;</span>, <span style="color:#ae81ff">1461232732</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;info&#39;</span>, OrderedDict([(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;length&#39;</span>, <span style="color:#ae81ff">1485881344</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;name&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;ubuntu-16.04-desktop-amd64.iso&#39;</span>), (<span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;piece</span>
+</span></span><span style="display:flex;"><span>length<span style="color:#e6db74">&#39;, 524288), (b&#39;</span>pieces<span style="color:#e6db74">&#39;, b&#39;</span>\x1at\xfc\x84\xc8\xfaV\xeb\x12\x1c\xc5\xa4\x1c<span style="color:#960050;background-color:#1e0010">?</span>\xf0\x96\x07P\x87\xb8\xb2\xa5G1\xc8L\x18\x81\x9bc\x81\xfc8<span style="color:#f92672">*</span>\x9d\xf4k\xe6\xdb6\xa3\x0b\x8d\xbe\xe3L\xfd\xfd4\<span style="color:#f92672">...</span><span style="color:#e6db74">&#39;)]))])</span>
+</span></span></code></pre></div><p>Here you can read see some of the <em>meta-data</em> such as the name of the destination file (ubuntu-16.04-desktop-amd64.iso) and the total size in bytes (1485881344).</p>
 <p>Notice how the keys used in the <code>OrderedDict</code> are <em>binary</em> strings. Bencoding is a binary protocol, and using UTF-8 strings as keys <em>will not work</em>!</p>
 <p>A wrapper class <code>pieces.torrent.Torrent</code> exposing these properties is implemented abstracting the binary strings, and other details away from the rest of the client. This class only implements the attributes used in pieces client.</p>
 <p>I will not go through which attributes that is available, instead the rest of this article will refer back to attributes found in the <code>.torrent</code> / <em>meta-info</em> were used.</p>
@@ -175,20 +175,20 @@ length<span style="color:#e6db74">&#39;, 524288), (b&#39;</span>pieces<span styl
 </tbody>
 </table>
 <p>The peer_id needs to be exactly 20 bytes, and there are two major conventions used on how to generate this ID. Pieces follows the <a href="https://wiki.theory.org/BitTorrentSpecification#peer_id">Azureus-style</a> convention generating peer id like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> random
-<span style="color:#75715e"># -&lt;2 character id&gt;&lt;4 digit version number&gt;-&lt;random numbers&gt;</span>
-<span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#39;-PC0001-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join([str(random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">9</span>)) <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">12</span>)])
-<span style="color:#e6db74">&#39;-PC0001-478269329936&#39;</span>
-</code></pre></div><p>A tracker request can look like this using <a href="https://github.com/jkbrzt/httpie">httpie</a>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-http" data-lang="http"><span style="color:#960050;background-color:#1e0010">http GET &#34;http://torrent.ubuntu.com:6969/announce?info_hash=%90%28%9F%D3M%FC%1C%F8%F3%16%A2h%AD%D85L%853DX&amp;peer_id=-PC0001-706887310628&amp;uploaded=0&amp;downloaded=0&amp;left=699400192&amp;port=6889&amp;compact=1&#34;
-</span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.0</span> <span style="color:#ae81ff">200</span> <span style="color:#a6e22e">OK</span>
-Content-Length<span style="color:#f92672">:</span> <span style="color:#ae81ff">363</span>
-Content-Type<span style="color:#f92672">:</span> <span style="color:#ae81ff">text/plain</span>
-Pragma<span style="color:#f92672">:</span> <span style="color:#ae81ff">no-cache</span>
-
-<span style="color:#960050;background-color:#1e0010">d8:completei3651e10:incompletei385e8:intervali1800e5:peers300:£¬%ËÌyOkÝ.ê@_&lt;K+Ô\Ý</span> <span style="color:#960050;background-color:#1e0010">Ámb^TnÈÕ^AËO*ÈÕ1*ÈÕ&gt;¥³ÈÕBä)ðþ¸ÐÞ¦Ô/ãÈÕÈuÉæÈÕ</span>
-<span style="color:#960050;background-color:#1e0010">...</span>
-</code></pre></div><p><em>The response data is truncated since it contains binary data that screws up the Markdown formatting.</em></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -&lt;2 character id&gt;&lt;4 digit version number&gt;-&lt;random numbers&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#e6db74">&#39;-PC0001-&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#39;</span><span style="color:#f92672">.</span>join([str(random<span style="color:#f92672">.</span>randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">9</span>)) <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">12</span>)])
+</span></span><span style="display:flex;"><span><span style="color:#e6db74">&#39;-PC0001-478269329936&#39;</span>
+</span></span></code></pre></div><p>A tracker request can look like this using <a href="https://github.com/jkbrzt/httpie">httpie</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-http" data-lang="http"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">http GET &#34;http://torrent.ubuntu.com:6969/announce?info_hash=%90%28%9F%D3M%FC%1C%F8%F3%16%A2h%AD%D85L%853DX&amp;peer_id=-PC0001-706887310628&amp;uploaded=0&amp;downloaded=0&amp;left=699400192&amp;port=6889&amp;compact=1&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010"></span><span style="color:#66d9ef">HTTP</span><span style="color:#f92672">/</span><span style="color:#ae81ff">1.0</span> <span style="color:#ae81ff">200</span> <span style="color:#a6e22e">OK</span>
+</span></span><span style="display:flex;"><span>Content-Length<span style="color:#f92672">:</span> <span style="color:#ae81ff">363</span>
+</span></span><span style="display:flex;"><span>Content-Type<span style="color:#f92672">:</span> <span style="color:#ae81ff">text/plain</span>
+</span></span><span style="display:flex;"><span>Pragma<span style="color:#f92672">:</span> <span style="color:#ae81ff">no-cache</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">d8:completei3651e10:incompletei385e8:intervali1800e5:peers300:£¬%ËÌyOkÝ.ê@_&lt;K+Ô\Ý</span> <span style="color:#960050;background-color:#1e0010">Ámb^TnÈÕ^AËO*ÈÕ1*ÈÕ&gt;¥³ÈÕBä)ðþ¸ÐÞ¦Ô/ãÈÕÈuÉæÈÕ</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">...</span>
+</span></span></code></pre></div><p><em>The response data is truncated since it contains binary data that screws up the Markdown formatting.</em></p>
 <p>From the tracker response, there is two properties of interest:</p>
 <ul>
 <li><strong>interval</strong> - The interval in seconds until the client should make a new announce call to the tracker.</li>
@@ -198,80 +198,80 @@ Pragma<span style="color:#f92672">:</span> <span style="color:#ae81ff">no-cache<
 <h4 id="async-http">Async HTTP</h4>
 <p>Python does not come with a built-in support for async HTTP and my beloved <a href="https://github.com/kennethreitz/requests">requests library</a> does not implement asyncio either. Scouting around the Internet it looks like most use <a href="https://github.com/KeepSafe/aiohttp">aiohttp</a>, which implement both a HTTP client and server.</p>
 <p>Pieces use <code>aiohttp</code> in the <code>pieces.tracker.Tracker</code> class for making the HTTP request to the tracker announce url. A shortened version of that code is this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">connect</span>(self,
-                    first: bool<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,
-                    uploaded: int<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,
-                    downloaded: int<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>):
-    params <span style="color:#f92672">=</span> { <span style="color:#f92672">...</span>}
-    url <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>torrent<span style="color:#f92672">.</span>announce <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;?&#39;</span> <span style="color:#f92672">+</span> urlencode(params)
-
-    <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> self<span style="color:#f92672">.</span>http_client<span style="color:#f92672">.</span>get(url) <span style="color:#66d9ef">as</span> response:
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> response<span style="color:#f92672">.</span>status <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>:
-            <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ConnectionError</span>(<span style="color:#e6db74">&#39;Unable to connect to tracker&#39;</span>)
-        data <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> response<span style="color:#f92672">.</span>read()
-        <span style="color:#66d9ef">return</span> TrackerResponse(bencoding<span style="color:#f92672">.</span>Decoder(data)<span style="color:#f92672">.</span>decode())
-</code></pre></div><p>The method is declared using <code>async</code> and uses the new <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-context-managers-and-async-with">asynchronous context manager</a> <code>async with</code> to allow being suspended while the HTTP call is being made. Given a successful response, this method will be suspended again while reading the binary response data <code>await response.read()</code>. Finally the response data is wrapped in a <code>TrackerResponse</code> instance containing the list of peers, alternative an error message.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">connect</span>(self,
+</span></span><span style="display:flex;"><span>                    first: bool<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>,
+</span></span><span style="display:flex;"><span>                    uploaded: int<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>,
+</span></span><span style="display:flex;"><span>                    downloaded: int<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>):
+</span></span><span style="display:flex;"><span>    params <span style="color:#f92672">=</span> { <span style="color:#f92672">...</span>}
+</span></span><span style="display:flex;"><span>    url <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>torrent<span style="color:#f92672">.</span>announce <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;?&#39;</span> <span style="color:#f92672">+</span> urlencode(params)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">async</span> <span style="color:#66d9ef">with</span> self<span style="color:#f92672">.</span>http_client<span style="color:#f92672">.</span>get(url) <span style="color:#66d9ef">as</span> response:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> response<span style="color:#f92672">.</span>status <span style="color:#f92672">==</span> <span style="color:#ae81ff">200</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">raise</span> <span style="color:#a6e22e">ConnectionError</span>(<span style="color:#e6db74">&#39;Unable to connect to tracker&#39;</span>)
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> response<span style="color:#f92672">.</span>read()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> TrackerResponse(bencoding<span style="color:#f92672">.</span>Decoder(data)<span style="color:#f92672">.</span>decode())
+</span></span></code></pre></div><p>The method is declared using <code>async</code> and uses the new <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-context-managers-and-async-with">asynchronous context manager</a> <code>async with</code> to allow being suspended while the HTTP call is being made. Given a successful response, this method will be suspended again while reading the binary response data <code>await response.read()</code>. Finally the response data is wrapped in a <code>TrackerResponse</code> instance containing the list of peers, alternative an error message.</p>
 <p>The result of using <code>aiohttp</code> is that our event loop is free to schedule other work while we have an outstanding request to the tracker.</p>
 <p>See the module <code>pieces.tracker</code> <a href="https://github.com/eliasson/pieces/blob/master/pieces/tracker.py">source code</a> for full details.</p>
 <h3 id="the-loop">The loop</h3>
 <p>Everything up to this point could really have been made synchronously, but now that we are about to connect to multiple peers we need to go asynchronous.</p>
 <p>The main function in <code>pieces.cli</code> is responsible for setting up the asyncio event loop. If we get rid of some <code>argparse</code> and error handling details it would look something like this (see <a href="https://github.com/eliasson/pieces/blob/master/pieces/cli.py">cli.py</a> for the full details).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> asyncio
-
-<span style="color:#f92672">from</span> pieces.torrent <span style="color:#f92672">import</span> Torrent
-<span style="color:#f92672">from</span> pieces.client <span style="color:#f92672">import</span> TorrentClient
-
-loop <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>get_event_loop()
-client <span style="color:#f92672">=</span> TorrentClient(Torrent(args<span style="color:#f92672">.</span>torrent))
-task <span style="color:#f92672">=</span> loop<span style="color:#f92672">.</span>create_task(client<span style="color:#f92672">.</span>start())
-
-<span style="color:#66d9ef">try</span>:
-    loop<span style="color:#f92672">.</span>run_until_complete(task)
-<span style="color:#66d9ef">except</span> CancelledError:
-    logging<span style="color:#f92672">.</span>warning(<span style="color:#e6db74">&#39;Event loop was canceled&#39;</span>)
-</code></pre></div><p>We start off by getting the default event loop for this thread. Then we construct the <code>TorrentClient</code> with the given <code>Torrent</code> (meta-info). This will parse the <code>.torrent</code> file and validate everything is ok.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> asyncio
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pieces.torrent <span style="color:#f92672">import</span> Torrent
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pieces.client <span style="color:#f92672">import</span> TorrentClient
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>loop <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>get_event_loop()
+</span></span><span style="display:flex;"><span>client <span style="color:#f92672">=</span> TorrentClient(Torrent(args<span style="color:#f92672">.</span>torrent))
+</span></span><span style="display:flex;"><span>task <span style="color:#f92672">=</span> loop<span style="color:#f92672">.</span>create_task(client<span style="color:#f92672">.</span>start())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">try</span>:
+</span></span><span style="display:flex;"><span>    loop<span style="color:#f92672">.</span>run_until_complete(task)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">except</span> CancelledError:
+</span></span><span style="display:flex;"><span>    logging<span style="color:#f92672">.</span>warning(<span style="color:#e6db74">&#39;Event loop was canceled&#39;</span>)
+</span></span></code></pre></div><p>We start off by getting the default event loop for this thread. Then we construct the <code>TorrentClient</code> with the given <code>Torrent</code> (meta-info). This will parse the <code>.torrent</code> file and validate everything is ok.</p>
 <p>Calling the <code>async</code> method <code>client.start()</code> and wrapping that in a <code>asyncio.Future</code> and later adding that future and instructing the event loop to keep running until that task is complete.</p>
 <p>Is that it? No, not really - we have our own loop (<strong>not</strong> event loop) implemented in the <code>pieces.client.TorrentClient</code> that sets up the peer connections, schedules the announce call, etc.</p>
 <p><code>TorrentClient</code> is something like a work coordinator, it starts by creating a <a href="https://docs.python.org/3/library/asyncio-queue.html">async.Queue</a> which will hold the list of available peers that can be connected to.</p>
 <p>Then it constructs <em>N</em> number of <code>pieces.protocol.PeerConnection</code> which will consume peers from off the queue. These <code>PeerConnection</code> instances will wait (<code>await</code>) until there is a peer available in the <code>Queue</code> for one of them to connect to (<em>not blocking</em>).</p>
 <p>Since the queue is empty to begin with, no <code>PeerConnection</code> will do any real work until we populate it with peers it can connect to. This is done in a loop inside of <code>TorrentClient.start</code>.</p>
 <p>Let&rsquo;s have a look at this loop:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">start</span>(self):
-    self<span style="color:#f92672">.</span>peers <span style="color:#f92672">=</span> [PeerConnection(self<span style="color:#f92672">.</span>available_peers,
-                                    self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>torrent<span style="color:#f92672">.</span>info_hash,
-                                    self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>peer_id,
-                                    self<span style="color:#f92672">.</span>piece_manager,
-                                    self<span style="color:#f92672">.</span>_on_block_retrieved)
-                    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(MAX_PEER_CONNECTIONS)]
-
-    <span style="color:#75715e"># The time we last made an announce call (timestamp)</span>
-    previous <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
-    <span style="color:#75715e"># Default interval between announce calls (in seconds)</span>
-    interval <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>
-
-    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
-        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>complete:
-            <span style="color:#66d9ef">break</span>
-        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>abort:
-            <span style="color:#66d9ef">break</span>
-
-        current <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
-        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">not</span> previous) <span style="color:#f92672">or</span> (previous <span style="color:#f92672">+</span> interval <span style="color:#f92672">&lt;</span> current):
-            response <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>connect(
-                first<span style="color:#f92672">=</span>previous <span style="color:#66d9ef">if</span> previous <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">False</span>,
-                uploaded<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>bytes_uploaded,
-                downloaded<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>bytes_downloaded)
-
-            <span style="color:#66d9ef">if</span> response:
-                previous <span style="color:#f92672">=</span> current
-                interval <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>interval
-                self<span style="color:#f92672">.</span>_empty_queue()
-                <span style="color:#66d9ef">for</span> peer <span style="color:#f92672">in</span> response<span style="color:#f92672">.</span>peers:
-                    self<span style="color:#f92672">.</span>available_peers<span style="color:#f92672">.</span>put_nowait(peer)
-        <span style="color:#66d9ef">else</span>:
-            <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">5</span>)
-    self<span style="color:#f92672">.</span>stop()
-</code></pre></div><p>Basically, what that loop does is to:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">start</span>(self):
+</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>peers <span style="color:#f92672">=</span> [PeerConnection(self<span style="color:#f92672">.</span>available_peers,
+</span></span><span style="display:flex;"><span>                                    self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>torrent<span style="color:#f92672">.</span>info_hash,
+</span></span><span style="display:flex;"><span>                                    self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>peer_id,
+</span></span><span style="display:flex;"><span>                                    self<span style="color:#f92672">.</span>piece_manager,
+</span></span><span style="display:flex;"><span>                                    self<span style="color:#f92672">.</span>_on_block_retrieved)
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(MAX_PEER_CONNECTIONS)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># The time we last made an announce call (timestamp)</span>
+</span></span><span style="display:flex;"><span>    previous <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Default interval between announce calls (in seconds)</span>
+</span></span><span style="display:flex;"><span>    interval <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span><span style="color:#f92672">*</span><span style="color:#ae81ff">60</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>complete:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> self<span style="color:#f92672">.</span>abort:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        current <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">not</span> previous) <span style="color:#f92672">or</span> (previous <span style="color:#f92672">+</span> interval <span style="color:#f92672">&lt;</span> current):
+</span></span><span style="display:flex;"><span>            response <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> self<span style="color:#f92672">.</span>tracker<span style="color:#f92672">.</span>connect(
+</span></span><span style="display:flex;"><span>                first<span style="color:#f92672">=</span>previous <span style="color:#66d9ef">if</span> previous <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>                uploaded<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>bytes_uploaded,
+</span></span><span style="display:flex;"><span>                downloaded<span style="color:#f92672">=</span>self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>bytes_downloaded)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> response:
+</span></span><span style="display:flex;"><span>                previous <span style="color:#f92672">=</span> current
+</span></span><span style="display:flex;"><span>                interval <span style="color:#f92672">=</span> response<span style="color:#f92672">.</span>interval
+</span></span><span style="display:flex;"><span>                self<span style="color:#f92672">.</span>_empty_queue()
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">for</span> peer <span style="color:#f92672">in</span> response<span style="color:#f92672">.</span>peers:
+</span></span><span style="display:flex;"><span>                    self<span style="color:#f92672">.</span>available_peers<span style="color:#f92672">.</span>put_nowait(peer)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>sleep(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>    self<span style="color:#f92672">.</span>stop()
+</span></span></code></pre></div><p>Basically, what that loop does is to:</p>
 <ol>
 <li>Check if we have downloaded all pieces</li>
 <li>Check if user aborted download</li>
@@ -337,17 +337,17 @@ close the connection.</p>
 <p>Once a handshake is made, the PeerConnection will use an asynchronous iterator to return a stream of <code>PeerMessages</code> and take the appropriate action.</p>
 <p>Using an async iterator separates the <code>PeerConnection</code> from the details on how to read from sockets and how to parse the BitTorrent binary protocol. The <code>PeerConnection</code> can focus on the semantics regarding the protocol - such as managing the peer state, receiving the pieces, closing the connection.</p>
 <p>This allows the main code in <code>PeerConnection.start</code> to basically look like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> message <span style="color:#f92672">in</span> PeerStreamIterator(self<span style="color:#f92672">.</span>reader, buffer):
-    <span style="color:#66d9ef">if</span> type(message) <span style="color:#f92672">is</span> BitField:
-        self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>add_peer(self<span style="color:#f92672">.</span>remote_id, message<span style="color:#f92672">.</span>bitfield)
-    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> Interested:
-        self<span style="color:#f92672">.</span>peer_state<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#39;interested&#39;</span>)
-    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> NotInterested:
-        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;interested&#39;</span> <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>peer_state:
-            self<span style="color:#f92672">.</span>peer_state<span style="color:#f92672">.</span>remove(<span style="color:#e6db74">&#39;interested&#39;</span>)
-    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> Choke:
-        <span style="color:#f92672">...</span>
-</code></pre></div><p>An <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-iterators-and-async-for">asynchronous iterator</a> is a class that implements the methods <code>__aiter__</code> and <code>__anext__</code> which is just async versions of Python&rsquo;s standard iterators that have implements the methods, <code>__iter__</code> and <code>next</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">for</span> message <span style="color:#f92672">in</span> PeerStreamIterator(self<span style="color:#f92672">.</span>reader, buffer):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> type(message) <span style="color:#f92672">is</span> BitField:
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>piece_manager<span style="color:#f92672">.</span>add_peer(self<span style="color:#f92672">.</span>remote_id, message<span style="color:#f92672">.</span>bitfield)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> Interested:
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>peer_state<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#39;interested&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> NotInterested:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;interested&#39;</span> <span style="color:#f92672">in</span> self<span style="color:#f92672">.</span>peer_state:
+</span></span><span style="display:flex;"><span>            self<span style="color:#f92672">.</span>peer_state<span style="color:#f92672">.</span>remove(<span style="color:#e6db74">&#39;interested&#39;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">elif</span> type(message) <span style="color:#f92672">is</span> Choke:
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">...</span>
+</span></span></code></pre></div><p>An <a href="https://www.python.org/dev/peps/pep-0492/#asynchronous-iterators-and-async-for">asynchronous iterator</a> is a class that implements the methods <code>__aiter__</code> and <code>__anext__</code> which is just async versions of Python&rsquo;s standard iterators that have implements the methods, <code>__iter__</code> and <code>next</code>.</p>
 <p>Upon iterating (calling next) the <code>PeerStreamIterator</code> will read data from the <code>StreamReader</code> and if enough data is available try to parse and return a valid <code>PeerMessage</code>.</p>
 <p>The BitTorrent protocol uses messages with variable length, where all messages takes the form:</p>
 <pre tabindex="0"><code>&lt;length&gt;&lt;id&gt;&lt;payload&gt;
@@ -360,60 +360,60 @@ close the connection.</p>
 <p>All messages are decoded using Python&rsquo;s module <code>struct</code> which contains functions to convert to and from Pythons values and C structs. <a href="https://docs.python.org/3.5/library/struct.html">Struct</a> use compact strings as descriptors on what to convert, e.g. <code>&gt;Ib</code> reads as &ldquo;Big-Endian, 4 byte unsigned integer, 1 byte character.</p>
 <p><em>Note that all messages uses Big-Endian in BitTorrent.</em></p>
 <p>This makes it easy to create unit tests to encode and decode messages. Let&rsquo;s have a look on the tests for the <code>Have</code> message:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HaveMessageTests</span>(unittest<span style="color:#f92672">.</span>TestCase):
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_can_construct_have</span>(self):
-        have <span style="color:#f92672">=</span> Have(<span style="color:#ae81ff">33</span>)
-        self<span style="color:#f92672">.</span>assertEqual(
-            have<span style="color:#f92672">.</span>encode(),
-            <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00\x00\x00\x05\x04\x00\x00\x00</span><span style="color:#e6db74">!&#34;</span>)
-
-    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_can_parse_have</span>(self):
-        have <span style="color:#f92672">=</span> Have<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00\x00\x00\x05\x04\x00\x00\x00</span><span style="color:#e6db74">!&#34;</span>)
-        self<span style="color:#f92672">.</span>assertEqual(<span style="color:#ae81ff">33</span>, have<span style="color:#f92672">.</span>index)
-</code></pre></div><p>From the raw binary string we can tell that the Have message have a length of 5 bytes <code>\x00\x00\x00\x05</code> an id of value 4 <code>\x04</code> and the payload is 33 <code>\x00\x00\x00!</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">HaveMessageTests</span>(unittest<span style="color:#f92672">.</span>TestCase):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_can_construct_have</span>(self):
+</span></span><span style="display:flex;"><span>        have <span style="color:#f92672">=</span> Have(<span style="color:#ae81ff">33</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>assertEqual(
+</span></span><span style="display:flex;"><span>            have<span style="color:#f92672">.</span>encode(),
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00\x00\x00\x05\x04\x00\x00\x00</span><span style="color:#e6db74">!&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">test_can_parse_have</span>(self):
+</span></span><span style="display:flex;"><span>        have <span style="color:#f92672">=</span> Have<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\x00\x00\x00\x05\x04\x00\x00\x00</span><span style="color:#e6db74">!&#34;</span>)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>assertEqual(<span style="color:#ae81ff">33</span>, have<span style="color:#f92672">.</span>index)
+</span></span></code></pre></div><p>From the raw binary string we can tell that the Have message have a length of 5 bytes <code>\x00\x00\x00\x05</code> an id of value 4 <code>\x04</code> and the payload is 33 <code>\x00\x00\x00!</code>.</p>
 <p>Since the message length is 5 and ID only use a single byte we know that we have four bytes to interpret as the payload value. Using <code>struct.unpack</code> we can easily convert it to a python integer like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> struct
-<span style="color:#f92672">&gt;&gt;&gt;</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;&gt;I&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00\x00\x00</span><span style="color:#e6db74">!&#39;</span>)
-(<span style="color:#ae81ff">33</span>,)
-</code></pre></div><p>That is basically it regarding the protocol, all messages follow the same procedure and the iterator keeps reading from the socket until it gets disconnected. See the <a href="https://github.com/eliasson/pieces/blob/master/pieces/protocol.py">source code</a> for details on all messages.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> <span style="color:#f92672">import</span> struct
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;&gt;&gt;</span> struct<span style="color:#f92672">.</span>unpack(<span style="color:#e6db74">&#39;&gt;I&#39;</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#39;</span><span style="color:#ae81ff">\x00\x00\x00</span><span style="color:#e6db74">!&#39;</span>)
+</span></span><span style="display:flex;"><span>(<span style="color:#ae81ff">33</span>,)
+</span></span></code></pre></div><p>That is basically it regarding the protocol, all messages follow the same procedure and the iterator keeps reading from the socket until it gets disconnected. See the <a href="https://github.com/eliasson/pieces/blob/master/pieces/protocol.py">source code</a> for details on all messages.</p>
 <h3 id="managing-the-pieces">Managing the pieces</h3>
 <p>So far we have only discussed pieces - pieces of data being exchanged by two peers. It turns out that pieces is not the entire truth, there is one more concept - <em>blocks</em>. If you have looked through any of the source code you might have seen code refering to blocks, so lets go through what a <em>piece</em> really is.</p>
 <p>A <em>piece</em> is, unsurprisingly, a partial piece of the torrents data. A torrent&rsquo;s data is split into <em>N</em> number of pieces of equal size (except the last piece in a torrent, which might be of smaller size than the others). The piece length is specified in the <code>.torrent</code> file. Typically pieces are of sizes 512 kB or less, and should be a power of 2.</p>
 <p>Pieces are still too big to be shared efficiently between peers, so pieces are further divided into something referred to as <em>blocks</em>. Blocks is the chunks of data that is actually requested between peers, but pieces are still used to indicate which peer that have which pieces. If only blocks should have been used it would increase the overhead in the protocol greatly (resulting in longer BitFields, more Have message and larger <code>.torrent</code> files).</p>
 <p>A <em>block</em> is 2^14 (16384) bytes in size, except the final block that most likely will be of a smaller size.</p>
 <p>Consider an example where a <code>.torrent</code> describes a single file <code>foo.txt</code> to be downloaded.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">name: foo<span style="color:#f92672">.</span>txt
-length: <span style="color:#ae81ff">135168</span>
-piece length: <span style="color:#ae81ff">49152</span>
-</code></pre></div><p>That small torrent would result in 3 pieces:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">piece <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-piece <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-piece <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes (<span style="color:#ae81ff">135168</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">49152</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">49152</span>)
-        <span style="color:#f92672">=</span> <span style="color:#ae81ff">135</span> <span style="color:#ae81ff">168</span>
-</code></pre></div><p>Now each piece is divided into blocks in sizes of <code>2^14</code> bytes:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">piece <span style="color:#ae81ff">0</span>:
-    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes (<span style="color:#ae81ff">2</span><span style="color:#f92672">^</span><span style="color:#ae81ff">14</span>)
-    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-    block <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-
-piece <span style="color:#ae81ff">1</span>:
-    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-    block <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-
-piece <span style="color:#ae81ff">2</span>:
-    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
-    block <span style="color:#ae81ff">2</span>:  <span style="color:#ae81ff">4</span> <span style="color:#ae81ff">096</span> bytes
-          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes
-
-total:       <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-          <span style="color:#f92672">+</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
-          <span style="color:#f92672">+</span>  <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes
-          <span style="color:#f92672">=</span> <span style="color:#ae81ff">135</span> <span style="color:#ae81ff">168</span> bytes
-</code></pre></div><p>Exchanging these blocks between peers is basically what BitTorrent is about. Once all blocks for a piece is done, that piece is complete and can be shared with other peers (the <code>Have</code> message is sent to connected peers). And once all pieces are complete the peer transform from a <em>downloader</em> to only be a <em>seeder</em>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>name: foo<span style="color:#f92672">.</span>txt
+</span></span><span style="display:flex;"><span>length: <span style="color:#ae81ff">135168</span>
+</span></span><span style="display:flex;"><span>piece length: <span style="color:#ae81ff">49152</span>
+</span></span></code></pre></div><p>That small torrent would result in 3 pieces:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>piece <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>piece <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>piece <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes (<span style="color:#ae81ff">135168</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">49152</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">49152</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">=</span> <span style="color:#ae81ff">135</span> <span style="color:#ae81ff">168</span>
+</span></span></code></pre></div><p>Now each piece is divided into blocks in sizes of <code>2^14</code> bytes:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>piece <span style="color:#ae81ff">0</span>:
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes (<span style="color:#ae81ff">2</span><span style="color:#f92672">^</span><span style="color:#ae81ff">14</span>)
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>piece <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">2</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>piece <span style="color:#ae81ff">2</span>:
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">0</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">1</span>: <span style="color:#ae81ff">16</span> <span style="color:#ae81ff">384</span> bytes
+</span></span><span style="display:flex;"><span>    block <span style="color:#ae81ff">2</span>:  <span style="color:#ae81ff">4</span> <span style="color:#ae81ff">096</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">=</span>  <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>total:       <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">+</span>  <span style="color:#ae81ff">49</span> <span style="color:#ae81ff">152</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">+</span>  <span style="color:#ae81ff">36</span> <span style="color:#ae81ff">864</span> bytes
+</span></span><span style="display:flex;"><span>          <span style="color:#f92672">=</span> <span style="color:#ae81ff">135</span> <span style="color:#ae81ff">168</span> bytes
+</span></span></code></pre></div><p>Exchanging these blocks between peers is basically what BitTorrent is about. Once all blocks for a piece is done, that piece is complete and can be shared with other peers (the <code>Have</code> message is sent to connected peers). And once all pieces are complete the peer transform from a <em>downloader</em> to only be a <em>seeder</em>.</p>
 <p>Two notes on where the official specification is a bit off:</p>
 <ol>
 <li>

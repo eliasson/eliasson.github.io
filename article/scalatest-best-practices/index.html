@@ -54,9 +54,9 @@ on features or alternatives to use when writing tests. This is seen as a strengt
 <pre tabindex="0"><code>import org.scalatest.FreeSpec
 
 class UserRepositoryTest extends FreeSpec {
-    &quot;UserRepository&quot; - {
-        &quot;after initial setup&quot; - {
-            &quot;there should be zero users&quot; in {
+    &#34;UserRepository&#34; - {
+        &#34;after initial setup&#34; - {
+            &#34;there should be zero users&#34; in {
                 // assertion
             }
         }
@@ -82,9 +82,9 @@ class UserRepository {
 class UserRepositoryTest extends FreeSpec
     with Matchers {
 
-    &quot;UserRepository&quot; - {
-        &quot;initial setup&quot; - {
-            &quot;has zero users&quot; in new TestData(new UserRepository()) {
+    &#34;UserRepository&#34; - {
+        &#34;initial setup&#34; - {
+            &#34;has zero users&#34; in new TestData(new UserRepository()) {
                 repository.count should equal (0)
             }
         }
@@ -111,9 +111,9 @@ so I would recommend against using due to:</p>
     withFixture(test.toNoArgTest(theFixture))
   }
 
-  &quot;UserRepository&quot; - {
-    &quot;when loaded&quot; - {
-      &quot;has three active users&quot; in { fixture =&gt;
+  &#34;UserRepository&#34; - {
+    &#34;when loaded&#34; - {
+      &#34;has three active users&#34; in { fixture =&gt;
         fixture.repository.activeUsers.size should equal (3)
       }
     }
@@ -130,9 +130,9 @@ class UserRepositoryTest extends FreeSpec
     with Matchers
     with ScalaFutures {
 
-    &quot;UserRepository&quot; - {
-        &quot;initial setup&quot; - {
-            &quot;has zero users&quot; in new TestData(new UserRepository()) {
+    &#34;UserRepository&#34; - {
+        &#34;initial setup&#34; - {
+            &#34;has zero users&#34; in new TestData(new UserRepository()) {
                 whenReady(repository.countAsync) { count =&gt;
                     count should equal (0)
                 }
@@ -155,9 +155,9 @@ import scala.concurrent.Future
 class UserRepositoryTestAsyncOther extends AsyncFreeSpec
     with Matchers {
 
-    &quot;UserRepository&quot; - {
-        &quot;initial setup&quot; - {
-            &quot;has zero users&quot; in async(new TestData(new UserRepository())) { testData =&gt;
+    &#34;UserRepository&#34; - {
+        &#34;initial setup&#34; - {
+            &#34;has zero users&#34; in async(new TestData(new UserRepository())) { testData =&gt;
                 testData.repository.countAsync.map { count =&gt;
                     count should equal (0)
                 }
@@ -181,8 +181,8 @@ class TestEventualConsistency extends FreeSpec
   with Matchers
   with Eventually {
 
-  &quot;Trigger a change&quot; - {
-    &quot;should eventually be processed&quot; in new TestData() {
+  &#34;Trigger a change&#34; - {
+    &#34;should eventually be processed&#34; in new TestData() {
       fireEvent()
 
       eventually {
@@ -207,21 +207,21 @@ class UserRepositoryTest extends FreeSpec
     with Matchers
     with BeforeAndAfterEach {
 
-    &quot;UserRepository&quot; - {
-        println(&quot;describe 1 st level&quot;)
+    &#34;UserRepository&#34; - {
+        println(&#34;describe 1 st level&#34;)
 
-        &quot;initial setup&quot; - {
-            println(&quot;describe 2 nd level&quot;)
+        &#34;initial setup&#34; - {
+            println(&#34;describe 2 nd level&#34;)
 
-            &quot;has zero users&quot; in {
-                println(&quot;the test&quot;)
+            &#34;has zero users&#34; in {
+                println(&#34;the test&#34;)
                 1 should equal(1)
             }
         }
     }
 
     override def beforeEach() = {
-        println(&quot;beforeEach&quot;)
+        println(&#34;beforeEach&#34;)
     }
 }
 </code></pre><p>The call to <code>beforeEach</code> will literally come just before the test, so the output the test above will be:</p>
@@ -239,18 +239,18 @@ to highlight a few individual tests that does not necessarily exist in the same 
 <p>ScalaTest handles this a bit differently, where you tag your test using symbols you define yourself and then filter tags when you run the tests using the parameter <code>-n focused</code></p>
 <pre tabindex="0"><code>import org.scalatest.{FreeSpec, Matchers, Tag}
 
-object Focused extends Tag(&quot;focused&quot;)
+object Focused extends Tag(&#34;focused&#34;)
 
 class UserRepositoryTestSync extends FreeSpec
   with Matchers {
 
-  &quot;UserRepository&quot; - {
-    &quot;initial setup&quot; - {
-      &quot;has zero users&quot; taggedAs(Focused) in new TestData(new UserRepository()) {
+  &#34;UserRepository&#34; - {
+    &#34;initial setup&#34; - {
+      &#34;has zero users&#34; taggedAs(Focused) in new TestData(new UserRepository()) {
         repository.count should equal (0)
       }
 
-      &quot;has zero users again&quot; in new TestData(new UserRepository()) {
+      &#34;has zero users again&#34; in new TestData(new UserRepository()) {
         repository.count should equal (0)
       }
     }
@@ -265,7 +265,7 @@ class UserRepositoryTestSync extends FreeSpec
 import org.scalatest.Tag
 
 package object util {
-  object Focused extends Tag(&quot;focused&quot;)
+  object Focused extends Tag(&#34;focused&#34;)
 }
 </code></pre><h2 id="keep-your-matchers-few">Keep your matchers few</h2>
 <p>Here is a glance on the available flavours of matchers in ScalaTest:</p>
@@ -275,7 +275,7 @@ repository.activeUsers.size should === (3)
 repository.activeUsers.size should be (3)
 repository.activeUsers.size shouldBe 3
 repository.activeUsers should have size 3     // An implicit Length[T] exists
-repository.activeUsers shouldNot be ('empty)  // ' is a shorthand for parameterless methods returning Boolean
+repository.activeUsers shouldNot be (&#39;empty)  // &#39; is a shorthand for parameterless methods returning Boolean
 </code></pre><p>More matchers and descriptions available in the <a href="http://www.scalatest.org/user_guide/using_matchers">documentation</a>.</p>
 <p>I tend to use the <code>equal</code> matcher as much as possible. Even though ScalaTest comes with quite a lot of matchers I stick to basic ones - there are two reasons for that;</p>
 <p>First, I don’t find them intuitive, so I have to search for which one to use when writing a test, and then often once again whenever I review some code later on. Some require parenthesis, others don&rsquo;t - it is quite confusing.</p>
@@ -283,18 +283,18 @@ repository.activeUsers shouldNot be ('empty)  // ' is a shorthand for parameterl
 <pre tabindex="0"><code>case class User(username: String, fullName: String)
 
 class UserRepository {
-  def activeUsers: Seq[User] = Seq(User(&quot;John&quot;, &quot;John doe&quot;), User(&quot;Jane&quot;, &quot;Jane Doe&quot;), User(&quot;janet&quot;, &quot;Janet Doe&quot;))
+  def activeUsers: Seq[User] = Seq(User(&#34;John&#34;, &#34;John doe&#34;), User(&#34;Jane&#34;, &#34;Jane Doe&#34;), User(&#34;janet&#34;, &#34;Janet Doe&#34;))
 }
 
 class UserRepositoryTestSync extends FreeSpec
   with Matchers
   with BeforeAndAfterEach {
 
-  &quot;UserRepository&quot; - {
-    &quot;when loaded&quot; - {
-      &quot;has three active users (3)&quot; in new TestData(new UserRepository()) {
+  &#34;UserRepository&#34; - {
+    &#34;when loaded&#34; - {
+      &#34;has three active users (3)&#34; in new TestData(new UserRepository()) {
         var usernames = repository.activeUsers.map(_.username).map(_.toLowerCase)
-        usernames should equal (Seq(&quot;john&quot;, &quot;jane&quot;, &quot;janet&quot;))
+        usernames should equal (Seq(&#34;john&#34;, &#34;jane&#34;, &#34;janet&#34;))
       }
     }
   }

@@ -88,19 +88,19 @@ label and standalone icons can be problematic.</p>
 the nature of the message (asynchronous or synchronous). I also changed <strong>System</strong> to <strong>Object</strong> since I though
 <strong>System</strong> was a bit to narrow.</p>
 <p>My next iteration of the language draft now looked like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">Actor Alice
-    Alices description in plain text
-
-Actor Bob
-Object Acme
-
-Sequence Hello
-    Alice tell Bob
-        | Sync call to Bob
-
-    Alice ask Bob
-        | Async call to Bob
-</code></pre></div><h3 id="talk-to-your-users">Talk to your users</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Actor Alice
+</span></span><span style="display:flex;"><span>    Alices description in plain text
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Actor Bob
+</span></span><span style="display:flex;"><span>Object Acme
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Sequence Hello
+</span></span><span style="display:flex;"><span>    Alice tell Bob
+</span></span><span style="display:flex;"><span>        | Sync call to Bob
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    Alice ask Bob
+</span></span><span style="display:flex;"><span>        | Async call to Bob
+</span></span></code></pre></div><h3 id="talk-to-your-users">Talk to your users</h3>
 <p>When I showed this for my collogue (<a href="https://twitter.com/provegard">@provegard</a>), he immediately pointed out that
 I swapped the semantic meaning of <code>tell</code> and <code>ask</code> - at least compared to how <a href="https://doc.akka.io/docs/akka/2.5/actors.html#send-messages">Akka</a>
 (a JVM actor implementation) defines them.</p>
@@ -116,20 +116,20 @@ believer that a language should have a benevolent dictator.</p>
 <p>I also removed the free form text from both descriptions and message text. The reason was a combination
 of my familiarity of using strings combined with the fear of parsing inline text fragments.</p>
 <p>These changes resulted in the latest, and present, version of Sequence:</p>
-<pre tabindex="0"><code>Name &quot;Sequence demo&quot;
+<pre tabindex="0"><code>Name &#34;Sequence demo&#34;
 
 Actor User
 Object Alpha
 Object Bravo
 
 Sequence Test
-    User ask Alpha &quot;A synchronous message&quot;
-    Alpha tell Bravo &quot;An asynchronous message&quot;
-    Bravo replies Alpha &quot;A response message&quot;
-    Alpha replies User &quot;&quot;&quot;
+    User ask Alpha &#34;A synchronous message&#34;
+    Alpha tell Bravo &#34;An asynchronous message&#34;
+    Bravo replies Alpha &#34;A response message&#34;
+    Alpha replies User &#34;&#34;&#34;
         This is a multi-line
         message text!
-        &quot;&quot;&quot;
+        &#34;&#34;&#34;
 </code></pre><p>My primary takeaways from defining the Sequence language so far is:</p>
 <ul>
 <li><strong>Begin with the semantics</strong> - Start with what do you want to express and then move into grammar and syntax</li>

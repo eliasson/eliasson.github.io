@@ -6,7 +6,17 @@
     <description>Recent content in Software Development on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Sep 2021 10:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 19 Aug 2022 13:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The fear of releasing</title>
+      <link>https://markuseliasson.se/article/the-fear-of-releasing/</link>
+      <pubDate>Fri, 19 Aug 2022 13:00:00 +0200</pubDate>
+      
+      <guid>https://markuseliasson.se/article/the-fear-of-releasing/</guid>
+      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.
+ The fear of releasing is real, it is the fear of failure. Will this feature work as intended?</description>
+    </item>
+    
     <item>
       <title>Technical debt</title>
       <link>https://markuseliasson.se/article/technical-debt/</link>
@@ -35,7 +45,7 @@ Looking at the pre-conditions, we have the speed of light and we have 24 hours p
       <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
       <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.
 The language, as we left it looks like:
-Name &amp;quot;Sequence demo&amp;quot; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;quot;A synchronous message&amp;quot; Alpha tell Bravo &amp;quot;An asynchronous message&amp;quot; Bravo replies Alpha &amp;quot;A response message&amp;quot; Alpha replies User &amp;quot;&amp;quot;&amp;quot; This is a multi-line message text!</description>
+Name &amp;#34;Sequence demo&amp;#34; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;#34;A synchronous message&amp;#34; Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34; Bravo replies Alpha &amp;#34;A response message&amp;#34; Alpha replies User &amp;#34;&amp;#34;&amp;#34; This is a multi-line message text!</description>
     </item>
     
     <item>

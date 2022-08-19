@@ -40,20 +40,20 @@
                     <section class="red-article-body"><p>Previously, in <a href="/article/defining-the-sequence-language/">Defining the Sequence language</a> we drafted a version
 of the <strong>Sequence</strong> language that were happy with, now we need to formalize this language and build a parser for it.</p>
 <p>The language, as we left it looks like:</p>
-<pre tabindex="0"><code>Name &quot;Sequence demo&quot;
+<pre tabindex="0"><code>Name &#34;Sequence demo&#34;
 
 Actor User
 Object Alpha
 Object Bravo
 
 Sequence Test
-    User ask Alpha &quot;A synchronous message&quot;
-    Alpha tell Bravo &quot;An asynchronous message&quot;
-    Bravo replies Alpha &quot;A response message&quot;
-    Alpha replies User &quot;&quot;&quot;
+    User ask Alpha &#34;A synchronous message&#34;
+    Alpha tell Bravo &#34;An asynchronous message&#34;
+    Bravo replies Alpha &#34;A response message&#34;
+    Alpha replies User &#34;&#34;&#34;
         This is a multi-line
         message text!
-        &quot;&quot;&quot;
+        &#34;&#34;&#34;
 </code></pre><p><em>For new readers, Sequence is a tiny domain specific language used to describe sequence diagrams. I use it as basis
 for a series of blog posts covering how to build such a tool together with a Visual Studio Code extension. See the
 initial post <a href="/article/building-your-own-dsl/">here</a>.</em></p>
@@ -67,75 +67,75 @@ matched word (which is called <em>lexeme</em>).</p>
 language.</p>
 <pre tabindex="0"><code># Small piece of Sequence code
 Sequence Test
-    User ask Alpha &quot;Hi&quot;
+    User ask Alpha &#34;Hi&#34;
 
 # The fragment above is really just a sequence of characters:
-characters = ['S', 'e', 'q', 'u', 'e', 'n', 'c', 'e', ' ', 'T', 'e', 's', 't', '\n', ' ', ' ', ' ', ' ', 'U', 's', 'e', 'r', ' ', 'a', 's', 'k', ' ', 'A', 'l', 'p', 'h', 'a', ' ', '&quot;', 'H', 'i', '&quot;']
+characters = [&#39;S&#39;, &#39;e&#39;, &#39;q&#39;, &#39;u&#39;, &#39;e&#39;, &#39;n&#39;, &#39;c&#39;, &#39;e&#39;, &#39; &#39;, &#39;T&#39;, &#39;e&#39;, &#39;s&#39;, &#39;t&#39;, &#39;\n&#39;, &#39; &#39;, &#39; &#39;, &#39; &#39;, &#39; &#39;, &#39;U&#39;, &#39;s&#39;, &#39;e&#39;, &#39;r&#39;, &#39; &#39;, &#39;a&#39;, &#39;s&#39;, &#39;k&#39;, &#39; &#39;, &#39;A&#39;, &#39;l&#39;, &#39;p&#39;, &#39;h&#39;, &#39;a&#39;, &#39; &#39;, &#39;&#34;&#39;, &#39;H&#39;, &#39;i&#39;, &#39;&#34;&#39;]
 
 # Which gets converted into tokens
 tokens = [
     {
-        &quot;type&quot;: &quot;sequence&quot;,
-        &quot;lexeme&quot;: &quot;Sequence&quot;
+        &#34;type&#34;: &#34;sequence&#34;,
+        &#34;lexeme&#34;: &#34;Sequence&#34;
     },
     {
-        &quot;type&quot;: &quot;identifier&quot;,
-        &quot;lexeme&quot;: &quot;Test&quot;
+        &#34;type&#34;: &#34;identifier&#34;,
+        &#34;lexeme&#34;: &#34;Test&#34;
     },
     {
-        &quot;type&quot;: &quot;identifier&quot;,
-        &quot;lexeme&quot;: &quot;User&quot;
+        &#34;type&#34;: &#34;identifier&#34;,
+        &#34;lexeme&#34;: &#34;User&#34;
     },
     {
-        &quot;type&quot;: &quot;ask&quot;,
-        &quot;lexeme&quot;: &quot;ask&quot;
+        &#34;type&#34;: &#34;ask&#34;,
+        &#34;lexeme&#34;: &#34;ask&#34;
     },
     {
-        &quot;type&quot;: &quot;identifier&quot;,
-        &quot;lexeme&quot;: &quot;Alpha&quot;
+        &#34;type&#34;: &#34;identifier&#34;,
+        &#34;lexeme&#34;: &#34;Alpha&#34;
     },
     {
-        &quot;type&quot;: &quot;string&quot;,
-        &quot;lexeme&quot;: &quot;Hi!&quot;
+        &#34;type&#34;: &#34;string&#34;,
+        &#34;lexeme&#34;: &#34;Hi!&#34;
     }
 ]
 
 # We convert that into a tree structure of nodes (called AST)
 tree = {
-    &quot;type&quot;: &quot;root&quot;,
-    &quot;children&quot;: [
+    &#34;type&#34;: &#34;root&#34;,
+    &#34;children&#34;: [
         {
-            &quot;type&quot;: &quot;sequence&quot;,
-            &quot;value&quot;: &quot;Test&quot;,
-            &quot;children&quot;: [
+            &#34;type&#34;: &#34;sequence&#34;,
+            &#34;value&#34;: &#34;Test&#34;,
+            &#34;children&#34;: [
                 {
-                    &quot;type&quot;: &quot;interaction&quot;
-                    &quot;value&quot;: &quot;&quot;,
-                    &quot;children&quot;: [
+                    &#34;type&#34;: &#34;interaction&#34;
+                    &#34;value&#34;: &#34;&#34;,
+                    &#34;children&#34;: [
                         {
-                            &quot;type&quot;: &quot;source&quot;
-                            &quot;value&quot;: &quot;User&quot;,
-                            &quot;children&quot;: []
+                            &#34;type&#34;: &#34;source&#34;
+                            &#34;value&#34;: &#34;User&#34;,
+                            &#34;children&#34;: []
                         },
                         {
-                            &quot;type&quot;: &quot;ask&quot;
-                            &quot;value&quot;: &quot;&quot;,
-                            &quot;children&quot;: []
+                            &#34;type&#34;: &#34;ask&#34;
+                            &#34;value&#34;: &#34;&#34;,
+                            &#34;children&#34;: []
                         }
                         {
-                            &quot;type&quot;: &quot;source&quot;
-                            &quot;value&quot;: &quot;User&quot;,
-                            &quot;children&quot;: []
+                            &#34;type&#34;: &#34;source&#34;
+                            &#34;value&#34;: &#34;User&#34;,
+                            &#34;children&#34;: []
                         },
                         {
-                            &quot;type&quot;: &quot;destination&quot;
-                            &quot;value&quot;: &quot;Alpha&quot;,
-                            &quot;children&quot;: []
+                            &#34;type&#34;: &#34;destination&#34;
+                            &#34;value&#34;: &#34;Alpha&#34;,
+                            &#34;children&#34;: []
                         },
                         {
-                            &quot;type&quot;: &quot;message&quot;
-                            &quot;value&quot;: &quot;Hi!&quot;,
-                            &quot;children&quot;: []
+                            &#34;type&#34;: &#34;message&#34;
+                            &#34;value&#34;: &#34;Hi!&#34;,
+                            &#34;children&#34;: []
                         }
                     ]
                 }
@@ -233,14 +233,14 @@ string
     ;
 
 // Definition of string tokens
-DOCUMENT_NAME                                           : 'Name';
-ACTOR                                                   : 'Actor';
-OBJECT                                                  : 'Object';
-IS                                                      : 'is';
-SEQUENCE                                                : 'Sequence';
-ASK                                                     : 'ask';
-TELL                                                    : 'tell';
-REPLIES                                                 : 'replies';
+DOCUMENT_NAME                                           : &#39;Name&#39;;
+ACTOR                                                   : &#39;Actor&#39;;
+OBJECT                                                  : &#39;Object&#39;;
+IS                                                      : &#39;is&#39;;
+SEQUENCE                                                : &#39;Sequence&#39;;
+ASK                                                     : &#39;ask&#39;;
+TELL                                                    : &#39;tell&#39;;
+REPLIES                                                 : &#39;replies&#39;;
 
 // Captures any word that is not a keyword. Keep this after the keywords
 // are defined
@@ -249,7 +249,7 @@ IDENTIFIER
     ;
 
 COMMENT
-    : '#' .+? (NEWLINE | EOF) -&gt; skip
+    : &#39;#&#39; .+? (NEWLINE | EOF) -&gt; skip
     ;
 
 STRING
@@ -280,13 +280,13 @@ fragment DIGIT
     ;
 
 fragment SINGLE_LINE_STRING
-    : '&quot;' (. | ~[\r\n&quot;])*? '&quot;'
-    | '\'' (. | ~[\r\n'])*? '\''
+    : &#39;&#34;&#39; (. | ~[\r\n&#34;])*? &#39;&#34;&#39;
+    | &#39;\&#39;&#39; (. | ~[\r\n&#39;])*? &#39;\&#39;&#39;
     ;
 
 fragment MULTI_LINE_STRING
-    : '&quot;&quot;&quot;' (.)*? '&quot;&quot;&quot;'
-    | '\'\'\'' (.)*? '\'\'\''
+    : &#39;&#34;&#34;&#34;&#39; (.)*? &#39;&#34;&#34;&#34;&#39;
+    | &#39;\&#39;\&#39;\&#39;&#39; (.)*? &#39;\&#39;\&#39;\&#39;&#39;
     ;
 </code></pre><p>Lexical rules are in <code>UPPER-CASE</code> and grammar must start with a <code>lower-case</code> character. Other than that, I think
 the ANTLR-grammar in this example is pretty easy to understand. (ANTLR has quite a few features, I am only using
@@ -305,30 +305,30 @@ any other implementation. The cycle I used for developing this language was:</p>
 the generated parser is separated from the other source code, and no modifications should be made to the generated code.</p>
 <h3 id="using-the-antlr-generated-parser">Using the ANTLR generated parser</h3>
 <p>Generate the Sequence parser by running the following commands:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># The following command use the alias defined when installing ANTLR</span>
-$ antlr4 -Dlanguage<span style="color:#f92672">=</span>JavaScript ./parser/Sequence.g4
-
-<span style="color:#75715e"># Which is the equvivalent of this command</span>
-$ java -Xmx500M -cp <span style="color:#e6db74">&#34;/usr/local/lib/antlr-4.7-complete.jar:</span>$CLASSPATH<span style="color:#e6db74">&#34;</span> org.antlr.v4.Tool -Dlanguage<span style="color:#f92672">=</span>JavaScript ./parser/Sequence.g4
-</code></pre></div><p>ANTLR will output the source code for the parser next to where the <code>.g4</code> file is located. In the case
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># The following command use the alias defined when installing ANTLR</span>
+</span></span><span style="display:flex;"><span>$ antlr4 -Dlanguage<span style="color:#f92672">=</span>JavaScript ./parser/Sequence.g4
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Which is the equvivalent of this command</span>
+</span></span><span style="display:flex;"><span>$ java -Xmx500M -cp <span style="color:#e6db74">&#34;/usr/local/lib/antlr-4.7-complete.jar:</span>$CLASSPATH<span style="color:#e6db74">&#34;</span> org.antlr.v4.Tool -Dlanguage<span style="color:#f92672">=</span>JavaScript ./parser/Sequence.g4
+</span></span></code></pre></div><p>ANTLR will output the source code for the parser next to where the <code>.g4</code> file is located. In the case
 of Sequence you can find them in the directory <a href="https://github.com/eliasson/sequence/tree/master/parser">./parser/</a>.</p>
 <p>We will import these modules in our code and use them to scan, lex, and parse the input to what is called a <em>Parser Tree</em>.</p>
 <p>A <strong>Parser Tree</strong> is very similar to an <em>Abstract Syntax Tree</em> - but is closer to the actual tokens. E.g.
 a parenthesis might be included in a parser tree to denote the start of a list, but is is not included
 in the AST (which might only contain a <code>List</code> and <code>ListItems</code>).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">antlr4</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;antlr4&#39;</span>;
-<span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">SequenceLexer</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../parser/SequenceLexer&#39;</span>;
-<span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">SequenceParser</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../parser/SequenceParser&#39;</span>;
-
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">InputStream</span>(<span style="color:#a6e22e">source</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lexer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceLexer</span>(<span style="color:#a6e22e">chars</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tokens</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">CommonTokenStream</span>(<span style="color:#a6e22e">lexer</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parser</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceParser</span>(<span style="color:#a6e22e">tokens</span>);
-<span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">buildParseTrees</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-
-<span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
-</code></pre></div><p>For Sequence there are two places where the generated parser is used, once for the entry point in <a href="https://github.com/eliasson/sequence/blob/master/src/index.js"><code>src/index.js</code></a>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">as</span> <span style="color:#a6e22e">antlr4</span> <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;antlr4&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">SequenceLexer</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../parser/SequenceLexer&#39;</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">import</span> { <span style="color:#a6e22e">SequenceParser</span> } <span style="color:#a6e22e">from</span> <span style="color:#e6db74">&#39;../parser/SequenceParser&#39;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">InputStream</span>(<span style="color:#a6e22e">source</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lexer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceLexer</span>(<span style="color:#a6e22e">chars</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tokens</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">CommonTokenStream</span>(<span style="color:#a6e22e">lexer</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parser</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceParser</span>(<span style="color:#a6e22e">tokens</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">buildParseTrees</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
+</span></span></code></pre></div><p>For Sequence there are two places where the generated parser is used, once for the entry point in <a href="https://github.com/eliasson/sequence/blob/master/src/index.js"><code>src/index.js</code></a>
 of our <em>compiler</em> (transpiler, generator or what you might call it). And another place is in the test utils at <a href="https://github.com/eliasson/sequence/blob/master/__tests__/test-utils.js"><code>__tests__/test-utils.js</code></a>, so that we can test individual grammar rules.</p>
 <p>One nice thing with the generated parser is that all the grammar rules are accessible. Notice the call made to
 <code>parser.root()</code> above? This will parse the input according to the grammar defined by <code>root</code> in the <code>.g4</code> file. This
@@ -345,25 +345,25 @@ write less tests.</p>
 <p>Here is an example of a small from <a href="https://github.com/eliasson/sequence/blob/master/__tests__/grammar/definitions-grammar.spec.js"><code>__tests__/grammar/definitions-grammar.spec.js</code></a>
 that asserts that an actor definition can be parsed (targetting a single grammar rule as
 described earlier):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parse</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">src</span>) =&gt; <span style="color:#a6e22e">createParser</span>(<span style="color:#a6e22e">src</span>, <span style="color:#66d9ef">false</span>).<span style="color:#a6e22e">definitions</span>();
-
-<span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;parse single Actor definition&#39;</span>, () =&gt; {
-    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">result</span>;
-    <span style="color:#a6e22e">beforeEach</span>(() =&gt; {
-        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parse</span>(
-            <span style="color:#e6db74">&#39;Actor Jane\n&#39;</span> <span style="color:#f92672">+</span>
-            <span style="color:#e6db74">&#39;&#39;</span>);
-    });
-
-    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;should parse without errors&#39;</span>, () =&gt; {
-        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">parser</span>.<span style="color:#ae81ff">_</span><span style="color:#a6e22e">syntaxErrors</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#ae81ff">0</span>);
-    });
-
-    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;should have &#34;Jane&#34; as the symbol name&#39;</span>, () =&gt; {
-        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">children</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">children</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">symbol</span>.<span style="color:#a6e22e">text</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;Jane&#39;</span>);
-    });
-});
-</code></pre></div><p>Not that I even check that the Parser Tree contains the correct element. This is <em>not something I recommend</em>, instead leave
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parse</span> <span style="color:#f92672">=</span> (<span style="color:#a6e22e">src</span>) =&gt; <span style="color:#a6e22e">createParser</span>(<span style="color:#a6e22e">src</span>, <span style="color:#66d9ef">false</span>).<span style="color:#a6e22e">definitions</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">describe</span>(<span style="color:#e6db74">&#39;parse single Actor definition&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> <span style="color:#a6e22e">result</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">beforeEach</span>(() =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">result</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parse</span>(
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;Actor Jane\n&#39;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#e6db74">&#39;&#39;</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;should parse without errors&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">_syntaxErrors</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">it</span>(<span style="color:#e6db74">&#39;should have &#34;Jane&#34; as the symbol name&#39;</span>, () =&gt; {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">expect</span>(<span style="color:#a6e22e">result</span>.<span style="color:#a6e22e">children</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">children</span>[<span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">symbol</span>.<span style="color:#a6e22e">text</span>).<span style="color:#a6e22e">toEqual</span>(<span style="color:#e6db74">&#39;Jane&#39;</span>);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><p>Not that I even check that the Parser Tree contains the correct element. This is <em>not something I recommend</em>, instead leave
 these tests to check of errors only. Later when building your <strong>Abstract Syntax Tree</strong> you will you will implicitly test
 the parser tree as well. By testing explicitly, like above, you will be more fragile to grammatical changes in your test -
 treat parser tree as an internal implementation detail.</p>
@@ -371,26 +371,26 @@ treat parser tree as an internal implementation detail.</p>
 <p>What you eventually will notice is that ANTLR prints errors to standard out, both for parser and lexer-errors. I recommend you to
 substitute the built-in error handler with your own so that you can capture errors, this gives you the possibility to build better
 tests as well as improving how errors are presented to the user.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">InputStream</span>(<span style="color:#a6e22e">source</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lexer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceLexer</span>(<span style="color:#a6e22e">chars</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tokens</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">CommonTokenStream</span>(<span style="color:#a6e22e">lexer</span>);
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parser</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceParser</span>(<span style="color:#a6e22e">tokens</span>);
-<span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">buildParseTrees</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
-
-<span style="color:#75715e">// Remove the standard error listener since we do not want to
-</span><span style="color:#75715e">// print to stdout, but to capture the errors ourself to present
-</span><span style="color:#75715e">// a nice and tidy error message for the end-user.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">removeErrorListeners</span>();
-<span style="color:#a6e22e">lexer</span>.<span style="color:#a6e22e">removeErrorListeners</span>();
-
-<span style="color:#75715e">// Register our listener used to build the AST while the parsing
-</span><span style="color:#75715e">// is being done.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">errorListener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">AntlrErrorListener</span>();  <span style="color:#75715e">// &lt;-- This is our own class
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addErrorListener</span>(<span style="color:#a6e22e">errorListener</span>);
-
-<span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
-</code></pre></div><h3 id="building-your-abstract-syntax-tree">Building your Abstract Syntax Tree</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">chars</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">InputStream</span>(<span style="color:#a6e22e">source</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">lexer</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceLexer</span>(<span style="color:#a6e22e">chars</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">tokens</span>  <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">antlr4</span>.<span style="color:#a6e22e">CommonTokenStream</span>(<span style="color:#a6e22e">lexer</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parser</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">SequenceParser</span>(<span style="color:#a6e22e">tokens</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">buildParseTrees</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Remove the standard error listener since we do not want to
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// print to stdout, but to capture the errors ourself to present
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// a nice and tidy error message for the end-user.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">removeErrorListeners</span>();
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">lexer</span>.<span style="color:#a6e22e">removeErrorListeners</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Register our listener used to build the AST while the parsing
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// is being done.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">errorListener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">AntlrErrorListener</span>();  <span style="color:#75715e">// &lt;-- This is our own class
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addErrorListener</span>(<span style="color:#a6e22e">errorListener</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
+</span></span></code></pre></div><h3 id="building-your-abstract-syntax-tree">Building your Abstract Syntax Tree</h3>
 <p>As said, the parser will generate a Parser Tree, which is closely related to the grammar definitions, while you can use this, it is a
 bit raw, a higher abstraction is generally what you want – this is what is known as the Abstract Syntax Tree (or AST for short).</p>
 <p>Our AST will be used to represent the participants and sequence of messages, we will use it later to produce the output
@@ -400,99 +400,99 @@ lexical details such as parentheses, line-breaks. I have often found that it is 
 line and column) and the symbol (lexeme) to be able to produce adequate diagnostic messages. My suggestion is to put as few things
 in there as possible, as you always should do when building things.</p>
 <p>For Sequence only a few types of nodes are needed, below is their definition in JavaScript.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript">
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * The root node represents the sequence document, containing the meta-data
-</span><span style="color:#75715e"> * information, actors and the defined sequence flows.
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RootNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * The declaration of the document name.
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *     Name &#34;My sequence flow&#34;
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NameNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * Represents an identifier of something (e.g. a sequence or a participant).
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> * E.g. the name of the actor is an identifier
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *     Actor Alice
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IdentifierNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * The definition of an actor, where the string at the end is the description.
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *     Actor Alice is &#34;A user&#34;
-</span><span style="color:#75715e"> */</span>
- <span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ActorNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * The definition of an object, where the string at the end is the description.
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *     Object Bob is &#34;A fake system&#34;
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ObjectNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * A Sequence of messages between one or more participants. This is what makes
-</span><span style="color:#75715e"> * a sequence diagram.
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *      Sequence Hello
-</span><span style="color:#75715e"> *          Alice tell Bob &#34;Sudo, make me a sandwich&#34;
-</span><span style="color:#75715e"> *          Alice tell Charlie &#34;Hello&#34;
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SequenceNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * The message that is exchanged by two participants, both of which are refered
-</span><span style="color:#75715e"> * to by their identifiers (names).
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *      Alice ask Bob &#34;Sudo, make me a sandwich&#34;
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MessageNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
-
-<span style="color:#75715e">/**
-</span><span style="color:#75715e"> * Represents a string value, that can either be from a single line or a
-</span><span style="color:#75715e"> * multi-line string. This is what is between the quotes in a message.
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> *     Alice ask Bob &#34;Sudo, make me a sandwich&#34;
-</span><span style="color:#75715e"> *
-</span><span style="color:#75715e"> */</span>
-<span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... } 
-</code></pre></div><p>If you&rsquo;re curious, go and have a look at the file <a href="https://github.com/eliasson/sequence/blob/master/src/ast.js"><code>src/ast.js</code></a>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * The root node represents the sequence document, containing the meta-data
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * information, actors and the defined sequence flows.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RootNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * The declaration of the document name.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *     Name &#34;My sequence flow&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">NameNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Represents an identifier of something (e.g. a sequence or a participant).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * E.g. the name of the actor is an identifier
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *     Actor Alice
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">IdentifierNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * The definition of an actor, where the string at the end is the description.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *     Actor Alice is &#34;A user&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span> <span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ActorNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * The definition of an object, where the string at the end is the description.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *     Object Bob is &#34;A fake system&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ObjectNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * A Sequence of messages between one or more participants. This is what makes
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * a sequence diagram.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *      Sequence Hello
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *          Alice tell Bob &#34;Sudo, make me a sandwich&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *          Alice tell Charlie &#34;Hello&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SequenceNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">NodeWithIdentifier</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * The message that is exchanged by two participants, both of which are refered
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * to by their identifiers (names).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *      Alice ask Bob &#34;Sudo, make me a sandwich&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MessageNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * Represents a string value, that can either be from a single line or a
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> * multi-line string. This is what is between the quotes in a message.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *     Alice ask Bob &#34;Sudo, make me a sandwich&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> *
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"> */</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">export</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">StringNode</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Node</span> { ... } 
+</span></span></code></pre></div><p>If you&rsquo;re curious, go and have a look at the file <a href="https://github.com/eliasson/sequence/blob/master/src/ast.js"><code>src/ast.js</code></a>
 for a full view on what the AST nodes looks like.</p>
 <h3 id="visit-your-parser-tree">Visit your parser tree</h3>
 <p>So, how exactly is this parser tree of ours transformed into a AST?</p>
 <p>When generating the parser ANTLR also generates a listener that defines <code>enter</code> and <code>exit</code> methods
 for all grammar rules defined, if you open the file <a href="https://github.com/eliasson/sequence/blob/master/parser/SequenceListener.js"><code>parser/SequenceListener.js</code></a>
 you will see a bunch of methods declared on the <code>SequenceListener</code> prototype looking like:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Enter a parse tree produced by SequenceParser#actorDefinition.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">SequenceListener</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">enterActorDefinition</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ctx</span>) {
-};
-
-<span style="color:#75715e">// Exit a parse tree produced by SequenceParser#actorDefinition.
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">SequenceListener</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">exitActorDefinition</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ctx</span>) {
-};
-</code></pre></div><p>Since we do not want to touch the generated code, we do not modify this file directly, instead
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Enter a parse tree produced by SequenceParser#actorDefinition.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SequenceListener</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">enterActorDefinition</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ctx</span>) {
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Exit a parse tree produced by SequenceParser#actorDefinition.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">SequenceListener</span>.<span style="color:#a6e22e">prototype</span>.<span style="color:#a6e22e">exitActorDefinition</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">function</span>(<span style="color:#a6e22e">ctx</span>) {
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>Since we do not want to touch the generated code, we do not modify this file directly, instead
 we declare our own <code>IntSequenceListener</code> which is derived from this one. The listener is then instantiated
 and registered in the parser in the code that sets up the parser (which should be familiar by now).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-javascript" data-lang="javascript"><span style="color:#75715e">// Register our listener used to build the AST while the parsing is being done.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">errorListener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">AntlrErrorListener</span>();
-<span style="color:#66d9ef">const</span> <span style="color:#a6e22e">listener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">IntSequenceListener</span>();      <span style="color:#75715e">// &lt;-- This is our listener
-</span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addErrorListener</span>(<span style="color:#a6e22e">errorListener</span>);
-<span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addParseListener</span>(<span style="color:#a6e22e">listener</span>);                <span style="color:#75715e">// &lt;-- Get notified  during the parsing
-</span><span style="color:#75715e"></span>
-<span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
-</code></pre></div><p>ANTLR will call the <code>enter</code> method with the contents of the parser tree as argument when it <em>starts</em>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#75715e">// Register our listener used to build the AST while the parsing is being done.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">errorListener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">AntlrErrorListener</span>();
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">listener</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">IntSequenceListener</span>();      <span style="color:#75715e">// &lt;-- This is our listener
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addErrorListener</span>(<span style="color:#a6e22e">errorListener</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">addParseListener</span>(<span style="color:#a6e22e">listener</span>);                <span style="color:#75715e">// &lt;-- Get notified  during the parsing
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Initiate the parsing, and begin with the root rule.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">parserResult</span> <span style="color:#f92672">=</span> <span style="color:#a6e22e">parser</span>.<span style="color:#a6e22e">root</span>();
+</span></span></code></pre></div><p>ANTLR will call the <code>enter</code> method with the contents of the parser tree as argument when it <em>starts</em>
 parse that grammar rule, and <code>exit</code> once that rule, and <em>all</em> its inner rules have been parsed. I.e.
 often there will calls to <code>enter</code> for other nodes before the current one is <code>exit</code>-ed.</p>
 <p>Let&rsquo;s look at the order of calls for a tiny example:</p>
-<pre tabindex="0"><code>Name &quot;foo&quot;
+<pre tabindex="0"><code>Name &#34;foo&#34;
 </code></pre><p>With only the the interesting part of the grammar definition cut out:</p>
 <pre tabindex="0"><code>root
     : NEWLINE* documentMeta definitions EOF
