@@ -6,7 +6,16 @@
     <description>Recent content in Software Development on Markus Eliasson</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Aug 2022 13:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 19:21:31 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Test-Driven Development - looking back</title>
+      <link>https://markuseliasson.se/article/tdd-looking-back/</link>
+      <pubDate>Fri, 09 Sep 2022 19:21:31 +0200</pubDate>
+      
+      <guid>https://markuseliasson.se/article/tdd-looking-back/</guid>
+      <description>I have been working in the software industry for more than 15 years. I started my career with Symbian C++, an obscure programming language used by the smartphones of that era. At that company there were almost no unit-tests, most of the testing was done manually (which included the time consuming flashing of ROM-image) both by developers and a huge test department. From there I moved on to web and general back-end development, still relying on manual testing.</description>
+    </item>
+    
     <item>
       <title>The fear of releasing</title>
       <link>https://markuseliasson.se/article/the-fear-of-releasing/</link>
