@@ -4,38 +4,30 @@
     <title>Obstacles on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/obstacles/</link>
     <description>Recent content in Obstacles on Markus Eliasson</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Aug 2022 13:00:00 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 19 Aug 2022 13:00:00 +0200</lastBuildDate>
+    <atom:link href="https://markuseliasson.se/tags/obstacles/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>The fear of releasing</title>
       <link>https://markuseliasson.se/article/the-fear-of-releasing/</link>
       <pubDate>Fri, 19 Aug 2022 13:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/the-fear-of-releasing/</guid>
-      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.
- The fear of releasing is real, it is the fear of failure. Will this feature work as intended?</description>
+      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.&#xA;The fear of releasing is real, it is the fear of failure. Will this feature work as intended? Will the on-call team be woken up in the middle of the night?</description>
     </item>
-    
     <item>
       <title>Technical debt</title>
       <link>https://markuseliasson.se/article/technical-debt/</link>
       <pubDate>Thu, 23 Sep 2021 10:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/technical-debt/</guid>
-      <description>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Part one.
- Have you ever experienced a full stop on new features due to the team being busy working on technical debt?</description>
+      <description>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Part one.&#xA;Have you ever experienced a full stop on new features due to the team being busy working on technical debt?</description>
     </item>
-    
     <item>
       <title>Your obstacles are YOUR obstacles</title>
       <link>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</link>
       <pubDate>Thu, 16 Sep 2021 15:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</guid>
-      <description>Software is magic, there are few physical limitations on what can be done. A change can be made quickly and its benefits are immediate. The same is true for how we work with developing software, there are very few rules or obstacles that stop us from doing what is required as swift and efficiently as possible.
-Looking at the pre-conditions, we have the speed of light and we have 24 hours per day, if we are strict those are the only ones.</description>
+      <description>Software is magic, there are few physical limitations on what can be done. A change can be made quickly and its benefits are immediate. The same is true for how we work with developing software, there are very few rules or obstacles that stop us from doing what is required as swift and efficiently as possible.&#xA;Looking at the pre-conditions, we have the speed of light and we have 24 hours per day, if we are strict those are the only ones.</description>
     </item>
-    
   </channel>
 </rss>

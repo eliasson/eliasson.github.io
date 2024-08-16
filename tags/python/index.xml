@@ -4,40 +4,30 @@
     <title>Python on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/python/</link>
     <description>Recent content in Python on Markus Eliasson</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 24 Aug 2016 22:48:17 +0200</lastBuildDate>
+    <atom:link href="https://markuseliasson.se/tags/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>A BitTorrent client in Python 3.5</title>
       <link>https://markuseliasson.se/article/bittorrent-in-python/</link>
       <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/bittorrent-in-python/</guid>
-      <description>When Python 3.5 was released together with the new module asyncio I was curios to give it a try. Recently I decided to implement a simple BitTorrent client using asyncio - I have always been interested in peer-to-peer protocols and it seemed like a perfect fit.
-The project is named Pieces, all of the source code is available at GitHub and released under the Apache 2 license. Feel free to learn from it, steal from it, improve it, laugh at it or just ignore it.</description>
+      <description>When Python 3.5 was released together with the new module asyncio I was curios to give it a try. Recently I decided to implement a simple BitTorrent client using asyncio - I have always been interested in peer-to-peer protocols and it seemed like a perfect fit.&#xA;The project is named Pieces, all of the source code is available at GitHub and released under the Apache 2 license. Feel free to learn from it, steal from it, improve it, laugh at it or just ignore it.</description>
     </item>
-    
     <item>
       <title>An introduction to Python&#39;s asyncio</title>
       <link>https://markuseliasson.se/article/introduction-to-asyncio/</link>
       <pubDate>Wed, 24 Aug 2016 21:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/introduction-to-asyncio/</guid>
-      <description>In Python 3.4 a new module, asyncio was introduced, this module allows you to write concurrent, single threaded code in Python without relying on any third-party libraries (such as Twisted, or Tornado).
-I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write concurrent code in Python 3.5.
-Remember, concurrency is not the same as parallelism.
-  Concurrency is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time.</description>
+      <description>In Python 3.4 a new module, asyncio was introduced, this module allows you to write concurrent, single threaded code in Python without relying on any third-party libraries (such as Twisted, or Tornado).&#xA;I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write concurrent code in Python 3.5.&#xA;Remember, concurrency is not the same as parallelism.&#xA;Concurrency is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time.</description>
     </item>
-    
     <item>
       <title>Python pip virtualenv in Windows</title>
       <link>https://markuseliasson.se/article/python-pip-virtualenv-windows/</link>
       <pubDate>Tue, 24 Feb 2015 22:00:33 +0100</pubDate>
-      
       <guid>https://markuseliasson.se/article/python-pip-virtualenv-windows/</guid>
-      <description>I needed to setup my Windows 8 machine for Python and Django development as I was fed up with running virtualbox and I really wanted to run PyCharm native in Windows. I jotted down these simple steps for future reference, or if someone else needs a brief overview.
-Install python I chose the official Python Windows distribution, the later versions comes with pip bundled. All I needed to do was to add two directories to my PATH:</description>
+      <description>I needed to setup my Windows 8 machine for Python and Django development as I was fed up with running virtualbox and I really wanted to run PyCharm native in Windows. I jotted down these simple steps for future reference, or if someone else needs a brief overview.&#xA;Install python I chose the official Python Windows distribution, the later versions comes with pip bundled. All I needed to do was to add two directories to my PATH:</description>
     </item>
-    
   </channel>
 </rss>

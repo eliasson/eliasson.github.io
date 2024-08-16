@@ -1,43 +1,35 @@
 <!DOCTYPE html>
 <html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-        <title>Test-Driven Development - looking back &middot; Markus Eliasson</title>
-        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
-        <link rel="stylesheet" type="text/css" href="https://markuseliasson.se/css/red.css" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="alternate" type="application/rss+xml" href="https://markuseliasson.se/index.xml" title="Markus Eliasson" />
-    </head>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    
+
+    
+        <title>Test-Driven Development - looking back at Markus Eliasson</title>
+    
+
+</head>
 
 
 
 
-<body class="red-page">
-    <div class="container">
-        <div class="red-page-header">
-    <div class="row">
-        <div class="col-xs-12">
-            <h2><a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
-        </div>
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se//">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
     </div>
-</div>
+</header>
 
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <article class="red-article">
-                    <header class="red-article-header">
-                        <h1 class="red-article-title">Test-Driven Development - looking back</h1>
-                        <div class="red-article-ingress">
-                            <p>For the last five years I have been test driving pretty much all the code I have written. This is a retrospective on why it took so long to get started, where I see the greatest benefits and where it is still hard.</p>
-                            <time class="red-article-date">
-                                Friday, September 9, 2022
-                            </time>
-                        </div>
-                    </header>
-                    <section class="red-article-body"><p>I have been working in the software industry for more than 15 years. I started my career with Symbian C++, an obscure programming language used by the smartphones of that era. At that company there were almost no unit-tests, most of the testing was done manually (which included the time consuming flashing of ROM-image) both by developers and a huge test department. From there I moved on to web and general back-end development, still relying on manual testing. At this moment in time, web development was all about server-side rendering, CSS and jQuery. There were a lot of moving parts like CMS, networking, browsers and most of it was about look and feel - that is too hard to test I argued. At the back-end, I wrote the occasional test, for the simple stuff at least, and so it continued for quite a few years.</p>
+
+    <article>
+        <h1>Test-Driven Development - looking back</h1>
+        <p class="preamble">For the last five years I have been test driving pretty much all the code I have written. This is a retrospective on why it took so long to get started, where I see the greatest benefits and where it is still hard.</p>
+        <time>Friday, September 9, 2022</time>
+
+        <section>
+            <p>I have been working in the software industry for more than 15 years. I started my career with Symbian C++, an obscure programming language used by the smartphones of that era. At that company there were almost no unit-tests, most of the testing was done manually (which included the time consuming flashing of ROM-image) both by developers and a huge test department. From there I moved on to web and general back-end development, still relying on manual testing. At this moment in time, web development was all about server-side rendering, CSS and jQuery. There were a lot of moving parts like CMS, networking, browsers and most of it was about look and feel - that is too hard to test I argued. At the back-end, I wrote the occasional test, for the simple stuff at least, and so it continued for quite a few years.</p>
 <p>I was well aware of Test-Driven Development and that it was popular in some communities such as Ruby. I also bought in on the rationale and motivation that you should test your code, at least your application logic. But whenever I tried to go from a tutorial on testing (typically testing some maths functions) to my application I failed and then I gave up, crawling back to manual testing.</p>
 <p>Then, about five years ago I started working at my current company. This is a high profile company of highly skilled developers that are advocates of eXtreme Programming in general, TDD in particular and producing quality software overall. Not writing tests was never an option, using TDD was (and still is) considered hygiene by us. Before I joined this company I met with a few of them at a conference where one of them said something along the lines of:</p>
 <blockquote>
@@ -81,70 +73,57 @@
 <li>Don’t rely too much on katas and exercises, practice in your daily code base. It does not matter if the tests are not that great to begin with, you can always improve them later.</li>
 <li>It takes time to establish new behaviour - do not give up! Once you get over the hill, writing tests is both technically and emotionally rewarding.</li>
 </ul>
-</section>
-                </article>
-            </div>
-        </div>
-        <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="red-article-tags">
-            
-                <a href="/tags/software-development" class="red-tag">Software Development</a>
-            
-        </div>
-    </div>
-</div>
-        <footer>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
-            <p class="red-landing-email">
-                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
-            </p>
-            <p class="red-landing-affiliation">
-                Consultant at <a href="http://factor10.com" class="no-feedback">
-                    <img src="https://markuseliasson.se/factor10.png" alt="factor10" />
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
                 </a>
-            </p>
-        </div>
-        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <ul class="red-landing-social">
-                
-                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
-                
-                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
-                
-                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
-                
-            </ul>
-            <div class="break"></div>
-        </div>
-    </div>
+            </li>
+        
+            <li>
+                <a href="https://x.com/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-twitter"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
 </footer>
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-42999256-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
 
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
 
-    </div>
+        <symbol id="icon-twitter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </symbol>
+    </defs>
+</svg>
 </body>
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad();
-    </script>
 </html>
 

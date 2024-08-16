@@ -1,55 +1,41 @@
 <!DOCTYPE html>
 <html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-        <title>An introduction to Python&#39;s asyncio &middot; Markus Eliasson</title>
-        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
-        <link rel="stylesheet" type="text/css" href="https://markuseliasson.se/css/red.css" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="alternate" type="application/rss+xml" href="https://markuseliasson.se/index.xml" title="Markus Eliasson" />
-    </head>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    
+
+    
+        <title>An introduction to Python&#39;s asyncio at Markus Eliasson</title>
+    
+
+</head>
 
 
 
 
-<body class="red-page">
-    <div class="container">
-        <div class="red-page-header">
-    <div class="row">
-        <div class="col-xs-12">
-            <h2><a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
-        </div>
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se//">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
     </div>
-</div>
+</header>
 
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <article class="red-article">
-                    <header class="red-article-header">
-                        <h1 class="red-article-title">An introduction to Python&#39;s asyncio</h1>
-                        <div class="red-article-ingress">
-                            <p>This article gives a gentle introduction to the asyncio that arrived in Python 3.5. The purpose is to set the scene for a future article where I use asyncio to build a BitTorrent client in Python.</p>
-                            <time class="red-article-date">
-                                Wednesday, August 24, 2016
-                            </time>
-                        </div>
-                    </header>
-                    <section class="red-article-body"><p>In Python 3.4 a new module, <code>asyncio</code> was introduced, this module allows you to write <em>concurrent</em>, <em>single threaded</em> code in Python without relying on any third-party libraries (such as Twisted, or Tornado).</p>
+
+    <article>
+        <h1>An introduction to Python&#39;s asyncio</h1>
+        <p class="preamble">This article gives a gentle introduction to the asyncio that arrived in Python 3.5. The purpose is to set the scene for a future article where I use asyncio to build a BitTorrent client in Python.</p>
+        <time>Wednesday, August 24, 2016</time>
+
+        <section>
+            <p>In Python 3.4 a new module, <code>asyncio</code> was introduced, this module allows you to write <em>concurrent</em>, <em>single threaded</em> code in Python without relying on any third-party libraries (such as Twisted, or Tornado).</p>
 <p>I plan to take this new module for a test run, implementing a simple BitTorrent client. But first lets see how we can write <em>concurrent</em> code in Python 3.5.</p>
 <p>Remember, <strong>concurrency</strong> is not the same as <strong>parallelism</strong>.</p>
-<ul>
-<li>
 <p><strong>Concurrency</strong> is when more than one function can be started and finished, overlapping each other, without having to be executed at the exact same time. This is possible with a single-core CPU.</p>
-</li>
-<li>
 <p><strong>Parallelism</strong> is when one or more functions run at the same time, this requires multi-core CPU.</p>
-</li>
-</ul>
 <p><em>As a metaphor, consider when you are in the kitchen making dinner. You put your potato cake into the oven, setting your kitchen timer for 15 minutes. Meanwhile, you start frying some pork to go with it. After 15 minutes, the timer goes off with a beep, you put away the frying pan and take the cake out of the oven.</em></p>
-<p>Your are being concurrent, there is only one person (CPU) in the kitchen, doing multiple tasks at the same time.</p>
+<p>You are being concurrent, there is only one person (CPU) in the kitchen, doing multiple tasks at the same time.</p>
 <p>Single threaded, asynchronous programming is considered simpler than using multi-threaded programming. The reason is that you don&rsquo;t need to coordinate routines, and shared mutable state. Rather you write single-threaded programs that feels quite sequential. This is partially what made NodeJS as popular as
 it is - the async nature is built in to NodeJS and async is often default and a synchronous API is made an option.</p>
 <p><code>asyncio</code> gives us asynchronous I/O, thus it is suitable for file and network operations, where the process will be schedule to wait for data being available. It is <strong>not</strong> suitable for CPU-bound programming - here you need to fallback to threading or multi-processing.</p>
@@ -57,28 +43,28 @@ it is - the async nature is built in to NodeJS and async is often default and a 
 <h3 id="await-and-async">await and async</h3>
 <p>If you run the code snippet below, you will open two TCP connections to two of Google&rsquo;s DNS servers. Once the connection is open, we&rsquo;ll pretend to do some I/O but rather sleeping. Once the fictive work is done, the connection will be closed.</p>
 <p>This is all run on a single thread, yet two connections are open at the same time. If you run the program for a couple of times you will see that the order in which the connections are closed varies due to the randomized time to sleep.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> asyncio
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> random <span style="color:#f92672">import</span> randint
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">async</span> <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">do_stuff</span>(ip, port):
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#39;About to open a connection to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
-</span></span><span style="display:flex;"><span>    reader, writer <span style="color:#f92672">=</span> <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>open_connection(ip, port)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#39;Connection open to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">await</span> asyncio<span style="color:#f92672">.</span>sleep(randint(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">5</span>))
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    writer<span style="color:#f92672">.</span>close()
-</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#39;Closed connection to </span><span style="color:#e6db74">{ip}</span><span style="color:#e6db74">&#39;</span><span style="color:#f92672">.</span>format(ip<span style="color:#f92672">=</span>ip))
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
-</span></span><span style="display:flex;"><span>    loop <span style="color:#f92672">=</span> asyncio<span style="color:#f92672">.</span>get_event_loop()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    work <span style="color:#f92672">=</span> [
-</span></span><span style="display:flex;"><span>        asyncio<span style="color:#f92672">.</span>ensure_future(do_stuff(<span style="color:#e6db74">&#39;8.8.8.8&#39;</span>, <span style="color:#e6db74">&#39;53&#39;</span>)),
-</span></span><span style="display:flex;"><span>        asyncio<span style="color:#f92672">.</span>ensure_future(do_stuff(<span style="color:#e6db74">&#39;8.8.4.4&#39;</span>, <span style="color:#e6db74">&#39;53&#39;</span>)),
-</span></span><span style="display:flex;"><span>    ]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    loop<span style="color:#f92672">.</span>run_until_complete(asyncio<span style="color:#f92672">.</span>gather(<span style="color:#f92672">*</span>work))
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">asyncio</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">async</span> <span class="k">def</span> <span class="nf">do_stuff</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;About to open a connection to </span><span class="si">{ip}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">ip</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">reader</span><span class="p">,</span> <span class="n">writer</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">open_connection</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Connection open to </span><span class="si">{ip}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">ip</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Closed connection to </span><span class="si">{ip}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ip</span><span class="o">=</span><span class="n">ip</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">work</span> <span class="o">=</span> <span class="p">[</span>
+</span></span><span class="line"><span class="cl">        <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span><span class="n">do_stuff</span><span class="p">(</span><span class="s1">&#39;8.8.8.8&#39;</span><span class="p">,</span> <span class="s1">&#39;53&#39;</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">asyncio</span><span class="o">.</span><span class="n">ensure_future</span><span class="p">(</span><span class="n">do_stuff</span><span class="p">(</span><span class="s1">&#39;8.8.4.4&#39;</span><span class="p">,</span> <span class="s1">&#39;53&#39;</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">    <span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">loop</span><span class="o">.</span><span class="n">run_until_complete</span><span class="p">(</span><span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">work</span><span class="p">))</span>
 </span></span></code></pre></div><p>Let&rsquo;s start with the main code block. First we get a reference to the default <a href="https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop">event loop</a>. Then we create a list of two tasks calling the function <code>do_stuff</code> and tell the event loop to run until those tasks are complete.</p>
 <p>The function <code>do_stuff</code> is declared with the <code>async def</code> statement, which makes it into something called a <a href="https://docs.python.org/3/glossary.html#term-coroutine">coroutine</a>. A <em>coroutine</em> is a special kind of generator and to which you can send a value back. The nice thing about coroutines is that they can be suspended, and resumed at a later state - with the scoped variables intact.</p>
 <p>Whenever a <code>await</code> is reached inside the <code>do_stuff</code> that coroutine will be suspended until the response is ready (the sending values back to a generator). When resumed, it will continue execution at the same position and keep going until the next <code>await</code> is there - or until the return statement is reached ( Python use implicit return statements).</p>
@@ -90,72 +76,57 @@ over to the <em>event loop</em>. And finally the <em>event loop</em> needs to be
 <h2 id="summary">Summary</h2>
 <p>This was a short introduction to asyncio in Python. If you have done async programming in another language (JavaScript, C#) you might feel just at home, if not there are great articles presenting Python&rsquo;s implementation in details and with a proper walkthrough from iterator, generator, corouties to async/await.</p>
 <p>Brett Cannon have written an excellent post <a href="http://www.snarky.ca/how-the-heck-does-async-await-work-in-python-3-5">How the heck does async/await work in Python 3.5</a>. And A. Jesse Jiryu Davis and Guido van Rossum gives great detail in their article <a href="http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html">A Web Crawler With asyncio Coroutines</a>. If you only read one, I recommend Brett Cannon&rsquo;s as I found it easier to digest.</p>
-</section>
-                </article>
-            </div>
-        </div>
-        <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="red-article-tags">
-            
-                <a href="/tags/python" class="red-tag">Python</a>
-            
-                <a href="/tags/bittorrent" class="red-tag">BitTorrent</a>
-            
-        </div>
-    </div>
-</div>
-        <footer>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
-            <p class="red-landing-email">
-                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
-            </p>
-            <p class="red-landing-affiliation">
-                Consultant at <a href="http://factor10.com" class="no-feedback">
-                    <img src="https://markuseliasson.se/factor10.png" alt="factor10" />
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
                 </a>
-            </p>
-        </div>
-        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <ul class="red-landing-social">
-                
-                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
-                
-                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
-                
-                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
-                
-            </ul>
-            <div class="break"></div>
-        </div>
-    </div>
+            </li>
+        
+            <li>
+                <a href="https://x.com/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-twitter"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
 </footer>
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-42999256-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
 
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
 
-    </div>
+        <symbol id="icon-twitter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </symbol>
+    </defs>
+</svg>
 </body>
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad();
-    </script>
 </html>
 

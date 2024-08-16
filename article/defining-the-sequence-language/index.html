@@ -1,43 +1,35 @@
 <!DOCTYPE html>
 <html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-        <title>Defining the Sequence language &middot; Markus Eliasson</title>
-        <link href="https://fonts.googleapis.com/css?family=Lora|Inconsolata" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/default.min.css">
-        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css">
-        <link rel="stylesheet" type="text/css" href="https://markuseliasson.se/css/red.css" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="alternate" type="application/rss+xml" href="https://markuseliasson.se/index.xml" title="Markus Eliasson" />
-    </head>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    
+
+    
+        <title>Defining the Sequence language at Markus Eliasson</title>
+    
+
+</head>
 
 
 
 
-<body class="red-page">
-    <div class="container">
-        <div class="red-page-header">
-    <div class="row">
-        <div class="col-xs-12">
-            <h2><a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a></h2>
-        </div>
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se//">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
     </div>
-</div>
+</header>
 
-        <div class="row">
-            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                <article class="red-article">
-                    <header class="red-article-header">
-                        <h1 class="red-article-title">Defining the Sequence language</h1>
-                        <div class="red-article-ingress">
-                            <p>Even a tiny language as Sequnce requires a careful and iterative process, you need to consider both the semantics and the synatax.</p>
-                            <time class="red-article-date">
-                                Thursday, August 16, 2018
-                            </time>
-                        </div>
-                    </header>
-                    <section class="red-article-body"><p>When discussing languages, especially computer language, I have noticed that people often start
+
+    <article>
+        <h1>Defining the Sequence language</h1>
+        <p class="preamble">Even a tiny language as Sequnce requires a careful and iterative process, you need to consider both the semantics and the synatax.</p>
+        <time>Thursday, August 16, 2018</time>
+
+        <section>
+            <p>When discussing languages, especially computer language, I have noticed that people often start
 with expressing their view on syntax and grammar.  Just like it is easy to have opinions about
 the appearance of an application, they are both <em>user interfaces</em>. What is far more important
 is the <em>semantics</em>, what the language allows to be expressed. I do not think look and feel or syntax
@@ -88,18 +80,18 @@ label and standalone icons can be problematic.</p>
 the nature of the message (asynchronous or synchronous). I also changed <strong>System</strong> to <strong>Object</strong> since I though
 <strong>System</strong> was a bit to narrow.</p>
 <p>My next iteration of the language draft now looked like this:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Actor Alice
-</span></span><span style="display:flex;"><span>    Alices description in plain text
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Actor Bob
-</span></span><span style="display:flex;"><span>Object Acme
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>Sequence Hello
-</span></span><span style="display:flex;"><span>    Alice tell Bob
-</span></span><span style="display:flex;"><span>        | Sync call to Bob
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    Alice ask Bob
-</span></span><span style="display:flex;"><span>        | Async call to Bob
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">Actor Alice
+</span></span><span class="line"><span class="cl">    Alices description in plain text
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Actor Bob
+</span></span><span class="line"><span class="cl">Object Acme
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Sequence Hello
+</span></span><span class="line"><span class="cl">    Alice tell Bob
+</span></span><span class="line"><span class="cl">        <span class="p">|</span> Sync call to Bob
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    Alice ask Bob
+</span></span><span class="line"><span class="cl">        <span class="p">|</span> Async call to Bob
 </span></span></code></pre></div><h3 id="talk-to-your-users">Talk to your users</h3>
 <p>When I showed this for my collogue (<a href="https://twitter.com/provegard">@provegard</a>), he immediately pointed out that
 I swapped the semantic meaning of <code>tell</code> and <code>ask</code> - at least compared to how <a href="https://doc.akka.io/docs/akka/2.5/actors.html#send-messages">Akka</a>
@@ -138,74 +130,57 @@ Sequence Test
 </ul>
 <p>Next up we will dive into the technical aspects of defining and parsing the language. I will show how to
 create a parser for the Sequence language and how you can use TDD your way through the grammar definition.</p>
-</section>
-                </article>
-            </div>
-        </div>
-        <div class="row">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <div class="red-article-tags">
-            
-                <a href="/tags/software-development" class="red-tag">Software Development</a>
-            
-                <a href="/tags/sequence" class="red-tag">Sequence</a>
-            
-                <a href="/tags/dsl" class="red-tag">DSL</a>
-            
-        </div>
-    </div>
-</div>
-        <footer>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <p class="red-landing-bio">A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
-            <p class="red-landing-email">
-                <a href="mailto:markus.eliasson@gmail.com">markus.eliasson@gmail.com</a>
-            </p>
-            <p class="red-landing-affiliation">
-                Consultant at <a href="http://factor10.com" class="no-feedback">
-                    <img src="https://markuseliasson.se/factor10.png" alt="factor10" />
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
                 </a>
-            </p>
-        </div>
-        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-            <h1 class="red-landing-header">Markus Eliasson<span class="is-red-period">.</span></h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-            <ul class="red-landing-social">
-                
-                    <li class="red-social"><a href="https://github.com/eliasson" class="no-feedback"><img src="/badge-github.png" /> </a></li>
-                
-                    <li class="red-social"><a href="https://twitter.com/markuseliasson" class="no-feedback"><img src="/badge-twitter.png" /> </a></li>
-                
-                    <li class="red-social"><a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback"><img src="/badge-linkedin.png" /> </a></li>
-                
-            </ul>
-            <div class="break"></div>
-        </div>
-    </div>
+            </li>
+        
+            <li>
+                <a href="https://x.com/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-twitter"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
 </footer>
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-42999256-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
 
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
 
-    </div>
+        <symbol id="icon-twitter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </symbol>
+    </defs>
+</svg>
 </body>
 
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
-    <script>
-        hljs.initHighlightingOnLoad();
-    </script>
 </html>
 

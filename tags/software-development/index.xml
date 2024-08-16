@@ -4,86 +4,65 @@
     <title>Software Development on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/software-development/</link>
     <description>Recent content in Software Development on Markus Eliasson</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Sep 2022 19:21:31 +0200</lastBuildDate><atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 19:21:31 +0200</lastBuildDate>
+    <atom:link href="https://markuseliasson.se/tags/software-development/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Test-Driven Development - looking back</title>
       <link>https://markuseliasson.se/article/tdd-looking-back/</link>
       <pubDate>Fri, 09 Sep 2022 19:21:31 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/tdd-looking-back/</guid>
       <description>I have been working in the software industry for more than 15 years. I started my career with Symbian C++, an obscure programming language used by the smartphones of that era. At that company there were almost no unit-tests, most of the testing was done manually (which included the time consuming flashing of ROM-image) both by developers and a huge test department. From there I moved on to web and general back-end development, still relying on manual testing.</description>
     </item>
-    
     <item>
       <title>The fear of releasing</title>
       <link>https://markuseliasson.se/article/the-fear-of-releasing/</link>
       <pubDate>Fri, 19 Aug 2022 13:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/the-fear-of-releasing/</guid>
-      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.
- The fear of releasing is real, it is the fear of failure. Will this feature work as intended?</description>
+      <description>This is the third in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Read part one here.&#xA;The fear of releasing is real, it is the fear of failure. Will this feature work as intended? Will the on-call team be woken up in the middle of the night?</description>
     </item>
-    
     <item>
       <title>Technical debt</title>
       <link>https://markuseliasson.se/article/technical-debt/</link>
       <pubDate>Thu, 23 Sep 2021 10:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/technical-debt/</guid>
-      <description>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Part one.
- Have you ever experienced a full stop on new features due to the team being busy working on technical debt?</description>
+      <description>This is the second in a series of articles that claim that the obstacles you have in your organisation are put there by the very same organisation, yours. And it is up to your organisation to remove these obstacles, no one else will do it for you. Part one.&#xA;Have you ever experienced a full stop on new features due to the team being busy working on technical debt?</description>
     </item>
-    
     <item>
       <title>Your obstacles are YOUR obstacles</title>
       <link>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</link>
       <pubDate>Thu, 16 Sep 2021 15:00:00 +0200</pubDate>
-      
       <guid>https://markuseliasson.se/article/your-obstacles-are-your-obstacles/</guid>
-      <description>Software is magic, there are few physical limitations on what can be done. A change can be made quickly and its benefits are immediate. The same is true for how we work with developing software, there are very few rules or obstacles that stop us from doing what is required as swift and efficiently as possible.
-Looking at the pre-conditions, we have the speed of light and we have 24 hours per day, if we are strict those are the only ones.</description>
+      <description>Software is magic, there are few physical limitations on what can be done. A change can be made quickly and its benefits are immediate. The same is true for how we work with developing software, there are very few rules or obstacles that stop us from doing what is required as swift and efficiently as possible.&#xA;Looking at the pre-conditions, we have the speed of light and we have 24 hours per day, if we are strict those are the only ones.</description>
     </item>
-    
     <item>
       <title>Building a parser for Sequence</title>
       <link>https://markuseliasson.se/article/building-a-parser-for-sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
-      
       <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
-      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.
-The language, as we left it looks like:
-Name &amp;#34;Sequence demo&amp;#34; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;#34;A synchronous message&amp;#34; Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34; Bravo replies Alpha &amp;#34;A response message&amp;#34; Alpha replies User &amp;#34;&amp;#34;&amp;#34; This is a multi-line message text!</description>
+      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.&#xA;The language, as we left it looks like:&#xA;Name &amp;#34;Sequence demo&amp;#34;&#xD;Actor User&#xD;Object Alpha&#xD;Object Bravo&#xD;Sequence Test&#xD;User ask Alpha &amp;#34;A synchronous message&amp;#34;&#xD;Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34;&#xD;Bravo replies Alpha &amp;#34;A response message&amp;#34;&#xD;Alpha replies User &amp;#34;&amp;#34;&amp;#34;&#xD;This is a multi-line&#xD;message text!</description>
     </item>
-    
     <item>
       <title>Defining the Sequence language</title>
       <link>https://markuseliasson.se/article/defining-the-sequence-language/</link>
       <pubDate>Thu, 16 Aug 2018 12:00:00 +0000</pubDate>
-      
       <guid>https://markuseliasson.se/article/defining-the-sequence-language/</guid>
       <description>When discussing languages, especially computer language, I have noticed that people often start with expressing their view on syntax and grammar. Just like it is easy to have opinions about the appearance of an application, they are both user interfaces. What is far more important is the semantics, what the language allows to be expressed. I do not think look and feel or syntax is superficial - it is still very important, but second to semantics.</description>
     </item>
-    
     <item>
       <title>Building your own DSL does not have to be hard</title>
       <link>https://markuseliasson.se/article/building-your-own-dsl/</link>
       <pubDate>Fri, 23 Mar 2018 18:48:00 +0100</pubDate>
-      
       <guid>https://markuseliasson.se/article/building-your-own-dsl/</guid>
-      <description>Currently there are a lot of initiatives saying that everybody should learn how to program, and schools are making programming part of the curriculum. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people to construct programs. And it&amp;rsquo;s all happening at a rapid pace.
-Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language.</description>
+      <description>Currently there are a lot of initiatives saying that everybody should learn how to program, and schools are making programming part of the curriculum. For enterprises there are numerous of low-code platforms popping up, all with the sole purpose of enabling more people to construct programs. And it&amp;rsquo;s all happening at a rapid pace.&#xA;Meanwhile, as developers, we get exposed to multiple languages daily, be it build-tools, web-frameworks or query language.</description>
     </item>
-    
     <item>
       <title>Bytes do not destroy software — people do</title>
       <link>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</link>
       <pubDate>Fri, 20 Oct 2017 22:00:00 +0100</pubDate>
-      
       <guid>https://markuseliasson.se/article/bytes-do-not-destroy-software-people-do/</guid>
       <description>Most of the times, people seem to refer to organic growth — much like a garden that grows wild when there’s no-one that’s maintaining it. This is not a valid metaphor — biological growth happens thanks to photosynthesis and is not by the hand of man. Software on the other side is static — it does not change by itself — it changes when someone change it or change the environment it operates in.</description>
     </item>
-    
   </channel>
 </rss>
