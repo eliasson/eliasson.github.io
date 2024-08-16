@@ -4,7 +4,7 @@
     <title>Markus Eliasson</title>
     <link>https://markuseliasson.se/</link>
     <description>Recent content on Markus Eliasson</description>
-    <generator>Hugo</generator>
+    <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 09 Sep 2022 19:21:31 +0200</lastBuildDate>
     <atom:link href="https://markuseliasson.se/index.xml" rel="self" type="application/rss+xml" />
@@ -48,7 +48,7 @@
       <link>https://markuseliasson.se/article/building-a-parser-for-sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
-      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.&#xA;The language, as we left it looks like:&#xA;Name &amp;#34;Sequence demo&amp;#34;&#xD;Actor User&#xD;Object Alpha&#xD;Object Bravo&#xD;Sequence Test&#xD;User ask Alpha &amp;#34;A synchronous message&amp;#34;&#xD;Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34;&#xD;Bravo replies Alpha &amp;#34;A response message&amp;#34;&#xD;Alpha replies User &amp;#34;&amp;#34;&amp;#34;&#xD;This is a multi-line&#xD;message text!</description>
+      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.&#xA;The language, as we left it looks like:&#xA;Name &amp;#34;Sequence demo&amp;#34; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;#34;A synchronous message&amp;#34; Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34; Bravo replies Alpha &amp;#34;A response message&amp;#34; Alpha replies User &amp;#34;&amp;#34;&amp;#34; This is a multi-line message text!</description>
     </item>
     <item>
       <title>Defining the Sequence language</title>
@@ -118,7 +118,7 @@
       <link>https://markuseliasson.se/article/taxonomies-in-liquorice/</link>
       <pubDate>Tue, 11 Nov 2014 22:21:10 +0100</pubDate>
       <guid>https://markuseliasson.se/article/taxonomies-in-liquorice/</guid>
-      <description>My Hugo theme liquorice was updated yesterday to add simple support for Taxonomies. Both categories and tags is supported both as list view and as the ingress part of a single article.&#xA;In order to use it you need to configured in your site configuration (see documentation), in TOML this is basically adding:&#xA;[indexes]&#xD;category = &amp;quot;categories&amp;quot;&#xD;tag = &amp;quot;tags&amp;quot;&#xD;You then add the categories and / or tags per article in the front-matter like:</description>
+      <description>My Hugo theme liquorice was updated yesterday to add simple support for Taxonomies. Both categories and tags is supported both as list view and as the ingress part of a single article.&#xA;In order to use it you need to configured in your site configuration (see documentation), in TOML this is basically adding:&#xA;[indexes] category = &amp;quot;categories&amp;quot; tag = &amp;quot;tags&amp;quot; You then add the categories and / or tags per article in the front-matter like:</description>
     </item>
     <item>
       <title>Adventures in Go</title>

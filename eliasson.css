@@ -9,8 +9,9 @@
     --color-gray-vlight: #c3c3c3;
     --color-gray-dark: #1f1b1a;
 
-    --font-s: 1.1rem;
-    --font-m: 1.2rem;
+    --font-xs: 0.8rem;
+    --font-s: 1.0rem;
+    --font-m: 1.1rem;
     --font-l: 2.2rem;
     --font-xl: 3.2rem;
 
@@ -25,9 +26,8 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --background-color: var(--color-gray-dark);
-        --text-color: var(--color-whiteish);
         --text-color: #b8b8b8;
-        --dim-text-color: var(--color-gray-vlight);
+        --dim-text-color: var(--color-gray);
         --icon-color: var(--color-gray)
     }
 }
@@ -87,7 +87,7 @@ ul.social li + li {
 
 p {
     width: 55%;
-    line-height: 1.4rem;
+    line-height: 1.5rem;
 }
 
 p.preamble {
@@ -98,7 +98,7 @@ p.preamble {
 h1 {
     font-weight: 400;
     font-size: var(--font-l);
-    line-height: 2rem;
+    line-height: 2.2rem;
     margin-top: 4rem;
     margin-bottom: 2rem;
 }
@@ -106,6 +106,7 @@ h1 {
 h2 {
     font-weight: 400;
     font-size: var(--font-l);
+    line-height: 2.2rem;
     margin-top: 3rem;
     margin-bottom: 2rem;
 }
@@ -113,6 +114,7 @@ h2 {
 h3 {
     font-weight: 600;
     font-size: var(--font-l);
+    line-height: 2.2rem;
     margin-top: 3rem;
     margin-bottom: 2rem;
 }
@@ -122,14 +124,14 @@ a:active,
 a:hover,
 a:visited {
     color: var(--text-color);
-    text-decoration: none;
+    text-decoration: underline;
     font-weight: 400;
     word-break: break-word;
-    border-bottom: 1px solid var(--color-red);
+    text-decoration-color: var(--color-red);
 }
 
 a:hover {
-    border-bottom: 1px solid var(--color-blackish);
+    text-decoration: none;
 }
 
 pre {
@@ -161,8 +163,8 @@ time {
 
 footer p {
     font-size: var(--font-s);
-    line-height: 1.2rem;
-    font-weight: 200;
+    line-height: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 article blockquote {
@@ -176,7 +178,7 @@ article blockquote {
 article ul,
 article ol {
     width: 55%;
-    line-height: 1.25rem;
+    line-height: 1.5rem;
     padding-left: 1rem;
 }
 
@@ -224,7 +226,7 @@ a.no-feedback,
 a.no-feedback:active,
 a.no-feedback:hover,
 a.no-feedback:visited {
-    border-bottom: none;
+    text-decoration: none;
 }
 
 header .logo {
@@ -236,7 +238,7 @@ header .logo a,
 header .logo a:active,
 header .logo a:hover,
 header .logo a:visited {
-    border: none;
+    text-decoration: none;
     font-weight: 200;
     font-size: var(--font-l);
 }
@@ -255,7 +257,7 @@ header .logo a:visited {
     article p,
     article ul,
     article ol {
-        width: 90%;
+        width: 100%;
     }
 
     article ul {
@@ -276,5 +278,13 @@ header .logo a:visited {
 
     .list-item a {
         align-self: flex-start;
+    }
+
+    .list-item time {
+        font-size: var(--font-xs);
+    }
+
+    footer p {
+        width: 100%;
     }
 }
