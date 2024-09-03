@@ -199,7 +199,8 @@ execute.</p>
     2. A love child between Scala and TypeScript.
 </span>
 </p>
-<pre tabindex="0"><code>def availableExtensionsFromPost(post, world, preferences) =
+<div class="fullwidth">
+    <pre tabindex="0"><code>def availableExtensionsFromPost(post, world, preferences) =
     for connection in post.availableConnections():
         // As the originating post will be muted (with wiring)
         // for each alternative, a clone is needed 
@@ -231,14 +232,17 @@ execute.</p>
             replacements = [originatingPost],
             added = [newPost, wires],
             pointOfInterest = post.position) 
-</code></pre><p>As illustrated in the code above, the <code>RuleEngine</code> is responsible to ensure that each alternative is viable. The
+</code></pre>
+</div>
+<p>As illustrated in the code above, the <code>RuleEngine</code> is responsible to ensure that each alternative is viable. The
 alternative where the new wires would intersect with something existing is not a valid alternative and not included
 in the result.</p>
 <p>The <code>RuleEngine</code> handles what is possible to do and what items of the world that will be affected. It is the
 <code>SolutionWorkingSet</code> that is the glue between the graphical representation and the domain model.</p>
 <p>The above method would have been called when the user selects the post item in the 2D rendering. Where the UI will call
 <code>SolutionWorkingSet.optionsForItem</code> to get the options to render.</p>
-<pre tabindex="0"><code>def *optionsForItem(id) =
+<div class="fullwidth">
+    <pre tabindex="0"><code>def *optionsForItem(id) =
     val item = this.world.byId(id)
     
     // Use our method to get the possible alternatives for extensions
@@ -256,12 +260,15 @@ in the result.</p>
         
         // Return an option that should be rendered as an Action at the given position
         yield Option(type = Action, position = alt.pointOfInterest, command))
-</code></pre><h3 id="executing-commands">Executing commands</h3>
+</code></pre>
+</div>
+<h3 id="executing-commands">Executing commands</h3>
 <p>Now that the UI has received the options available it needs to show them somehow. In our case each option represents a
 possible direction, which is illustrated with a blue arrow.</p>
 <p><img src="/designer/executing-command.png" alt="Executing a command"></p>
 <p>The renderer code that generates the UI above upon a post selection looks something like this:</p>
-<pre tabindex="0"><code>// Method called when user selects a post
+<div class="fullwidth">
+    <pre tabindex="0"><code>// Method called when user selects a post
 def showOptions(itemId) =
     val options = this.workingSet.optionsForItem(itemId)
     for option in options:
@@ -272,12 +279,15 @@ def showOptions(itemId) =
                 position = option.position,
                 onClick = this.workingSet.execute(option.command))
             this.canvas.add(ornament)
-</code></pre><p>As you can see the UI is quite “dumb”, it will only get available options, filter out the relevant ones and then create
+</code></pre>
+</div>
+<p>As you can see the UI is quite “dumb”, it will only get available options, filter out the relevant ones and then create
 the UI control that should be used to represent it.</p>
 <p>Again, the available options only return viable options and the commands are already constructed; the code needed to
 implement the “action handler” when a blue arrow is clicked is very simple, it just executes the command.</p>
 <p>When the user clicks the arrow the command is executed by calling the <code>SolutionWorkingSet.execute</code>:</p>
-<pre tabindex="0"><code>def executeCommand(command):
+<div class="fullwidth">
+    <pre tabindex="0"><code>def executeCommand(command):
     // Handle the undo and redo stack 
     updateUndoStack()
     
@@ -296,14 +306,17 @@ implement the “action handler” when a blue arrow is clicked is very simple, 
     // the view
     val renderInstructions = this.createRenderInstructions(executionResult)
     this.renderer.rerender(renderInstructions)
-</code></pre><p>The <code>SolutionWorkingSet</code> is orchestrating the command execution, handling things like the undo/redo stack and generates
+</code></pre>
+</div>
+<p>The <code>SolutionWorkingSet</code> is orchestrating the command execution, handling things like the undo/redo stack and generates
 instructions on what to render based on the result of the command execution (to avoid re-render the entire drawing).</p>
 <p>Each command is responsible for carrying out the work needed and returning a result.</p>
 <p>The command in our example, <code>ExtendFromPostCommand</code> was constructed using the alternative from <code>RuleEngine</code> as
 previously  shown in <code>optionsForItem</code>. The replacement post and list of added items were simply given as constructor
 arguments to the command, <code>ExtendFromPostCommand(alt.replacement, alt.added)</code>.</p>
 <p>The implementation of the command execution is something like:</p>
-<pre tabindex="0"><code>def execute(world) =
+<div class="fullwidth">
+    <pre tabindex="0"><code>def execute(world) =
     // The command constructor was given the items to replace and add
     val newPost = this.added.posts.single()
     val wire = this.added.wires.single()
@@ -316,7 +329,9 @@ arguments to the command, <code>ExtendFromPostCommand(alt.replacement, alt.added
         added = [newPost, wire],
         updated = [this.replacement]
         deleted = [])
-</code></pre><p>This is a simple command, the RuleEngine has already constructed all the items needed. The command only needs to connect
+</code></pre>
+</div>
+<p>This is a simple command, the RuleEngine has already constructed all the items needed. The command only needs to connect
 the wiring between the posts in order to set the positions and attach the wire to each post.</p>
 <h3 id="result-of-executing-a-command">Result of executing a command</h3>
 <p>All commands return a <code>CommandExecutionResult</code>, that contains:</p>
@@ -377,7 +392,8 @@ present or not in the UI. Commands execution are simple to test given their pure
 a post given its state. Modifying or accessing the world is also simple to unit-test.</p>
 <p>The domain rules have slightly more high-level tests that are executed via the <code>SolutionWorkingSet</code> to the <code>RuleEngine</code>
 and back. These tests look something like this:</p>
-<pre tabindex="0"><code>describe(&#34;extend form post&#34;):
+<div class="fullwidth">
+    <pre tabindex="0"><code>describe(&#34;extend form post&#34;):
     beforeEach:
         articleRepository = ArticleRepository(&#34;fake-articles.json&#34;)
         workingSet = TestableWorkingSet()
@@ -408,7 +424,9 @@ and back. These tests look something like this:</p>
                 test(&#34;should have added a post&#34;):
                     var posts = workingSet.world.posts()
                     expect(posts.length).toEqual(2)
-</code></pre><p>Sure, in the real world there are slightly more details to these tests. I think that the use of options and commands
+</code></pre>
+</div>
+<p>Sure, in the real world there are slightly more details to these tests. I think that the use of options and commands
 also benefit the test setup to be quite readable.</p>
 <h3 id="performance-and-waste">Performance and waste</h3>
 <p>One challenge with this design is that there is some wasted processing when options are evaluated. For options that are
