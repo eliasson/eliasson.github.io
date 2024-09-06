@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    
+
+    
+        <title>Guide Comments at Markus Eliasson</title>
+    
+
+    <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="t6zLGwH2S4qPWg5EY6RnU5Xg0af5aztT"></script>
+</head>
+
+
+
+
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
+    </div>
+</header>
+
+
+    <article>
+        <h1>Guide Comments</h1>
+        <p class="preamble">Code comments is a subjective topic in a world of collaboration. What is superfluous for some might be helpful for others. Personally, I come to like something referred to as guide comments.</p>
+        <time>Friday, September 6, 2024</time>
+
+        <section>
+            <p>A few months ago I stumbled upon an <a href="http://antirez.com/news/124">article</a> about code comments and documentation. The
+article was written by none other than <em>antirez</em>, the creator of Redis, and a well known<span class="note">1</span>
+ C programmer.</p>
+<p>There is one recommendation in his article that surprised me, it was the use of what he calls <strong>“Guide comments”</strong>.
+These  are comments that do not add any new information, they just state what the code is doing.
+<span class="sidenote">
+    
+1. Antirez has a reputation for writing well written and easy to understand code. I remember that I was
+   impressed by his toy text editor [Kilo](https://github.com/antirez/kilo) in just 1 000 lines of C.
+
+</span>
+</p>
+<p>Below is an excerpt from a time-reporting tool that deals with merging adjacent and overlapping slots of registered
+time. The comments do not add any details that are not part of the if-conditions, yet they assist the reader in
+interpreting the code.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">Offset</span> <span class="p">&gt;=</span> <span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">&amp;&amp;</span> <span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span> <span class="p">&lt;=</span> <span class="n">slot</span><span class="p">.</span><span class="n">EndsAt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Completely overlaps (i.e. replaces)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">drop</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span> <span class="p">==</span> <span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">&amp;&amp;</span> <span class="n">isSameActivity</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Just before (i.e. merge)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">=</span> <span class="n">current</span><span class="p">.</span><span class="n">Offset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">slot</span><span class="p">.</span><span class="n">Duration</span> <span class="p">+=</span> <span class="n">current</span><span class="p">.</span><span class="n">Duration</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">drop</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">Offset</span> <span class="p">==</span> <span class="n">slot</span><span class="p">.</span><span class="n">EndsAt</span> <span class="p">&amp;&amp;</span> <span class="n">isSameActivity</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Just after (i.e. merge)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">slot</span><span class="p">.</span><span class="n">Duration</span> <span class="p">+=</span> <span class="n">current</span><span class="p">.</span><span class="n">Duration</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">drop</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span> <span class="p">&gt;</span> <span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">&amp;&amp;</span> <span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span> <span class="p">&lt;=</span> <span class="n">slot</span><span class="p">.</span><span class="n">EndsAt</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Slot overlaps tail part of current</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">isSameActivity</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Merge into one slot</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">delta</span> <span class="p">=</span> <span class="n">Math</span><span class="p">.</span><span class="n">Abs</span><span class="p">(</span><span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">-</span> <span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">slot</span><span class="p">.</span><span class="n">Duration</span> <span class="p">=</span> <span class="n">slot</span><span class="p">.</span><span class="n">Duration</span> <span class="p">+</span> <span class="p">(</span><span class="n">current</span><span class="p">.</span><span class="n">Duration</span> <span class="p">-</span> <span class="n">delta</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">=</span> <span class="n">current</span><span class="p">.</span><span class="n">Offset</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">drop</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Shrink the current (old) slot</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">delta</span> <span class="p">=</span> <span class="n">Math</span><span class="p">.</span><span class="n">Abs</span><span class="p">(</span><span class="n">slot</span><span class="p">.</span><span class="n">Offset</span> <span class="p">-</span> <span class="n">current</span><span class="p">.</span><span class="n">EndsAt</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">current</span><span class="p">.</span><span class="n">Duration</span> <span class="p">-=</span> <span class="n">delta</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Younger me would have dismissed this recommendation as too trivial, code should be self documenting and all that 🤦.
+But I like them, and find them valuable. I just hadn’t thought of them as a guide.</p>
+<p>The last few months one of the teams I work with have started using these types of comments more frequently (when it
+has a name it is easier to discuss and adopt). And I think they are great and that more people should use them!</p>
+<p>When I write code, they help me communicate my intention, sometimes I even write them before I write the code. They are
+also a good way to highlight sections<span class="note">2</span>
+ of a function, especially test setups.
+<span class="sidenote">
+    
+2. There was a misconception during the Clean Code era that all such sections should be extracted to separate
+functions. Luckily we are not as dogmatic today.
+
+</span>
+</p>
+<p>The greatest benefit however is when I read code. It really is like having a guide, it gives me confirmation that I
+have read and interpreted the code correctly. Or allows me to skim some sections that are less relevant.</p>
+<blockquote>
+<p>Code is written once but read many times.</p>
+</blockquote>
+<p>Given how often code is read, I think it deserves a narrator. Do not be afraid to state the obvious, it might help
+future you and your teammates to better understand and navigate your system.</p>
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="https://x.com/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-twitter"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
+</footer>
+
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
+
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
+
+        <symbol id="icon-twitter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </symbol>
+    </defs>
+</svg>
+</body>
+
+</html>
+

@@ -4,7 +4,7 @@
     <title>Tags on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/</link>
     <description>Recent content in Tags on Markus Eliasson</description>
-    <generator>Hugo</generator>
+    <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 09 Sep 2022 19:21:31 +0200</lastBuildDate>
     <atom:link href="https://markuseliasson.se/tags/index.xml" rel="self" type="application/rss+xml" />
@@ -65,7 +65,7 @@
       <description></description>
     </item>
     <item>
-      <title>BitTorrent</title>
+      <title>bittorrent</title>
       <link>https://markuseliasson.se/tags/bittorrent/</link>
       <pubDate>Wed, 24 Aug 2016 22:48:17 +0200</pubDate>
       <guid>https://markuseliasson.se/tags/bittorrent/</guid>
@@ -86,14 +86,14 @@
       <description></description>
     </item>
     <item>
-      <title>Liquorice</title>
+      <title>liquorice</title>
       <link>https://markuseliasson.se/tags/liquorice/</link>
       <pubDate>Tue, 11 Nov 2014 22:21:10 +0100</pubDate>
       <guid>https://markuseliasson.se/tags/liquorice/</guid>
       <description></description>
     </item>
     <item>
-      <title>Go</title>
+      <title>go</title>
       <link>https://markuseliasson.se/tags/go/</link>
       <pubDate>Sun, 31 Aug 2014 12:34:15 +0000</pubDate>
       <guid>https://markuseliasson.se/tags/go/</guid>
