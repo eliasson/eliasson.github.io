@@ -13,7 +13,7 @@
       <link>https://markuseliasson.se/article/dont-round-twice/</link>
       <pubDate>Sat, 22 Feb 2025 09:00:00 +0200</pubDate>
       <guid>https://markuseliasson.se/article/dont-round-twice/</guid>
-      <description>The issue I was facing was that I had a list of things where each of these things had a number of properties that I wanted to group on. Let’s say that these things were liquorice bars with fillings1&#xD;. 1. These are commonly found at the cash register in Swedish supermarkets. I highly recommend the Pingvinstång, with a filling of mint! Such bars have many properties2&#xD;, but to illustrate my problem let us say that they have diameter and the type of filling.</description>
+      <description>The issue I was facing was that I had a list of things where each of these things had a number of properties that I wanted to group on. Let’s say that these things were liquorice bars with fillings1&#xD;. 1. These are commonly found at the cash register in Swedish supermarkets. I highly recommend the Pingvinstång,&#xD;with a filling of mint!&#xD;Such bars have many properties2&#xD;, but to illustrate my problem let us say that they have diameter and the type of filling.</description>
     </item>
     <item>
       <title>Guide Comments</title>

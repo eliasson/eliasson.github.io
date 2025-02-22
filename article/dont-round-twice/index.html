@@ -51,16 +51,15 @@ details.
 </span>
 </p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">record</span> <span class="nc">class</span> <span class="n">Bar</span><span class="p">(</span><span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Filling</span><span class="p">)</span>
-</span></span></code></pre></div><p>The task was to group these bars based on their diameter and filling to better understand what sells the most.</p>
+</span></span></code></pre></div><p>The task was to group these bars based on their diameter and filling to better understand what sells the most.
+Then take that list and save it elsewhere. When saving, the diameter should be rounded to <em>1 decimal</em> which was
+decided to be precise enought for our use-case.</p>
 <p>I choose to implement a key that represented the unique properties to group on as follows:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">record</span> <span class="nc">class</span> <span class="n">Bar</span><span class="p">(</span><span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Filling</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">	<span class="kt">string</span> <span class="n">Key</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="s">$&#34;{Diameter:F1}_{Filling}&#34;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></div><p>Part of the grouping was to produce another list with the count of bars sharing the same key. Then take that list
-and save it elsewhere. When saving the diameter should be rounded to <em>1 decimal</em> which was decided to be precise
-enought for our use-case.</p>
-<p>So there was a DTO for this bar as well, looking something like this:</p>
+</span></span></code></pre></div><p>There was a DTO for this bar as well, looking something like this:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">BarDto</span><span class="p">(</span><span class="kt">uint</span> <span class="n">count</span><span class="p">,</span> <span class="n">Bar</span> <span class="n">bar</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="kt">uint</span> <span class="n">Count</span><span class="p">;</span>
