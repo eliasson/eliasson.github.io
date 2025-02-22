@@ -4,7 +4,7 @@
     <title>Sequence on Markus Eliasson</title>
     <link>https://markuseliasson.se/tags/sequence/</link>
     <description>Recent content in Sequence on Markus Eliasson</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 18 Aug 2018 13:00:00 +0100</lastBuildDate>
     <atom:link href="https://markuseliasson.se/tags/sequence/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +13,7 @@
       <link>https://markuseliasson.se/article/building-a-parser-for-sequence/</link>
       <pubDate>Sat, 18 Aug 2018 13:00:00 +0100</pubDate>
       <guid>https://markuseliasson.se/article/building-a-parser-for-sequence/</guid>
-      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.&#xA;The language, as we left it looks like:&#xA;Name &amp;#34;Sequence demo&amp;#34; Actor User Object Alpha Object Bravo Sequence Test User ask Alpha &amp;#34;A synchronous message&amp;#34; Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34; Bravo replies Alpha &amp;#34;A response message&amp;#34; Alpha replies User &amp;#34;&amp;#34;&amp;#34; This is a multi-line message text!</description>
+      <description>Previously, in Defining the Sequence language we drafted a version of the Sequence language that were happy with, now we need to formalize this language and build a parser for it.&#xA;The language, as we left it looks like:&#xA;Name &amp;#34;Sequence demo&amp;#34;&#xD;Actor User&#xD;Object Alpha&#xD;Object Bravo&#xD;Sequence Test&#xD;User ask Alpha &amp;#34;A synchronous message&amp;#34;&#xD;Alpha tell Bravo &amp;#34;An asynchronous message&amp;#34;&#xD;Bravo replies Alpha &amp;#34;A response message&amp;#34;&#xD;Alpha replies User &amp;#34;&amp;#34;&amp;#34;&#xD;This is a multi-line&#xD;message text!</description>
     </item>
     <item>
       <title>Defining the Sequence language</title>

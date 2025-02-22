@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    
+
+    
+        <title>Don’t round twice at Markus Eliasson</title>
+    
+
+    <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="t6zLGwH2S4qPWg5EY6RnU5Xg0af5aztT"></script>
+</head>
+
+
+
+
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
+    </div>
+</header>
+
+
+    <article>
+        <h1>Don’t round twice</h1>
+        <p class="preamble">When debugging what seemed to be a rounding error, I learned a surprising thing about the way .NET round decimal values.</p>
+        <time>Saturday, February 22, 2025</time>
+
+        <section>
+            <p>The issue I was facing was that I had a list of <em>things</em> where each of these things had a number of properties
+that I wanted to group on. Let’s say that these things were liquorice bars with fillings<span class="note">1</span>
+.
+<span class="sidenote">
+    
+1. These are commonly found at the cash register in Swedish supermarkets. I highly recommend the Pingvinstång,
+with a filling of mint!
+
+</span>
+</p>
+<p>Such bars have many properties<span class="note">2</span>
+, but to illustrate my problem let us say that they have <em>diameter</em>
+and the <em>type of filling</em>.
+<span class="sidenote">
+    
+2. Obviously, the "bar" had a lot more details attached to it, but I spared you those
+details.
+
+</span>
+</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">record</span> <span class="nc">class</span> <span class="n">Bar</span><span class="p">(</span><span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Filling</span><span class="p">)</span>
+</span></span></code></pre></div><p>The task was to group these bars based on their diameter and filling to better understand what sells the most.</p>
+<p>I choose to implement a key that represented the unique properties to group on as follows:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">record</span> <span class="nc">class</span> <span class="n">Bar</span><span class="p">(</span><span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Filling</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">string</span> <span class="n">Key</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="s">$&#34;{Diameter:F1}_{Filling}&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>Part of the grouping was to produce another list with the count of bars sharing the same key. Then take that list
+and save it elsewhere. When saving the diameter should be rounded to <em>1 decimal</em> which was decided to be precise
+enought for our use-case.</p>
+<p>So there was a DTO for this bar as well, looking something like this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">BarDto</span><span class="p">(</span><span class="kt">uint</span> <span class="n">count</span><span class="p">,</span> <span class="n">Bar</span> <span class="n">bar</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="kt">uint</span> <span class="n">Count</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">Filling</span> <span class="p">=</span> <span class="n">bar</span><span class="p">.</span><span class="n">Filling</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="k">readonly</span> <span class="kt">decimal</span> <span class="n">Diameter</span> <span class="p">=</span> <span class="n">Math</span><span class="p">.</span><span class="n">Round</span><span class="p">(</span><span class="n">thing</span><span class="p">.</span><span class="n">Diameter</span><span class="p">,</span> <span class="m">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h2 id="the-problem">The problem</h2>
+<p>The problem was that when I looked in the saved bars. There were duplicate rows where I expected none!</p>
+<pre tabindex="0"><code>| Count | Diameter | Filling   |
+|-------|----------|-----------|
+|  12   | 11.0     | Mint      |
+|   1   | 11.0     | Mint      |
+|  10   | 12.5     | Lemon     |
+</code></pre><p>Why are there two rows of mint liquorice bars with the same diameter!?</p>
+<p>I looked closer at the data used. Examples of the diameters used were <code>11.0</code>, <code>11.04</code>, <code>11.05</code>, and <code>11.30</code>.</p>
+<blockquote>
+<p>Measure twice - cut once</p>
+</blockquote>
+<p>Most of you have heard the expression <em>measure twice - cut once</em>. Whenever I do woodworking I measure, at least,
+twice before I cut anything - something I have learned the hard way.</p>
+<p>Another thing<span class="note">3</span>
+ I have learnt that the measuring has to be performed by the same person and using the
+same instrument. Me and my wife tend to get slightly different parallax errors when measuring, and different rulers
+can yield different results.
+<span class="sidenote">
+    
+3. Yet another thing I have learnt is to STOP working when you are tired. When you, late in the
+evening, miter cut the trim for a corner wrong the second time, you will not get it right the third time.
+
+</span>
+</p>
+<p>Turns out that the same thing was happening here. I rounded the decimal value twice, but I used different
+instruments when doing so! And apparently C# implements this differently when using string interpolation and
+when using <code>Math.Round</code>!</p>
+<p>I wrote a quick test to better understand.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="na">[Test]</span>
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">void</span> <span class="n">It_should_round_consistent</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">offendingValue</span> <span class="p">=</span> <span class="m">11.05</span><span class="n">m</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">Multiple</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="s">$&#34;{offendingValue:F1}&#34;</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EqualTo</span><span class="p">(</span><span class="s">&#34;11.1&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="s">$&#34;{Math.Round(offendingValue, 1)}&#34;</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EqualTo</span><span class="p">(</span><span class="s">&#34;11.1&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The last assertion failed, <code>11.05</code> was rounded to <code>11.0</code> when using <code>Math.Round</code>. And to <code>11.1</code> when using <code>$”{11.5:F1}”</code>.</p>
+<p><code>Math.Round</code> is clear in <a href="https://learn.microsoft.com/en-us/dotnet/api/system.math.round?view=net-9.0">its documentation</a>
+that it uses what is called <em>bankers rounding</em>. It rounds midpoint values to the nearest even number.</p>
+<p>While the string interpolation use C# number format strings, which states in
+<a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">its documentation</a> that it
+use <em>fixed-point rounding</em>.</p>
+<h2 id="the-mistakes-made">The mistakes made</h2>
+<p>The API documentation for <code>Math.Round</code> describes how it rounds, and there are ways to control the algorithm used. But I did
+not think of that, as the algorithm used was irrelevant for my use case, as long as it was consistent - which it was not.
+<strong>Assumption</strong> is, once again, the mother of all fuck ups.</p>
+<p><strong>Test data weakness</strong>, this code was under test already. Tests that ensured that the values were rounded. But there was no test
+with a midpoint decimal value (there is now!).</p>
+<p>Not using the rounded value, but to <strong>round it again</strong>. The fix I made was to round the value once<span class="note">4</span>
+, and then use
+that value in both places, which in hindsight, is what I should have done in the first place.
+<span class="sidenote">
+    
+4. Unlike humans, computers have very good memory and do not self
+doubt their previous measurement.
+
+</span>
+</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">record</span> <span class="nc">class</span> <span class="n">Bar</span><span class="p">(</span><span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">,</span> <span class="kt">string</span> <span class="n">Filling</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">string</span> <span class="n">Key</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="s">$&#34;{DiameterRounded:F1}_{Filling}&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">decimal</span> <span class="n">DiameterRounded</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">Math</span><span class="p">.</span><span class="n">Round</span><span class="p">(</span><span class="n">Diameter</span><span class="p">,</span> <span class="m">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">BarDto</span><span class="p">(</span><span class="kt">uint</span> <span class="n">count</span><span class="p">,</span> <span class="n">Bar</span> <span class="n">bar</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="kt">uint</span> <span class="n">Count</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="k">readonly</span> <span class="kt">string</span> <span class="n">Filling</span> <span class="p">=</span> <span class="n">bar</span><span class="p">.</span><span class="n">Filling</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kd">public</span> <span class="k">readonly</span> <span class="kt">decimal</span> <span class="n">Diameter</span><span class="p">=</span> <span class="n">thing</span><span class="p">.</span><span class="n">DiameterRounded</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>So for programming, I guess the saying goes:</p>
+<blockquote>
+<p>Round once - use twice!</p>
+</blockquote>
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="https://x.com/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-twitter"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
+</footer>
+
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
+
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
+
+        <symbol id="icon-twitter" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+        </symbol>
+    </defs>
+</svg>
+</body>
+
+</html>
+
