@@ -6,8 +6,15 @@
     <description>Recent content in Articles on Markus Eliasson</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 22 Feb 2025 09:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Tue, 25 Mar 2025 12:00:00 +0200</lastBuildDate>
     <atom:link href="https://markuseliasson.se/article/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A test-data builder</title>
+      <link>https://markuseliasson.se/article/a-test-data-builder/</link>
+      <pubDate>Tue, 25 Mar 2025 12:00:00 +0200</pubDate>
+      <guid>https://markuseliasson.se/article/a-test-data-builder/</guid>
+      <description>In the system I currently work on we do a lot of automated testing. Both unit-tests, system-tests, integration-tests, end-to-end tests, etc. When doing system level tests and integration-tests we are faced with setting up test data for many different situations. The test-data must also be correct / valid, as there are plenty of business rules that are validated by the system. This can easily result in complex and verbose test-setup.</description>
+    </item>
     <item>
       <title>Don’t round twice</title>
       <link>https://markuseliasson.se/article/dont-round-twice/</link>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="/eliasson.css" />
+    <link rel="stylesheet" type="text/css" href="/syntax-light.css" />
+    
+
+    
+        <title>A test-data builder at Markus Eliasson</title>
+    
+
+    <script defer src="https://api.pirsch.io/pa.js" id="pianjs" data-code="t6zLGwH2S4qPWg5EY6RnU5Xg0af5aztT"></script>
+</head>
+
+
+
+
+<body>
+    <header>
+    <div class="logo">
+        <a href="https://markuseliasson.se/">M<span class="is-red-period">.</span>E<span class="is-red-period">.</span></a>
+    </div>
+</header>
+
+
+    <article>
+        <h1>A test-data builder</h1>
+        <p class="preamble">A while back I built a test-data builder for one of the projects I am working on. Now, after using if for some time I really think it simplifies and improves our tests, while also helping us to write new tests faster. This article will guide you through how to implement one for yourself.</p>
+        <time>Tuesday, March 25, 2025</time>
+
+        <section>
+            <p>In the system I currently work on we do a lot of automated testing. Both unit-tests, system-tests,
+integration-tests, end-to-end tests, etc. When doing system level tests and integration-tests we are faced with
+setting up test data for many different situations. The test-data must also be
+correct / valid, as there are plenty of business rules that are validated by the system. This
+can easily result in complex and verbose test-setup.</p>
+<p>A complex test-setup in combination with a system where we have thousands of tests is not a good
+combination! One of the ways to mitigate this is to provide a test-data builder. A tool that helps
+you to set up correct test-data while avoiding repetition.</p>
+<p>This article will go through the implementation of such a test-data builder.</p>
+<h2 id="a-relational-model">A relational model</h2>
+<p>Before we dive into the art of test-data, let us set the scene by going through the example domain
+used in this article.</p>
+<p>As I enjoy listening to (and collecting) music, so today&rsquo;s domain will be albums and tracks. The
+model is greatly simplified to only contain what is needed for two illustrative tests.</p>
+<p>Think of system where a user enters music albums, their tracks and the performing artist. The user
+can mark tracks as favourite tracks. And that is all there is.</p>
+<p><img src="/test-data-builder/test-data-model-white.png" alt="Our simplified model"></p>
+<p>A User is a cross-cutting concern in this system. All persisted data will be separated by user.</p>
+<ul>
+<li>Each Artist has a reference to the owning User.</li>
+<li>Each Album has a reference to an Artist.</li>
+<li>Each Track has a reference to the Album it belongs to.</li>
+</ul>
+<p>Here is the code, in C#<span class="note">1</span>
+.
+<span class="sidenote">
+    
+1. The examples here will be in C#, but the concepts is transferable to most languages. At least
+object-oriented languages.
+
+</span>
+</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">interface</span> <span class="nc">IAggregate</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// As this is an example, use Guid instead of, better, a type-safe ID.</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">User</span> <span class="p">:</span> <span class="n">IAggregate</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">string</span> <span class="n">Username</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">Artist</span> <span class="p">:</span> <span class="n">IAggreagate</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">Album</span> <span class="p">:</span> <span class="n">IAggreagate</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// As this is an example, let&#39;s limit each album to one artist.</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">ArtistId</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">string</span> <span class="n">Name</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">Track</span> <span class="p">:</span> <span class="n">IAggregate</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">AlbumId</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Guid</span><span class="p">.</span><span class="n">NewGuid</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">string</span> <span class="n">Title</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">bool</span> <span class="n">IsFavorite</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="kd">private</span> <span class="k">set</span><span class="p">;</span>  <span class="p">}</span> <span class="p">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="k">void</span> <span class="n">MarkAsFavourite</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">IsFavorite</span> <span class="p">=</span> <span class="kc">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="k">void</span> <span class="n">UnmarkAsFavourite</span><span class="p">()</span> <span class="p">=&gt;</span> <span class="n">IsFavorite</span> <span class="p">=</span> <span class="kc">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>The example used something called an <em>Aggregate</em>. If you are not familiar with the term, you can think
+of it as a coherent entity with a unique ID. It is not that important<span class="note">2</span>
+ for the rest of this
+article.
+<span class="sidenote">
+    
+2. Aggregate is an important concept in Domain Driven Design, however. And I think DDD is a valuable tool
+for modelling complex domains. It is definitely worth looking into.
+
+</span>
+</p>
+<h2 id="our-system-design">Our system design</h2>
+<p>While being a very small example, I have built it using patterns, like repository pattern, from
+Domain Driven Design<span class="note">3</span>
+, similar to the system that where I originally created this test-data builder.
+It is however not necessary to use these patterns to get the benefits of a test-data builder. The concepts used
+in the example are fairly unorthodox and hopefully easy enough to understand even if you are not familiar with
+them in the first place.
+<span class="sidenote">
+    
+3. Here is this domain thing again! Could it be something interesting? 🤔
+
+</span>
+</p>
+<p>Concepts used:</p>
+<ul>
+<li><strong>Domain model</strong>, a rich domain model that contains most of the business logic. Free of I/O and other effects.</li>
+<li><strong>Repositories</strong>, are used for all reading and writing of aggregates, lots of I/O.</li>
+<li><strong>Services</strong>, are the point of entry for any actions, orchestrates domain model and other processing.</li>
+<li><strong>Asynchronous</strong>, all I/O operations are asynchronous and test-data generation must therefore support it.</li>
+</ul>
+<h2 id="a-first-test">A first test</h2>
+<p>Now, imagine that we want to write a test for a service where a user can mark a <em>track</em> as a
+favourite.</p>
+<p>With no test-helper such a test might look something like.
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">WithoutTheBuilder</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">UserRepository</span> <span class="n">_userRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Artist</span><span class="p">&gt;</span> <span class="n">_artistRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Album</span><span class="p">&gt;</span> <span class="n">_albumRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Track</span><span class="p">&gt;</span> <span class="n">_trackRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">User</span> <span class="n">_actingUser</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">FavouriteService</span> <span class="n">_service</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [OneTimeSetUp]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">MarkTrackAsFavourite</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// First, we need to set up the infra to store our stuff.</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Due to validation rules we must create the correct graph of aggregates.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_userRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">UserRepository</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_artistRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Artist</span><span class="p">&gt;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_albumRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Album</span><span class="p">&gt;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_trackRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Track</span><span class="p">&gt;();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Create the acting user for our test</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_actingUser</span> <span class="p">=</span> <span class="k">new</span> <span class="n">User</span> <span class="p">{</span> <span class="n">Username</span> <span class="p">=</span> <span class="s">&#34;emma.goldman&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_userRepository</span><span class="p">.</span><span class="n">SaveAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">artist</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Artist</span> <span class="p">{</span> <span class="n">UserId</span> <span class="p">=</span> <span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;Kite&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_artistRepository</span><span class="p">.</span><span class="n">SaveAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">artist</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">album</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Album</span> <span class="p">{</span> <span class="n">ArtistId</span> <span class="p">=</span> <span class="n">artist</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">Name</span> <span class="p">=</span> <span class="s">&#34;VII&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_albumRepository</span><span class="p">.</span><span class="n">SaveAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">album</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">track</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Track</span> <span class="p">{</span> <span class="n">AlbumId</span> <span class="p">=</span> <span class="n">album</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">Title</span> <span class="p">=</span> <span class="s">&#34;Glassy Eyes&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_trackRepository</span><span class="p">.</span><span class="n">SaveAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Create the service we are writing our test of.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_service</span> <span class="p">=</span> <span class="k">new</span> <span class="n">FavouriteService</span><span class="p">(</span><span class="n">_userRepository</span><span class="p">,</span> <span class="n">_trackRepository</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Perform the action that we are testing</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_service</span><span class="p">.</span><span class="n">SetFavouriteTracksAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">track</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [Test]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">It_should_have_one_favourite_track</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favouriteTracks</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_service</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">GetFavouriteTracksAsync</span><span class="p">(</span><span class="n">_actingUser</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">ToListAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favourites</span> <span class="p">=</span> <span class="n">favouriteTracks</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="n">favourites</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EqualTo</span><span class="p">(</span><span class="k">new</span> <span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;Glassy Eyes&#34;</span> <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div></p>
+<blockquote>
+<p>Hey, there is a lot of stuff being set up which is never used!</p>
+</blockquote>
+<p>Well, indirectly it is being used. If you have a complex domain you most definitely want to enforce the business rules,
+have a consistent model, etc. This is typically done both in the domain model and in the services. In the
+example above, there can be constraints at the persistence layer, that a track cannot be saved unless
+its album reference also exists.</p>
+<p>Now, think about your own system. Are your entities as simple as set up as the <code>Artist</code> and <code>Album</code> above? No, I did
+not think so.</p>
+<p>Now, think about your own system. I am pretty confident that your entities are a lot more complex than the example
+above. If this was not an example made to be simple, the maybe the <code>Album</code> would require us to add information about
+the label. The tracks to include details about composers, etc.</p>
+<p>Take this mental image of a complex domain and then how it would look having to be setup in thousands<span class="note">4</span>
+
+of tests. A lot  of those tests would have very similar setup and in worst case, this setup is copied from test to test.
+<span class="sidenote">
+    
+4. In the system this originates from we have > 20 000 tests for the backend alone.
+
+</span>
+</p>
+<p>This it is not an ideal situation.</p>
+<blockquote>
+<p>This looks like an integration level tests!</p>
+</blockquote>
+<p>I call it a &ldquo;system level&rdquo; test, and yes, in the examples we rely on persistence. These could be in-memory or a real
+database it is up to you. Regardless of underlying technology I would argue that using an actual implementation rather
+than mocks both increase the confidence in the tests, and making them more robust to future changes.</p>
+<p>The test data builder is not limited to these types of tests though! It is just that I write a lot of these, and I have
+found the builder to be very valuable at this level.</p>
+<h2 id="an-alternative">An alternative</h2>
+<p>Now, let us finally see how this might look using this test-data builder.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">WhenGettingFavouriteTracksForUser</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">FavouriteTestCase</span> <span class="n">_tc</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [OneTimeSetUp]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">MarkTrackAsFavourite</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_tc</span> <span class="p">=</span> <span class="k">await</span> <span class="k">new</span> <span class="n">FavouriteTestCase</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithUser</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithArtist</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithAlbum</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithTrack</span><span class="p">(</span><span class="n">configure</span><span class="p">:</span> <span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span> <span class="p">=</span> <span class="s">&#34;Glassy Eyes&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">BuildAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">UserOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">track</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">TrackOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">FavouriteService</span><span class="p">.</span><span class="n">SetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">track</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [Test]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">It_should_have_one_favourite_track</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">UserOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favouriteTracks</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">FavouriteService</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">GetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">ToListAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favourites</span> <span class="p">=</span> <span class="n">favouriteTracks</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="n">favourites</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EqualTo</span><span class="p">(</span><span class="k">new</span> <span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;Glassy Eyes&#34;</span> <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>This alternative is a lot more concise. The &ldquo;irrelevant&rdquo; details, such as the username of the acting user, details
+about the artist and album is omitted (but still set behind the scene).</p>
+<p>What is left is the details <em>that do matter</em>. The name of the track is configured, since we use that later in the
+test when asserting the result.</p>
+<p>But there are a lot of things going on under the hood. Let us go through piece by piece.</p>
+<h3 id="synchronous-setup---asynchronous-construction">Synchronous setup - asynchronous construction</h3>
+<p>Previously I wrote that all construction and I/O has to be asynchronous, did I not? So how come we add
+user with <code>WithUser</code>, this does not look very asynchronous<span class="note">5</span>
+.
+<span class="sidenote">
+    
+5. In C# asynchronous methods returns a `Task` (similar to JavaScript's `Promise` or `Future` in Scala). The convention
+is to name such methods using a `Async` suffix.
+
+</span>
+</p>
+<p>Looking at the implementation of the <code>WithUser</code> shows us the answer.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="n">FavouriteTestCase</span> <span class="n">WithUser</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">UserName</span><span class="p">?</span> <span class="n">name</span> <span class="p">=</span> <span class="kc">null</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Action</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;?</span> <span class="n">configure</span> <span class="p">=</span> <span class="kc">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Kick off the construction on some thread, to run at some point.</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">task</span> <span class="p">=</span> <span class="n">Task</span><span class="p">.</span><span class="n">Run</span><span class="p">(()</span> <span class="p">=&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Create an arbitrary user.</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">new</span> <span class="n">User</span> <span class="p">{</span> <span class="n">Username</span> <span class="p">=</span> <span class="n">name</span><span class="p">?.</span><span class="n">Name</span> <span class="p">??</span> <span class="s">&#34;emma.goldman&#34;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Allow the caller to configure the instance before saving.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">configure</span><span class="p">?.</span><span class="n">Invoke</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">await</span> <span class="n">UserRepository</span><span class="p">.</span><span class="n">SaveAsync</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Use the given name or create a default name to use for this</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// test-data instance.</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">testName</span> <span class="p">=</span> <span class="n">name</span> <span class="p">??</span> <span class="n">NextUserName</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// Store details about the constructed user and its test-data</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// name so it can be retrieved from tests.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_constructedUsers</span><span class="p">.</span><span class="n">Enqueue</span><span class="p">(</span><span class="k">new</span> <span class="n">ConstructedUser</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">testName</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">});</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Keep track of the task so that we can wait for its completion at</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// a later stage.</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_constructionOfUsers</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">task</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// This is a builder alright!</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>Aha! The user <em>is</em> created asynchronously, we just do not wait for it until we return!</p>
+<p>What takes place is the following:</p>
+<ol>
+<li>Kick of the construction to run as a <code>Task</code> on the thread pool that runs tasks. The execution
+will not wait for this complete.</li>
+<li>Store this operation as <code>task</code>, so that it can be added to a list of all the tasks of <em>&ldquo;created users&rdquo;</em>.</li>
+<li>Once the code passed to <code>Task.Run</code> is executed, create an arbitrary instance of <code>User</code>.</li>
+<li>Since arbitrary data only gets you so far, there is an option for the caller to configure the instance.</li>
+<li>When the code passed to <code>Task.Run</code> is run, it can be async, which allows for saving the user using async I/O operations.</li>
+<li>After the user is saved via the repository it is added to a list of constructed users.
+There is an option for the caller to provide a name for this instance, if none is given a default name is created</li>
+</ol>
+<p>Being synchronous allows for the builder notation, where method calls are chained, even
+thought the construction itself is asynchronous. E.g.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">WithUser</span><span class="p">().</span><span class="n">WithArtist</span><span class="p">().</span><span class="n">WithAlbum</span><span class="p">()</span>
+</span></span></code></pre></div><p>Providing an <em>optional</em> argument where the caller of the function (the test) can configure the test-data is quite
+nice. The test instance will use the default data set by the builder, and the test can override the significant details
+from the test, like setting the track name:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="p">.</span><span class="n">WithTrack</span><span class="p">(</span><span class="n">configure</span><span class="p">:</span> <span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span> <span class="p">=</span> <span class="s">&#34;Glassy Eyes&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><h3 id="building">Building</h3>
+<p>Building the test-case on the other hand is an asynchronous task. The build has two main purposes:</p>
+<ol>
+<li>Setup and configure the test-data instances.</li>
+<li>Create the component that is being tested (i.e. the &ldquo;system under test&quot;<span class="note">6</span>
+).
+<span class="sidenote">
+    
+6. Some prefer to name the variables in test `sut`, I prefer to call them by their real names.
+
+</span>
+
+After the build has completed the test should be able to access any data or related components. Our implementation
+looks like this:</li>
+</ol>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">FavouriteTestCase</span><span class="p">&gt;</span> <span class="n">BuildAsync</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Wait for all scheduled construction of aggregates to complete. Wait in order parent</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// to child aggregate since children typically refer to their parent.</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">WhenAll</span><span class="p">(</span><span class="n">_constructionOfUsers</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">WhenAll</span><span class="p">(</span><span class="n">_constructionOfArtists</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">WhenAll</span><span class="p">(</span><span class="n">_constructionOfAlbums</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">WhenAll</span><span class="p">(</span><span class="n">_constructionOfTracks</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Create the System Under Test</span>
+</span></span><span class="line"><span class="cl">    <span class="n">FavouriteService</span> <span class="p">=</span> <span class="k">new</span> <span class="n">FavouriteService</span><span class="p">(</span><span class="n">UserRepository</span><span class="p">,</span> <span class="n">TrackRepository</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>In the previous chapter, we stored future <code>Task</code> for each aggregate created using our builder methods such as
+<code>.WithUser</code>. The builder does not have any control over when these are ready, some might have been constructed already,
+other might not. So the first thing we have to do is to wait for all these to be constructed. Luckily, this is quite
+easy, just a bunch of <code>Task.WhenAll</code> calls.</p>
+<p>Since our data is relational, aggregates can depend<span class="note">7</span>
+ on their ancestor to be existing (we will go through
+that part soon). Therefore, we wait in top-down order for construction.
+<span class="sidenote">
+    
+7. If you have circular dependencies between your aggregates, you will have to resolve these dependencies differently!
+Circular dependencies are a drag.
+
+</span>
+</p>
+<p>Once all objects are created, we can proceed to create an instance of the <code>FavouriteService</code>, which is the service we
+are writing our tests for.</p>
+<p>The dependencies injected to <code>FavouriteService</code> is just plain old properties defined in the <code>FavouriteTestCase</code>.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">FavouriteTestCase</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">protected</span> <span class="k">readonly</span> <span class="n">UserRepository</span> <span class="n">UserRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">protected</span> <span class="k">readonly</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Track</span><span class="p">&gt;</span> <span class="n">TrackRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="k">readonly</span> <span class="n">IList</span><span class="p">&lt;</span><span class="n">Task</span><span class="p">&gt;</span> <span class="n">_constructionOfUsers</span> <span class="p">=</span> <span class="k">new</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Task</span><span class="p">&gt;();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<h3 id="acting-on-test-data">Acting on test data</h3>
+<p>At the very end of our test setup, we want to act on our service to set a track as favourite. But in order to do that
+we need to get hold of the acting user and the track to favourite. Given that we asked the test-builder to create if
+for us, we have no reference to those objects around.</p>
+<p>This is where the <em>test-data name</em> comes in.</p>
+<p>The method call <code>.WithUser()</code> made in the test setup is using the default argument for the <code>name</code>, which is <code>null</code>.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="n">FavouriteTestCase</span> <span class="n">WithUser</span><span class="p">(</span><span class="n">UserName</span><span class="p">?</span> <span class="n">name</span> <span class="p">=</span> <span class="kc">null</span><span class="p">,</span> <span class="n">Action</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;?</span> <span class="n">configure</span> <span class="p">=</span> <span class="kc">null</span><span class="p">)</span>
+</span></span></code></pre></div>
+</div>
+<p>This resulted in that the code that created the actual instance of the <code>User</code> aggregate used the default name for this
+instance when it was constructed. Remember these statements?</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">testName</span> <span class="p">=</span> <span class="n">name</span> <span class="p">??</span> <span class="n">NextUserName</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="n">_constructedUsers</span><span class="p">.</span><span class="n">Enqueue</span><span class="p">(</span><span class="k">new</span> <span class="n">ConstructedUser</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">testName</span><span class="p">));</span>
+</span></span></code></pre></div>
+</div>
+<p>Ok, so there is a list of constructed users, with a test-data name associated to them. This is the secret to getting
+a reference to a created instance when we call the <code>OrThrowAsync</code> methods on the test case.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">UserOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">track</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">TrackOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">FavouriteService</span><span class="p">.</span><span class="n">SetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">track</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span></code></pre></div>
+</div>
+<p>Let us have a look on how the <code>UserOrThrowAsync</code> is implemented.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;</span> <span class="n">UserOrThrowAsync</span><span class="p">(</span><span class="n">UserName</span><span class="p">?</span> <span class="n">name</span> <span class="p">=</span> <span class="kc">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">await</span> <span class="n">Task</span><span class="p">.</span><span class="n">WhenAll</span><span class="p">(</span><span class="n">_constructionOfUsers</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="k">is</span> <span class="kc">null</span> <span class="p">&amp;&amp;</span> <span class="n">_constructedUsers</span><span class="p">.</span><span class="n">Count</span> <span class="p">!=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="p">(</span><span class="s">&#34;Implicit access of users is only allowed when one user exists. Qualify using name.&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">constructed</span> <span class="p">=</span> <span class="n">name</span> <span class="k">is</span> <span class="kc">null</span>
+</span></span><span class="line"><span class="cl">        <span class="p">?</span> <span class="n">_constructedUsers</span><span class="p">.</span><span class="n">First</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="p">:</span> <span class="n">_constructedUsers</span><span class="p">.</span><span class="n">FirstOrDefault</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span><span class="p">.</span><span class="n">IsMatch</span><span class="p">(</span><span class="n">name</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">constructed</span> <span class="k">is</span> <span class="kc">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">throw</span> <span class="k">new</span> <span class="n">Exception</span><span class="p">(</span><span class="s">$&#34;No user found with the test name: {name?.Name}&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">await</span> <span class="n">UserRepository</span><span class="p">.</span><span class="n">LoadAsync</span><span class="p">(</span><span class="n">constructed</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>Let us break it down.</p>
+<ol>
+<li>Just to be safe, wait for the construction of all users to be finished.</li>
+<li>If this method is accessed when there are multiple users created ensure that a name is used as argument.<span class="note">8</span>
+
+<span class="sidenote">
+    
+8. Using guards and assertions in your test-utils can be a real time-saver for future you!
+
+</span>
+</li>
+<li>Get the representation of the created user matching the given name, or use the first as default.</li>
+<li>If there is no result, fail with a helpful message.</li>
+<li>Read and return the latest version of this aggregate.<span class="note">9</span>
+
+<span class="sidenote">
+    
+9. Yes, there is plenty of I/O hidden in this builder. But I rather have I/O than stale data to assert on!
+
+</span>
+</li>
+</ol>
+<p>The representation of the created object mentioned at step 3, is a small data type for matching name to aggregate ID.
+This is what is kept in memory for created aggregates.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">internal</span> <span class="k">class</span> <span class="nc">ConstructedUser</span><span class="p">(</span><span class="n">User</span> <span class="n">user</span><span class="p">,</span> <span class="n">UserName</span> <span class="n">userName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kt">bool</span> <span class="n">IsMatch</span><span class="p">(</span><span class="n">UserName</span> <span class="n">name</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="n">name</span><span class="p">.</span><span class="n">Name</span> <span class="p">==</span> <span class="n">userName</span><span class="p">.</span><span class="n">Name</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>After using the test builder for quite a few tests I have noticed that the majority of tests only set up a single
+instance per type. So the behaviour of getting the single instance without giving a name argument helps keeping the
+tests more concise.</p>
+<h3 id="asserting">Asserting</h3>
+<p>Ok, now that we have acted on our service we want to implement the test that asserts that the track was actually
+set as favourite.</p>
+<p>Here is the test, so that you do not have to scroll:</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">UserOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">favouriteTracks</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">FavouriteService</span>
+</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">GetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">.</span><span class="n">ToListAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">var</span> <span class="n">favourites</span> <span class="p">=</span> <span class="n">favouriteTracks</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="n">favourites</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EqualTo</span><span class="p">(</span><span class="k">new</span> <span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;Glassy Eyes&#34;</span> <span class="p">}));</span>
+</span></span></code></pre></div>
+</div>
+<p>As we have done so far, let us take this step by step.</p>
+<ol>
+<li>First, we get the user using the mechanism we just discussed.</li>
+<li>Get the list of favourite tracks by accessing the service.</li>
+<li>I order to produce a helpful test failure message<span class="note">10</span>
+, select the title for each favourite track.
+<span class="sidenote">
+    
+10. Try to be as specific as possible in the assertion. Using `Count` in this test would hide an error where the wrong track was set as favourite.
+
+</span>
+</li>
+<li>Assert that the actual favourite tracks are the expected tracks by title.</li>
+</ol>
+<h2 id="another-test">Another test</h2>
+<p>Let us have a look at another test, one where multiple tracks, from different albums, are to be set as favourites.</p>
+<p>This test exercise the test-data names a lot more than the previous one did. I personally find it quite easy to read
+and to produce the mental graph of the objects and their relationships. Most of the details seen are the significant
+details of the tests, then, of course, there is some verbosity in type signatures, courtesy of C#.</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">WhenGettingFavouriteTracksAcrossAlbums</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Not only using authentic data, it is also great songs (and albums)!</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="k">readonly</span> <span class="n">AlbumName</span> <span class="n">SeventeenSeconds</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">&#34;Seventeen Seconds&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="k">readonly</span> <span class="n">AlbumName</span> <span class="n">Wish</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">&#34;Wish&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="k">readonly</span> <span class="n">TrackName</span> <span class="n">AForest</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">&#34;A Forest&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="k">readonly</span> <span class="n">TrackName</span> <span class="n">Apart</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">&#34;Apart&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="kd">static</span> <span class="k">readonly</span> <span class="n">TrackName</span> <span class="n">ALetterToElise</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">&#34;A Letter to Elise&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">FavouriteTestCase</span> <span class="n">_tc</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [OneTimeSetUp]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">MarkTracksAsFavourite</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_tc</span> <span class="p">=</span> <span class="k">await</span> <span class="k">new</span> <span class="n">FavouriteTestCase</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithUser</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithArtist</span><span class="p">()</span> <span class="c1">// You know who it is, right?</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// These to albums will use the default artist, since there is only one.</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithAlbum</span><span class="p">(</span><span class="n">SeventeenSeconds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithAlbum</span><span class="p">(</span><span class="n">Wish</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// Add two favourite tracks</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithTrack</span><span class="p">(</span><span class="n">albumNamed</span><span class="p">:</span> <span class="n">SeventeenSeconds</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">AForest</span><span class="p">,</span> <span class="n">configure</span><span class="p">:</span> <span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">MarkAsFavourite</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithTrack</span><span class="p">(</span><span class="n">albumNamed</span><span class="p">:</span> <span class="n">Wish</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Apart</span><span class="p">,</span> <span class="n">configure</span><span class="p">:</span> <span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">MarkAsFavourite</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// Add a control track that is not yet a favourite.</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithTrack</span><span class="p">(</span><span class="n">albumNamed</span><span class="p">:</span> <span class="n">Wish</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">ALetterToElise</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">AsFavouriteTestCase</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">BuildAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">    [Test]</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span> <span class="n">It_should_have_two_favourite_tracks</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">UserOrThrowAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favouriteTracks</span> <span class="p">=</span> <span class="k">await</span> <span class="n">_tc</span><span class="p">.</span><span class="n">FavouriteService</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">GetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">ToListAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">favourites</span> <span class="p">=</span> <span class="n">favouriteTracks</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Assert</span><span class="p">.</span><span class="n">That</span><span class="p">(</span><span class="n">favourites</span><span class="p">,</span> <span class="n">Is</span><span class="p">.</span><span class="n">EquivalentTo</span><span class="p">(</span><span class="k">new</span> <span class="p">[]</span> <span class="p">{</span> <span class="s">&#34;A Forest&#34;</span><span class="p">,</span> <span class="s">&#34;Apart&#34;</span> <span class="p">}));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<h3 id="improvements">Improvements</h3>
+<p>If you like what you see I would recommend you to start fairly simple and grow your test-builder over time. A few things
+we have done at work is.</p>
+<p>We have an abstract <code>TestCaseBuilder</code> that implements all generic operations (CRUD) for all our aggregates. Then we have
+concrete implementations for each area we are testing. So if there is a service, similar to the <code>FavouriteService</code>,
+there is a <code>FavouriteServiceTestCase</code> subclass that sets up the service, and implement any convenience methods that are
+only relevant in the tests of that service, such as:</p>
+<div class="fullwidth">
+    <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="kd">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;&gt;</span> <span class="n">FavouriteTrackNamesAsync</span><span class="p">(</span><span class="n">UserName</span> <span class="n">name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">user</span> <span class="p">=</span> <span class="k">await</span> <span class="n">UserOrThrowAsync</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="k">await</span> <span class="n">FavouriteService</span><span class="p">.</span><span class="n">GetFavouriteTracksAsync</span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">Id</span><span class="p">,</span> <span class="n">CancellationToken</span><span class="p">.</span><span class="n">None</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">t</span> <span class="p">=&gt;</span> <span class="n">t</span><span class="p">.</span><span class="n">Title</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">ToListAsync</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
+</div>
+<p>The construction of arbitrary objects does not have to be part of the builder. Some of them can be shifted to a static
+class that is fully synchronous and also very helpful to use in smaller, unit-tests.</p>
+<p>It might be tempting to generalize the test-data name implementations and the representation of constructed objects. If
+you do, make sure that no signature use primitive or generic types. To have a type-safe builder cost slightly more in
+terms of verbosity but can save hours when you debug why your expected test-data is not there!</p>
+<h2 id="a-full-example">A full example</h2>
+<p>The code examples from this article is also available in this <a href="https://github.com/eliasson/test-data-builder/">repository</a>
+at GitHub. It might be that the example code looks slightly different from the examples above since we explored the
+builder step by step in the article.</p>
+<p>The support for the <code>Album</code> aggregate is the one with guide comments:
+<a href="https://github.com/eliasson/test-data-builder/blob/main/Code.Tests/TestCaseBuilder.Album.cs">TestCaseBuilder.Album.cs</a>.</p>
+<h2 id="final-notes">Final notes</h2>
+<p>I am very happy with how our test builder turned out. Excited enough to write the code and article to illustrate this!</p>
+<p>It certainly saves us time to write new test and any improvement or correction in the default test-data is shared among
+the tests automatically.</p>
+<p>Thank you for reading! I hope this walkthrough gave you some inspiration or ideas on how to improve your own tests. If
+you have any thoughts or questions please <a href="mailto:markus.eliasson@gmail.com">reach out</a>.</p>
+
+        </section>
+    </article>
+
+    <footer>
+    <h1>Markus Eliasson<span class="is-red-period">.</span></h1>
+    <p>A thorough technical lead with a passion for producing valuable and clean code. Tends to occasionally blog about building software and can&#39;t seem to make up his mind on which programming language to use next.</p>
+    <p>
+        <a href="mailto:markus.eliasson@gmail.com" class="no-feedback">markus.eliasson@gmail.com</a>
+    </p>
+    <ul class="social">
+        
+            <li>
+                <a href="https://github.com/eliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-github"></use>"</svg>
+                </a>
+            </li>
+        
+            <li>
+                <a href="http://www.linkedin.com/in/markuseliasson" class="no-feedback">
+                    <svg class="is-icon"><use xlink:href="#icon-linkedin"></use>"</svg>
+                </a>
+            </li>
+        
+    </ul>
+</footer>
+
+    
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <symbol id="icon-github" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        </symbol>
+
+        <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect>
+            <circle cx="4" cy="4" r="2"></circle>
+        </symbol>
+    </defs>
+</svg>
+</body>
+
+</html>
+
