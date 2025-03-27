@@ -66,7 +66,6 @@ object-oriented languages.
 <div class="fullwidth">
     <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">interface</span> <span class="nc">IAggregate</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="c1">// As this is an example, use Guid instead a type-safe ID.</span>
 </span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Guid</span> <span class="n">Id</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
@@ -140,7 +139,7 @@ favourite.</p>
 <div class="fullwidth">
     <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">WithoutTheBuilder</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">UserRepository</span> <span class="n">_userRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;</span> <span class="n">_userRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
 </span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Artist</span><span class="p">&gt;</span> <span class="n">_artistRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
 </span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Album</span><span class="p">&gt;</span> <span class="n">_albumRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
 </span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Track</span><span class="p">&gt;</span> <span class="n">_trackRepository</span> <span class="p">=</span> <span class="kc">null</span><span class="p">!;</span>
@@ -153,7 +152,7 @@ favourite.</p>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// First, we need to set up the infra to store our stuff.</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// Due to validation rules we must create the correct graph of aggregates.</span>
-</span></span><span class="line"><span class="cl">        <span class="n">_userRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">UserRepository</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_userRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">User</span><span class="p">&gt;();</span>
 </span></span><span class="line"><span class="cl">        <span class="n">_artistRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Artist</span><span class="p">&gt;();</span>
 </span></span><span class="line"><span class="cl">        <span class="n">_albumRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Album</span><span class="p">&gt;();</span>
 </span></span><span class="line"><span class="cl">        <span class="n">_trackRepository</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Repository</span><span class="p">&lt;</span><span class="n">Track</span><span class="p">&gt;();</span>
@@ -200,7 +199,7 @@ have a consistent model, etc. This is typically done both in the domain model an
 example above, there can be constraints at the persistence layer, that a track cannot be saved unless
 its album reference also exists.</p>
 <p>Now, think about your own system. I am pretty confident that your entities are a lot more complex than the example
-above. If this was not an example made to be simple, the maybe the <code>Album</code> would require us to add information about
+above. If this was not an example made to be simple, then maybe the <code>Album</code> would require us to add information about
 the label. The tracks to include details about composers, etc.</p>
 <p>Take this mental image of a complex domain and then how it would look having to be setup in thousands<span class="note">4</span>
 
@@ -389,7 +388,7 @@ are writing our tests for.</p>
 </div>
 <h3 id="acting-on-test-data">Acting on test data</h3>
 <p>At the very end of our test setup, we want to act on our service to set a track as favourite. But in order to do that
-we need to get hold of the acting user and the track to favourite. Given that we asked the test-builder to create if
+we need to get hold of the acting user and the track to favourite. Given that we asked the test-builder to create it
 for us, we have no reference to those objects around.</p>
 <p>This is where the <em>test-data name</em> comes in.</p>
 <p>The method call <code>.WithUser()</code> made in the test setup is using the default argument for the <code>name</code>, which is <code>null</code>.</p>
@@ -488,7 +487,7 @@ set as favourite.</p>
 <ol>
 <li>First, we get the user using the mechanism we just discussed.</li>
 <li>Get the list of favourite tracks by accessing the service.</li>
-<li>I order to produce a helpful test failure message<span class="note">10</span>
+<li>In order to produce a helpful test failure message<span class="note">10</span>
 , select the title for each favourite track.
 <span class="sidenote">
     
@@ -520,7 +519,7 @@ details of the tests, then, of course, there is some verbosity in type signature
 </span></span><span class="line"><span class="cl">        <span class="n">_tc</span> <span class="p">=</span> <span class="k">await</span> <span class="k">new</span> <span class="n">FavouriteTestCase</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithUser</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithArtist</span><span class="p">()</span> <span class="c1">// You know who it is, right?</span>
-</span></span><span class="line"><span class="cl">            <span class="c1">// These to albums will use the default artist, since there is only one.</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// These two albums will use the default artist, since there is only one.</span>
 </span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithAlbum</span><span class="p">(</span><span class="n">SeventeenSeconds</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">WithAlbum</span><span class="p">(</span><span class="n">Wish</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">            <span class="c1">// Add two favourite tracks</span>
